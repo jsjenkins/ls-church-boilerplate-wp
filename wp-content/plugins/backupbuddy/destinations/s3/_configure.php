@@ -24,11 +24,11 @@ if ( ( 'add' == $mode ) || ( 'edit' == $mode ) ) {
 $default_name = NULL;
 
 if ( $mode != 'save' ) {
-	
+
 	if ( $mode == 'add' ) {
 		$default_name = 'My S3';
 	}
-	
+
 } else { // save mode
 	if ( isset( $_POST['pb_backupbuddy_directory'] ) ) {
 		$_POST['pb_backupbuddy_bucket'] = strtolower( $_POST['pb_backupbuddy_bucket'] ); // bucket must be lower-case.
@@ -53,7 +53,7 @@ $settings_form->add_setting( array(
 	'title'		=>		__( 'AWS access key', 'it-l10n-backupbuddy' ),
 	'tip'		=>		__( '[Example: BSEGHGSDEUOXSQOPGSBE] - Log in to your Amazon S3 AWS Account and navigate to Account: Access Credentials: Security Credentials.', 'it-l10n-backupbuddy' ),
 	'rules'		=>		'required|string[1-45]',
-	'after'		=>		' <a target="_new" href="http://ithemes.com/codex/page/BackupBuddy_Remote_Destinations:_Amazon_S3">Help setting up S3</a>',
+	'after'		=>		' <a target="_new" href="https://ithemeshelp.zendesk.com/hc/en-us/articles/211129517-Amazon-S3">Help setting up S3</a>',
 ) );
 
 

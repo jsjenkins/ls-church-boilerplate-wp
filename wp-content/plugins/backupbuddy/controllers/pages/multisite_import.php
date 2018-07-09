@@ -29,20 +29,20 @@ wp_print_scripts( 'backupbuddy-ms-export' );
 $action = isset( $_GET[ 'action' ] ) ? $_GET[ 'action' ] : false;
 ?>
 <div class='wrap'>
-<p>For BackupBuddy Multisite documentation, please visit the <a href='http://ithemes.com/codex/page/BackupBuddy_Multisite'>BackupBuddy Multisite Codex</a>.</p>
+<p>For BackupBuddy Multisite documentation, please visit the <a href='https://ithemeshelp.zendesk.com/hc/en-us/articles/115004532967-Backup-Restore-and-Migrate-with-BackupBuddy-Multisite-Experimental-'>BackupBuddy Multisite Codex</a>.</p>
 <?php
 //check_admin_referer( 'bbms-migration', 'pb_bbms_migrate' );
-if ( !current_user_can( 'manage_sites' ) ) 
+if ( !current_user_can( 'manage_sites' ) )
 	wp_die( __( 'You do not have permission to access this page.','it-l10n-backupbuddy' ) );
 //global $current_blog;
-$errors = false;	
+$errors = false;
 $blog = $domain = $path = '';
 
 // ********** BEGIN IMPORT OPTIONS **********
 $import_options = array(
 	'zip_id' => '',
 	'extract_to' => '',
-		
+
 	'show_php_warnings' => false,
 	'type' => 'zip',
 	'skip_files' => false,
@@ -62,34 +62,34 @@ $pluginbuddy_ms_import = new pluginbuddy_ms_import( $action, $import_options );
 
 class pluginbuddy_ms_import {
 	var $import_options;
-	
+
 	public function __construct( $action, $import_options ) {
 		$this->import_options = $import_options;
 		if ( ( $this->import_options['zip_id'] == '' ) && ( isset( $this->import_options['file'] ) ) ) {
 			$this->import_options['zip_id'] = $this->get_zip_id( basename( $this->import_options['file'] ) );
 		}
-		
+
 		// Detect max execution time for database steps so they can pause when needed for additional PHP processes.
 		$this->detected_max_execution_time = str_ireplace( 's', '', ini_get( 'max_execution_time' ) );
 		if ( is_numeric( $this->detected_max_execution_time ) === false ) {
 			$this->detected_max_execution_time = 30;
 		}
-		
-		
+
+
 		// Set advanced options if they have been passed along.
 		if ( isset( $_POST['global_options'] ) && ( $_POST['global_options'] != '' ) ) {
 			$this->advanced_options = json_decode( base64_decode( $_POST['global_options'] ), true );
 		}
-		
+
 		$this->time_start = microtime( true );
-		
-		// Temporarily unzips into the main sites uploads temp 
+
+		// Temporarily unzips into the main sites uploads temp
 		$wp_uploads = wp_upload_dir();
 		$this->import_options[ 'extract_to' ] = $wp_uploads[ 'basedir' ] . '/backupbuddy_temp/import_' . $this->import_options[ 'zip_id' ];
-		
+
 		global $current_blog;
 		$import_steps = 8;
-		
+
 		switch( $action ) {
 			case 'step2':
 				echo '<h3>Step 2 of ' . $import_steps . ': Create Site</h3>';
@@ -126,33 +126,33 @@ class pluginbuddy_ms_import {
 				break;
 		} //end switch
 	}
-	
+
 	function load_backup_dat() {
 		pb_backupbuddy::anti_directory_browsing( backupbuddy_core::getTempDirectory(), $die = false );
-		
+
 		$dat_file = $this->import_options[ 'extract_to' ] . '/' . str_replace( ABSPATH, '', backupbuddy_core::getTempDirectory() ) . $this->import_options[ 'zip_id' ] . '/backupbuddy_dat.php';
 		$this->_backupdata = $this->get_backup_dat( $dat_file );
 	}
-	
-	
+
+
 	function get_backup_dat( $dat_file ) {
 		require_once( pb_backupbuddy::plugin_path() . '/classes/import.php' );
 		$import = new pb_backupbuddy_import();
-		
+
 		return backupbuddy_core::get_dat_file_array( $dat_file );
 	}
-	
-	
+
+
 	function get_ms_option( $blogID, $option_name ) {
 		global $wpdb;
-		
+
 		$sql = "SELECT option_value FROM `" . DB_NAME . "`.`" . $wpdb->get_blog_prefix( $blogID ) . "options` WHERE `option_name` = %s";
 		$query = $wpdb->prepare( $sql, $option_name );
 		$option_value = $wpdb->get_var( $query );
 		return $option_value;
 	}
-	
-	
+
+
 	/**
 	 *	array_remove()
 	 *
@@ -168,8 +168,8 @@ class pluginbuddy_ms_import {
 		}
 		return array_values( array_diff( $array, $remove ) );
 	}
-	
-	
+
+
 	/**
 	 *	status_box()
 	 *
@@ -180,9 +180,9 @@ class pluginbuddy_ms_import {
 	 */
 	function status_box( $default_text = '' ) {
 		return '<textarea readonly="readonly" style="width: 100%;" rows="10" cols="75" id="importbuddy_status" wrap="off">' . $default_text . '</textarea><br><br>';
-	}		
-	
-	
+	}
+
+
 	/**
 	 *	status()
 	 *
@@ -194,7 +194,7 @@ class pluginbuddy_ms_import {
 	 */
 	function status( $type, $message ) {
 		pb_backupbuddy::status( $type, $message );
-		
+
 		$status_lines = pb_backupbuddy::get_status( 'ms_import', true, true, true ); // $serial = '', $clear_retrieved = true, $erase_retrieved = true, $hide_getting_status = false
 		if ( $status_lines !== false ) { // Only add lines if there is status contents.
 			foreach( $status_lines as $status_line ) {
@@ -202,15 +202,15 @@ class pluginbuddy_ms_import {
 				$status_line['time'] = pb_backupbuddy::$format->date( pb_backupbuddy::$format->localize_time( $status_line['time'] ) );
 				$status_line['run'] .= 'sec';
 				$status_line['mem'] .= 'MB';
-				echo '<script type="text/javascript">jQuery( "#importbuddy_status" ).append( "\n' . 
+				echo '<script type="text/javascript">jQuery( "#importbuddy_status" ).append( "\n' .
 					$status_line['time'] . "\t" . $status_line['run'] . "\t" . $status_line['mem'] . "\t" . $status_line['event'] . "\t" . $status_line['data']
 				 . '");	textareaelem = document.getElementById( "importbuddy_status" );	textareaelem.scrollTop = textareaelem.scrollHeight;	</script>';
 				pb_backupbuddy::flush();
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 *	get_zip_id()
 	 *
@@ -233,17 +233,17 @@ class pluginbuddy_ms_import {
 		} else {
 			$zip_id = strrpos($file,'_')+1;
 		}
-		
+
 		$zip_id = substr( $file, $zip_id, - 4 );
 		return $zip_id;
 	}
-	
-	
-	
+
+
+
 	/*	remove_file()
-	 *	
+	 *
 	 *	Deletes a file.
-	 *	
+	 *
 	 *	@param		string		$file				Full path to file to delete.
 	 *	@param		string		$description		Description of file for logging.
 	 *	@param		boolean		$error_on_missing	default false. Whether to log an error for a missing file.
@@ -251,9 +251,9 @@ class pluginbuddy_ms_import {
 	 */
 	function remove_file( $file, $description, $error_on_missing = false ) {
 		$this->status( 'message', 'Deleting ' . $description . '...' );
-	
+
 		@chmod( $file, 0755 ); // High permissions to delete.
-		
+
 		if ( is_dir( $file ) ) { // directory.
 			$this->remove_dir( $file );
 			if ( file_exists( $file ) ) {

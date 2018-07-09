@@ -26,6 +26,10 @@ jQuery(document).ready(function() {
 		jQuery(this).parents('.pb_backupbuddy_alert').slideUp();
 		
 	});
+
+	jQuery( '.pb_backupbuddy_alert[rel="deprecated_s3_destinations"] ').on('click', '.backupbuddy-nag-button', function() {
+		jQuery(this).parent().siblings('.more_info').slideToggle();
+	});
 	
 	
 	

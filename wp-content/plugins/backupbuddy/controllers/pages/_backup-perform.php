@@ -79,11 +79,11 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		return false;
 	}
 	unset( $deployDataRaw );
-	
+
 	$profile_array['backup_nonwp_tables'] = '2';
 	$profile_array['profile_globaltables'] = '0';
 	$profile_array['profile_globalexcludes'] = '0';
-	
+
 	$profile_array['mysqldump_additional_includes'] = implode( "\n", (array)pb_backupbuddy::_POST( 'tables' ) );
 	$tables = (array)pb_backupbuddy::_POST( 'tables' );
 	//array_walk( $tables, create_function('&$val', '$val = trim($val);'));
@@ -116,14 +116,14 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		alert( "Error #82389: <?php _e( 'A javascript error occurred which may prevent the backup from continuing. Check your browser error console for details. This is most often caused by another plugin or theme containing broken javascript. See details below for clues or try temporarily disabling all other plugins.', 'it-l10n-backupbuddy' ); ?>\n\nDetails: `" + errorMsg + "`.\n\nURL: `" + url + "`.\n\nLine: `" + lineNumber + "`." );
 		backupbuddy_log( 'Javascript Error. Message: `' + errorMsg + '`, URL: `' + url + '`, Line: `' + lineNumber + '`, Col: `' + colNumber + '`, Trace: `' + error.stack + '`.' ); // Attempt to log.
 	}
-	
+
 	var statusBox; // #backupbuddy_messages
 	var statusBoxQueueEnabled = true; // When true status box updates will queue to prevent DOM from being flooded and freezing. Set false when backup is ending to prevent anything from not being shown.
 	var statusBoxQueue = ''; // Queue of text to append into message box.
 	var statusBoxLastAppendTime = 0; // Store timestamp of last append to prevent updating the DOM too often. Cache in memory until 1 second (or some reasonable period) passes between appends.
 	var statusBoxAutoScroll = true;
 	var statusBoxLimit = false;  // False for no limit.  Integer for limiting to latest X lines. Number of lines set in backupbuddy_constants::BACKUP_STATUS_BOX_LIMIT_OPTION_LINES.
-	
+
 	var stale_archive_time_trigger = 30; // If this time ellapses without archive size increasing warn user that something may have gone wrong.
 	var stale_sql_time_trigger = 30; // If this time ellapses without archive size increasing warn user that something may have gone wrong.
 	var stale_archive_time_trigger_increment = 1; // Number of times the popup has been shown.
@@ -139,7 +139,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 	var seconds_before_verifying_cron_schedule = 15; // How many seconds must elapse while in the cronPass action before polling WP to check and see if the schedule exists.
 	var status_503_retry_limit = 250; // How many times should we retry when we recieve a 503 (probably because of .maintenance) before giving up?
 	var status_503_retry_count = 0; // The number of times we have retried the poll because of a 503 error.
-	
+
 	// Vars used by events.
 	var backupbuddy_currentFunction = '';
 	var backupbuddy_currentAction = '';
@@ -150,15 +150,15 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 	var backupbuddy_cancelClicked = false;
 	var backupbuddy_serial = '<?php echo $serial_override; ?>';
 	var isInDeployLog = false;
-	
+
 	// Misc
 	var statusURL = '<?php echo pb_backupbuddy::ajax_url( 'backup_status' ); ?>'; // AJAX status check URL. Gets log from server for this backup / process.
 	var loadingIndicator = ''; // jQuery('.pb_backupbuddy_loading') for speed.
-	
+
 	// Tells BackupBuddy to stop the running backup.
 	// cb = optional callback function.
 	function backupbuddy_ajax_call_stop( cb ) {
-		jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'stop_backup' ); ?>', { serial: '<?php echo $serial_override; ?>' }, 
+		jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'stop_backup' ); ?>', { serial: '<?php echo $serial_override; ?>' },
 			function(data) {
 				data = jQuery.trim( data );
 				if ( data.charAt(0) != '1' ) {
@@ -176,11 +176,11 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			}
 		);
 	}
-	
+
 	jQuery(document).ready(function() {
-		
+
 		loadingIndicator = jQuery( '.pb_backupbuddy_loading' );
-		
+
 		// Scroll to top on clicking Status tab.
 		jQuery( '.nav-tab-1' ).click( function(){
 			statusBox = jQuery( '#backupbuddy_messages' );
@@ -190,55 +190,55 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 				statusBox.scrollTop( statusBox[0].scrollHeight - statusBox.height() );
 			}
 		});
-		
+
 		<?php
 		// For MODERN mode we will wait until the DOM fully loads before beginning polling the server status.
 		if ( $profile_array['backup_mode'] != '1' ) { // NOT classic mode. Run once doc ready.
 			echo "setTimeout( 'backupbuddy_poll()', 500 );";
 		}
 		?>
-		
+
 		jQuery( '#pb_backupbuddy_archive_send' ).click( function(e) {
 			e.preventDefault();
 			jQuery( '.bb_actions_remotesent' ).hide();
 			jQuery('.bb_destinations').toggle();
 		});
-		
+
 		jQuery('.bb_destinations-existing .bb_destination-item a').click( function(e){
 			e.preventDefault();
-			
+
 			if ( jQuery(this).parent().hasClass( 'bb_destination-item-disabled' ) ) {
 				alert( 'This remote destination is unavailable.  It is either disabled in its Advanced Settings or not compatible with this server.' );
 				return false;
 			}
-			
+
 			destinationID = jQuery(this).attr( 'rel' );
 			console.log( 'Send to destinationID: `' + destinationID + '`.' );
 			pb_backupbuddy_selectdestination( destinationID, jQuery(this).attr( 'title' ), jQuery('#pb_backupbuddy_archive_send').attr('rel'), jQuery('#pb_backupbuddy_remote_delete').is(':checked') );
 		});
-		
+
 		jQuery( '.bb_destination-new-item a' ).click( function(e){
 			e.preventDefault();
-			
+
 			if ( jQuery(this).parent('.bb_destination-item').hasClass('bb_destination-item-disabled') ) {
 				alert( 'Error #848448: This destination is not available on your server.' );
 				return false;
 			}
-			
+
 			tb_show( 'BackupBuddy', '<?php echo pb_backupbuddy::ajax_url( 'destination_picker' ); ?>&add=' + jQuery(this).attr('rel') + '&filter=' + jQuery(this).attr('rel') + '&callback_data=' + jQuery('#pb_backupbuddy_archive_send').attr('rel') + '&sending=1&TB_iframe=1&width=640&height=455', null );
 		});
-		
+
 		jQuery( '#pb_backupbuddy_stop' ).click( function(e) {
 			e.preventDefault();
-			
+
 			statusBoxQueueEnabled = false;
 			backupbuddy_cancelClicked = true;
-			
+
 			setTimeout(function(){
 				jQuery( '.backup-step-active').removeClass('backup-step-active');
 				jQuery( '.bb_progress-step-active').removeClass('bb_progress-step-active');
 			},2200);
-			
+
 			//jQuery( '.backup-step-active').addClass('backup-step-error').removeClass('backup-step-active');
 			jQuery( '.backup-step-active').removeClass('backup-step-active');
 			jQuery( '.bb_progress-step-active').removeClass('bb_progress-step-active');
@@ -249,24 +249,24 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			jQuery( '.bb_actions').hide();
 			jQuery( '.pb_actions_cancelled').show();
 			jQuery( '.bb_progress-step-unfinished').removeClass( 'bb_progress-step-unfinished' );
-			
+
 			jQuery(this).html( 'Cancelling ...' );
 			backupbuddy_log( '' );
 			backupbuddy_log( "***** BACKUP CANCELLED - Forcing backup to skip to cleanup step as soon as possible. *****" );
 			backupbuddy_log( '' );
-			
+
 			backupbuddy_ajax_call_stop();
-			
+
 			return false;
 		});
-		
+
 		jQuery( '.pb_backupbuddy_deployUndo' ).click( function(){
 			backupbuddy_ajax_call_stop();
 			return true;
 		});
-		
-		
-		
+
+
+
 		// Toggle auto scrolling on/off. Set as var for faster checking by rapidly updating status box.
 		jQuery( '#backupbuddy-status-autoscroll' ).click( function(){
 			if ( jQuery(this).is(':checked') ) {
@@ -275,9 +275,9 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 				statusBoxAutoScroll = false;
 			}
 		});
-		
-		
-		
+
+
+
 		jQuery( '#backupbuddy-status-limit' ).click( function(){
 			if ( jQuery(this).is(':checked') ) {
 				statusBoxLimit = <?php echo backupbuddy_constants::BACKUP_STATUS_BOX_LIMIT_OPTION_LINES; ?>;
@@ -285,13 +285,13 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 				statusBoxLimit = false;
 			}
 		});
-		
-		
-		
+
+
+
 		<?php if ( isset( $deployData ) ) { ?>
 			jQuery( '.btn-confirm-deploy' ).click( function(){
 				confirmDeployButton = jQuery(this);
-				jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'deploy_confirm' ); ?>', { serial: '<?php echo $serial_override; ?>', direction: '<?php echo $direction; ?>', destinationID: '<?php echo $deployData['destination_id']; ?>' }, 
+				jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'deploy_confirm' ); ?>', { serial: '<?php echo $serial_override; ?>', direction: '<?php echo $direction; ?>', destinationID: '<?php echo $deployData['destination_id']; ?>' },
 					function(data) {
 						data = jQuery.trim( data );
 						if ( data.charAt(0) != '1' ) {
@@ -302,24 +302,24 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 						}
 					}
 				);
-					
+
 				return true;
 			});
 		<?php } ?>
-		
+
 	}); // end on jquery ready.
-	
-	
-	
+
+
+
 	<?php
 	if ( $profile_array['backup_mode'] == '1' ) { // CLASSIC mode. Run right away so we can show output before page finishes loading (backup fully finishes).
 		echo "setTimeout( 'backupbuddy_poll()', 2000 );";
 	}
 	?>
-	
-	
-	
-	
+
+
+
+
 	function backupbuddy_showSuggestions( suggestionList ) {
 		//suggestionList.forEach( function(suggestion){
 		for (var k in suggestionList){
@@ -330,19 +330,19 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			backupbuddy_log( '***' );
 		}
 	}
-	
-	
+
+
 	function backupbuddy_bytesToSize(bytes) {
 		var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
 		if (bytes == 0) return '0 Byte';
 		var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 		return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
 	};
-	
-	
+
+
 	function pb_backupbuddy_selectdestination( destination_id, destination_title, callback_data, delete_after, mode ) {
 		if ( callback_data != '' ) {
-			jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'remote_send' ); ?>', { destination_id: destination_id, destination_title: destination_title, file: callback_data, trigger: 'manual', delete_after: delete_after }, 
+			jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'remote_send' ); ?>', { destination_id: destination_id, destination_title: destination_title, file: callback_data, trigger: 'manual', delete_after: delete_after },
 				function(data) {
 					data = jQuery.trim( data );
 					if ( data.charAt(0) != '1' ) {
@@ -353,7 +353,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 					}
 				}
 			);
-			
+
 			/* Try to ping server to nudge cron along since sometimes it doesnt trigger as expected. */
 			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>',
 				function(data) {
@@ -370,46 +370,46 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			?>?page=pb_backupbuddy_backup&custom=remoteclient&destination_id=' + destination_id;
 		}
 	}
-	
-	
-	
+
+
+
 	/***** LOOK & FEEL *****/
-	
-	
-	
+
+
+
 	function backupbuddy_redstatus() {
 		jQuery( '#ui-id-2' ).css( 'background', '#FF8989' );
 		jQuery( '#ui-id-2' ).css( 'color', '#000000' );
 	}
-	
-	
+
+
 	/***** HELPER FUNCTIONS *****/
-	
-	
-	
+
+
+
 	function unix_timestamp() {
 		return Math.round( ( new Date() ).getTime() / 1000 );
 	}
-	
-	
+
+
 	function backupbuddy_poll_altcron() {
 		if ( keep_polling != 1 ) {
 			return;
 		}
-		
+
 		jQuery.get(
 			'<?php echo admin_url('admin.php').'?pb_backupbuddy_alt_cron=true'; ?>',
 			function(data) {
 			}
 		);
 	}
-	
-	
-	
+
+
+
 	/***** BACKUP STATUS *****/
-	
-	
-	
+
+
+
 	/* backupbuddy_log()
 	 * Note: Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php, & maybe more.
 	 *
@@ -418,19 +418,19 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 	 *
 	 */
 	function backupbuddy_log( json, classType ) {
-		
+
 		if( 'undefined' === typeof statusBox ) { // No status box yet so may need to create it.
 			statusBox = jQuery( '#backupbuddy_messages' );
 			if( statusBox.length == 0 ) { // No status box yet so suppress.
 				return;
 			}
 		}
-		
+
 		maybeDeployPrefix = '';
 		if ( true === isInDeployLog ) {
 			maybeDeployPrefix = '* ';
 		}
-		
+
 		message = '';
 		if ( 'string' == ( typeof json ) ) {
 			if ( '' !== classType ) {
@@ -443,26 +443,26 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			}
 			message = json.date + '.' + json.u + " \t" + json.run + "sec \t" + json.mem + "MB\t" + maybeDeployPrefix + json.data;
 		}
-		
+
 		statusBoxQueue = statusBoxQueue + "\r\n" + message;
-		
+
 		if ( ( false === statusBoxQueueEnabled ) || ( ( ( new Date().getTime() ) - statusBoxLastAppendTime ) > 1000 ) ) { // Queue up any updates that happens faster than once per second and append all at once.
-			
+
 			if ( false !== statusBoxLimit ) { // If limiting status box length, check new length and slice it as needed.
-				
+
 				var tempStatusContents = ( statusBox.html() + statusBoxQueue ).split( "\n" ); // Get existing contents (if any) + new contents & split on newlines.
 				if ( tempStatusContents.length > statusBoxLimit ) { // If over limit then slice off the beginning lines.
 					tempStatusContents = tempStatusContents.slice( tempStatusContents.length - statusBoxLimit );
 				}
 				statusBox.html( tempStatusContents.join( "\n" ) ); // Replace current content with new shortened version.
 				tempStatusContents = ''; // Clear temp var.
-				
+
 			} else { // Normal, unlimited length status box.
-				
+
 				statusBox.append( statusBoxQueue ); // Append to existing content.
-				
+
 			}
-			
+
 			if ( false !== statusBoxAutoScroll ) { // Scroll to bottom of status box unless disabled.
 				if ( ( statusBox.length == 0 ) || ( 'undefined' == typeof statusBox[0] ) ) { // No status box yet so don't scroll.
 					return;
@@ -470,22 +470,22 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 					statusBox.scrollTop( statusBox[0].scrollHeight - statusBox.height() );
 				}
 			}
-			
+
 			statusBoxLastAppendTime = new Date().getTime(); // Mark last time we updated status box.
 			statusBoxQueue = ''; // Clear out queue.
 		}
 	}
-	
-	
-	
+
+
+
 	// left hour pad with zeros
 	function backupbuddy_hourpad(n) { return ("0" + n).slice(-2); }
-	
-	
+
+
 	backup_maybe_timed_out = 'Creating the backup archive may have timed out';
 	backup_db_maybe_timed_out = 'Creating the database backup archive may have timed out';
-	
-	
+
+
 	function backupbuddy_poll() {
 		if ( keep_polling != 1 ) {
 			if ( '' != statusBoxQueue ) { // If something left in queue then push it out. Should be checked elsewhere but just in case...
@@ -496,38 +496,38 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			}
 			return;
 		}
-		
+
 		// Check to make sure archive size is increasing. Warn if it seems to hang.
 		if ( ( last_archive_change != 0 ) && ( ( ( unix_timestamp() - last_archive_change ) > stale_archive_time_trigger ) ) ) {
-			
+
 			thisMessage = 'Warning: The backup archive file size has not increased in ' + stale_archive_time_trigger + ' seconds. If it does not increase in the next few minutes it most likely timed out. If the backup proceeds ignore this warning.';
 			//alert( thisMessage + "Subsequent warnings will be displayed in the Status Log which contains more details." );
 			backupbuddy_log( '***', 'notice' );
 			backupbuddy_log( thisMessage, 'notice' );
 			backupbuddy_log( '***', 'notice' );
 			errorHelp( backup_maybe_timed_out, thisMessage );
-			
+
 			stale_archive_time_trigger = 60 * 5 * stale_archive_time_trigger_increment;
 			stale_archive_time_trigger_increment++;
 		} else {
 			jQuery( '.backup-step-error-message_' + bb_hashCode( backup_maybe_timed_out ) ).slideUp();
 		}
-		
+
 		// Check to make sure sql dump size is increasing. Warn if it seems to hang.
 		if ( ( last_sql_change != 0 ) && ( ( ( unix_timestamp() - last_sql_change ) > stale_sql_time_trigger ) ) ) {
-			
+
 			thisMessage = 'Warning: The SQL database dump file size has not increased in ' + stale_sql_time_trigger + ' seconds. If it does not increase in the next few minutes it most likely timed out. If the backup proceeds ignore this warning.';
 			backupbuddy_log( '***', 'notice' );
 			backupbuddy_log( thisMessage, 'notice' );
 			backupbuddy_log( '***', 'notice' );
 			errorHelp( 'Creating the database backup may have timed out', thisMessage );
-			
+
 			stale_sql_time_trigger = 60 * 5 * stale_sql_time_trigger_increment;
 			stale_sql_time_trigger_increment++;
 		} else {
 			jQuery( '.backup-step-error-message_' + bb_hashCode( backup_db_maybe_timed_out ) ).slideUp();
 		}
-		
+
 		specialAction = '';
 		if ( 0 != loadingIndicator.length ) {
 			loadingIndicator.show();
@@ -539,23 +539,23 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 				specialAction = 'checkSchedule';
 			}
 		}
-		
+
 		jQuery.ajax({
-			
+
 			url:	statusURL,
 			type:	'post',
 			data:	{ serial: '<?php echo $serial_override; ?>', initwaitretrycount: backup_init_complete_poll_retry_count, specialAction: specialAction, sqlFile: current_sql_file },
 			context: document.body,
-			
+
 			success: function( data ) {
-				
+
 				if ( 0 != loadingIndicator.length ) {
 					loadingIndicator.hide();
 				}
-				
+
 				data = data.split( "\n" );
 				for( var i = 0; i < data.length; i++ ) {
-					
+
 					isJSON = false;
 					try {
 						var json = jQuery.parseJSON( data[i] );
@@ -576,7 +576,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 						}
 						isJSON = false;
 					}
-					
+
 					// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php
 					if ( ( true === isJSON ) && ( 'object' === typeof json ) && ( null !== json ) ) { // non-empty json
 						json.date = new Date();
@@ -586,9 +586,9 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 							seconds = '0' + seconds;
 						}
 						json.date = backupbuddy_hourpad( json.date.getHours() ) + ':' + json.date.getMinutes() + ':' + seconds;
-						
+
 						triggerEvent = 'backupbuddy_' + json.event;
-						
+
 						// Log non-text events.
 						if ( ( 'details' !== json.event ) && ( 'message' !== json.event ) && ( 'error' !== json.event ) ) {
 							//console.log( 'Non-text event `' + triggerEvent + '`.' );
@@ -596,7 +596,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 						} else {
 							//console.log( json.data );
 						}
-						
+
 						if( 'undefined' === typeof statusBox ) { // No status box yet so may need to create it.
 							statusBox = jQuery( '#backupbuddy_messages' );
 							if( statusBox.length == 0 ) { // No status box yet so suppress.
@@ -621,11 +621,11 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 						//alert( message );
 						backupbuddy_log( message );
 					}
-					
+
 					continue;
-					
+
 				} // end for.
-				
+
 				// Set the next server poll if applicable to happen in 2 seconds.
 				setTimeout( 'backupbuddy_poll()' , 2000 );
 				<?php // Handles alternate WP cron forcing.
@@ -633,7 +633,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 					echo '	setTimeout( \'backupbuddy_poll_altcron()\', 2000 );';
 				}
 				?>
-				
+
 			}, // end success.
 
 			error : function( xhr ) {
@@ -655,7 +655,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 					}
 				}
 			}, // end error
-			
+
 			error: function( xhr ) {
 				if ( 503 == xhr.status ) {
 					status_503_retry_count++;
@@ -675,7 +675,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 					}
 				}
 			}, // end error
-			
+
 			complete: function( jqXHR, status ) {
 				if ( ( status != 'success' ) && ( status != 'notmodified' ) ) {
 					if ( 0 != loadingIndicator.length ) {
@@ -683,15 +683,15 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 					}
 				}
 			} // end complete.
-			
+
 		}); // end ajax.
-		
+
 		// Check runtime of current action...
 		if ( '' !== backupbuddy_currentAction ) {
 			actionRunTime = unix_timestamp() - backupbuddy_currentActionStart;
 			sinceLastWarn = ( unix_timestamp() - backupbuddy_currentActionLastWarn );
-			
-			
+
+
 			if ( 'cronPass' == backupbuddy_currentAction ) {
 				if ( ( actionRunTime > 20 ) && ( sinceLastWarn > 45 ) ) { // sinceLastWarn is large number (timestamp) until set first time. so triggers off actionRunTime solely first.
 					backupbuddy_currentActionLastWarn = unix_timestamp();
@@ -704,8 +704,8 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 					backupbuddy_showSuggestions( [thisSuggestion] );
 				}
 			}
-			
-			
+
+
 			if ( 'importbuddyCreation' == backupbuddy_currentAction ) {
 				if ( ( actionRunTime > 10 ) && ( sinceLastWarn > 30 ) ) { // sinceLastWarn is large number (timestamp) until set first time. so triggers off actionRunTime solely first.
 					backupbuddy_currentActionLastWarn = unix_timestamp();
@@ -718,8 +718,8 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 					backupbuddy_showSuggestions( [thisSuggestion] );
 				}
 			}
-			
-			
+
+
 			if ( 'zipCommentMeta' == backupbuddy_currentAction ) {
 				if ( ( actionRunTime > 10 ) && ( sinceLastWarn > 30 ) ) { // sinceLastWarn is large number (timestamp) until set first time. so triggers off actionRunTime solely first.
 					backupbuddy_currentActionLastWarn = unix_timestamp();
@@ -732,16 +732,16 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 					backupbuddy_showSuggestions( [thisSuggestion] );
 				}
 			}
-			
-			
+
+
 		} // end if an action is running.
-		
-		
-		
+
+
+
 	} // end backupbuddy_poll().
-	
-	
-	
+
+
+
 	function pb_status_append( status_string ) {
 		target_id = 'backupbuddy_messages'; // importbuddy_status or pb_backupbuddy_status
 		if( jQuery( '#' + target_id ).length == 0 ) { // No status box yet so suppress.
@@ -751,18 +751,18 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		textareaelem = document.getElementById( target_id );
 		textareaelem.scrollTop = textareaelem.scrollHeight;
 	}
-	
-	
-	
+
+
+
 	// Trigger an error to be logged, displayed, etc.
 	// Returns updated message with trouble URL, etc.
 	// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php
 	function backupbuddyError( message, title ) {
-		
+
 		// Get start of any error numbers.
 		troubleURL = '';
 		error_number_begin = message.toLowerCase().indexOf( 'error #' );
-		
+
 		if ( error_number_begin >= 0 ) {
 			error_number_begin += 7; // Shift over index to after 'error #'.
 			error_number_end = message.toLowerCase().indexOf( ':', error_number_begin );
@@ -774,7 +774,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			}
 			error_number = message.slice( error_number_begin, error_number_end );
 			rawMessage = message.slice( error_number_end + 2 );
-			troubleURL = 'http://ithemes.com/codex/page/BackupBuddy:_Error_Codes#' + error_number;
+			troubleURL = 'https://ithemeshelp.zendesk.com/hc/en-us/articles/211132377-Error-Codes-#4001' + error_number;
 			if ( 'undefined' === typeof title ) {
 				title = 'Error #' + error_number;
 			}
@@ -784,39 +784,39 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		if ( 'undefined' === typeof title ) {
 			title = 'Alert';
 		}
-		
+
 		//getErrorInfo( error_number );
-		
+
 		if ( '' !== troubleURL ) {
 			errorHelp( 'Alert', '<a href="' + troubleURL + '" target="_blank">' + title + '</a>', rawMessage + ' <a href="' + troubleURL + '" target="_blank">Click to <b>view error details</b> in the Knowledge Base</a>' );
 		} else {
 			errorHelp( title, rawMessage );
 		}
-		
+
 		// Display error box to make it clear errors were encountered.
 		backupbuddy_errors_encountered++;
 		jQuery( '#backupbuddy_errors_notice_count' ).text( backupbuddy_errors_encountered );
 		jQuery( '#backupbuddy_errors_notice' ).slideDown();
-		
+
 		// Make Status tab red.
 		jQuery( '.nav-tab-1' ).addClass( 'bb-nav-status-tab-error' );
-		
+
 		// If the word error is nowhere in the error message then add in error prefix.
 		if ( message.toLowerCase().indexOf( 'error' ) < 0 ) {
 			message = 'ERROR: ' + message;
 		}
-		
+
 		return message; // Return updated error message with trouble URL.
 	} // end backupbuddyError().
-	
-	
+
+
 	// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php
 	function backupbuddyWarning( message ) {
 		return 'Warning: ' + message;
 	} // end backupbuddyWarning().
-	
-	
-	
+
+
+
 	var shownErrorHelps = [];
 	function errorHelp( title, message ) {
 		if ( shownErrorHelps.indexOf( title ) > -1 ) {
@@ -824,18 +824,18 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		}
 		shownErrorHelps.push( title ); // Add to list of shown errors so it will not be shown multiple times.
 		errorHTML = '<div class="backup-step-error-message backup-step-error-message_' + bb_hashCode( title ) + '"><h3>' + title + '</h3>' + message + '</div>';
-		
+
 		if ( jQuery('.backup-step-active').length > 0 ) { // Target active function if currently is one, else target one after last to finish.
 			targetObj = jQuery('.backup-step-active');
 		} else {
 			targetObj = jQuery('.bb_overview .backup-step-finished:last').next('.backup-step');
 		}
 		jQuery(targetObj).append( errorHTML ).addClass('backup-step-error');
-		
+
 		// Make Status tab red.
 		jQuery( '.nav-tab-1' ).addClass( 'bb-nav-status-tab-error' );
 	}
-	
+
 	bb_hashCode = function( text ) {
 	  var hash = 0, i, chr;
 	  if (text.length === 0) return hash;
@@ -983,12 +983,12 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 						if ( ( 'site' == $destination['type'] ) || ( 'live' == $destination['type'] ) ) {
 							continue;
 						}
-						
+
 						$disabledClass= '';
 						if ( isset( $destination['disabled'] ) && ( '1' == $destination['disabled'] ) ) {
 							$disabledClass = 'bb_destination-item-disabled';
 						}
-						
+
 						echo '<li class="bb_destination-item bb_destination-' . $destination['type'] . ' ' . $disabledClass . '"><a href="javascript:void(0)" title="' . $destination['title'] . '" rel="' . $destination_id . '">' . $destination['title'] . '</a></li>';
 					}
 					?>
@@ -1015,12 +1015,12 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 						if ( ! isset( $destination['name'] ) ) { // Messed up destination.
 							continue;
 						}
-						
+
 						// Hide these destinations from list to add here.
 						if ( ( 'live' == $destination_name ) || ( 'site' == $destination_name ) ) {
 							continue;
 						}
-						
+
 						$thisDest = '';
 						$thisDest .= '<li class="bb_destination-item bb_destination-' . $destination_name . ' bb_destination-new-item ' . $disableClass . '">';
 						if ( 'stash3' == $destination_name ) {
@@ -1032,7 +1032,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 							$thisDest .= ' [Unavailable; ' . $destination['compatibility'] . ']';
 						}
 						$thisDest .= '</a></li>';
-						
+
 						if ( isset( $destination['category'] ) && ( 'best' == $destination['category'] ) ) {
 							$best .= $thisDest;
 							$bestCount++;
@@ -1055,9 +1055,9 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 								$normalCount = 0;
 							}
 						}
-						
+
 					}
-					
+
 					echo '<h3>' . __( 'Preferred', 'it-l10n-backupbuddy' ) . '</h3>' . $best;
 					echo '<br><br><hr style="max-width: 1200px;"><br>';
 					echo '<h3>' . __( 'Normal', 'it-l10n-backupbuddy' ) . '</h3>' . $normal;
@@ -1079,21 +1079,21 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		<b><?php _e('Archive size', 'it-l10n-backupbuddy' );?></b>:&nbsp; <span class="backupbuddy_archive_size">-- MB</span>
 	</span>
 	<?php
-	
-	
+
+
 	$active_tab = pb_backupbuddy::$options['default_backup_tab'];
 	pb_backupbuddy::$ui->start_tabs(
 		'settings',
 		array(
-			
-			
+
+
 			array(
 				'title'		=>		__( 'Overview', 'it-l10n-backupbuddy' ),
 				'slug'		=>		'general',
 				'css'		=>		'margin-top: -8px;',
 			),
-			
-			
+
+
 			array(
 				'title'		=>		__( 'Status Log', 'it-l10n-backupbuddy' ),
 				'slug'		=>		'advanced',
@@ -1104,9 +1104,9 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		true,
 		$active_tab
 	);
-	
-	
-	
+
+
+
 	pb_backupbuddy::$ui->start_tab( 'general' );
 	?>
 	<div class="bb_overview">
@@ -1208,7 +1208,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			<div class="backup-step-error-message" style="display: none;" id="backupbuddy_errors_notice">
 				<h3>Possible errors or warnings may have been encountered</h3>
 				See the Status Log in the tab above for details on detected errors.
-				<b>Not all errors are fatal and are sometimes normal.</b> Look up error codes & troubleshooting details in the <a href="http://ithemes.com/codex/page/BackupBuddy#Troubleshooting" target="_blank"><b>Knowledge Base</b></a>.
+				<b>Not all errors are fatal and are sometimes normal.</b> Look up error codes & troubleshooting details in the <a href="https://ithemeshelp.zendesk.com/hc/en-us/sections/202110027-Troubleshooting" target="_blank"><b>Knowledge Base</b></a>.
 				<b><i>Provide a copy of the Status Log if seeking support.</i></b>
 			</div>
 		</div>
@@ -1219,9 +1219,9 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 	</div>
 	<?php
 	pb_backupbuddy::$ui->end_tab();
-	
-	
-	
+
+
+
 	pb_backupbuddy::$ui->start_tab( 'advanced' );
 	?>
 	<pre wrap="off" id="backupbuddy_messages" style="width: 100%; font-family: Andale Mono, monospace; tab-size: 3; -moz-tab-size: 3; -o-tab-size: 3;">Time				Elapsed	Memory	Message</pre>
@@ -1242,8 +1242,8 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 	<br><br>
 	<?php
 	pb_backupbuddy::$ui->end_tab();
-	
-	
+
+
 	?>
 </div>
 
@@ -1260,28 +1260,28 @@ if ( $profile_array['backup_mode'] == '1' ) { // Classic mode (all in one page l
 			?>
 		</div>
 	</div>
-	
+
 	<?php // SCRIPT BELOW IS COPIED FROM pb_tabs.js ?>
 	<script>
 		// Change tab on click.
 		jQuery( '.backupbuddy-tabs-wrap .nav-tab[href^="#"]' ).click( function(e){ /* ignores any non hashtag links since they go direct to a URL... */
-			
+
 			e.preventDefault();
-			
+
 			// Hide all tab blocks.
 			thisTabBlock = jQuery(this).closest( '.backupbuddy-tabs-wrap' );
 			thisTabBlock.find( '.backupbuddy-tab' ).hide();
-			
+
 			// Update selected tab.
 			thisTabBlock.find( '.nav-tab-active' ).removeClass( 'nav-tab-active' );
 			jQuery(this).addClass( 'nav-tab-active' );
-			
+
 			// Show the correct tab block.
 			//targetDivID = jQuery(this).attr( 'href' ).substring(1);
 			thisTabBlock.find( jQuery(this).attr( 'href' ) ).show();
 		});
 	</script>
-	
+
 <?php }
 
 
@@ -1319,32 +1319,32 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 	$deployData['sourceMaxExecutionTime'] = pb_backupbuddy::_POST( 'sourceMaxExecutionTime' );
 	$deployData['destinationMaxExecutionTime'] = pb_backupbuddy::_POST( 'destinationMaxExecutionTime' );
 	$trigger = 'deployment';
-	
-	
+
+
 	// Determine bottleneck execution time.
 	$deployData['minimumExecutionTime'] = $deployData['sourceMaxExecutionTime'];
 	if ( $deployData['destinationMaxExecutionTime'] < $deployData['minimumExecutionTime'] ) {
 		$deployData['minimumExecutionTime'] = $deployData['destinationMaxExecutionTime'];
 	}
-	
+
 	if ( 'true' == pb_backupbuddy::_POST( 'sendTheme' ) ) {
 		$deployData['sendTheme'] = true;
 	} else {
 		$deployData['sendTheme'] = false;
 	}
-	
+
 	if ( 'true' == pb_backupbuddy::_POST( 'sendChildTheme' ) ) {
 		$deployData['sendChildTheme'] = true;
 	} else {
 		$deployData['sendChildTheme'] = false;
 	}
-	
+
 	if ( 'true' == pb_backupbuddy::_POST( 'doImportCleanup' ) ) {
 		$deployData['doImportCleanup'] = true;
 	} else {
 		$deployData['doImportCleanup'] = false;
 	}
-	
+
 	// Calculate plugin root directories we want to transfer.
 	$sendPlugins = pb_backupbuddy::_POST( 'sendPlugins' );
 	if ( ! is_array( $sendPlugins ) ) {
@@ -1356,10 +1356,10 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		$sendPluginDirs[] = dirname( '/' . $sendPlugin );
 		//$sendPluginFileLen = strlen( $sendPluginFile );
 	}
-	
+
 	// Remove any unselected plugins from the plugin files to transfer.
 	if ( 'push' == pb_backupbuddy::_GET( 'direction' ) ) {
-		foreach( $deployData['pushPluginFiles'] as $i => $pushPluginFile ) { // For each pushPluginFile make sure 
+		foreach( $deployData['pushPluginFiles'] as $i => $pushPluginFile ) { // For each pushPluginFile make sure
 			$firstDirSlash = strpos( str_replace( '\\', '/', $pushPluginFile ), '/', 1 );
 			$thisDir = substr( $pushPluginFile, 0, $firstDirSlash );
 			if ( ! in_array( $thisDir, $sendPluginDirs ) ) { // File is in directory we are not sending. Unset.
@@ -1367,7 +1367,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			}
 		}
 	} elseif ( 'pull' == pb_backupbuddy::_GET( 'direction' ) ) {
-		foreach( $deployData['pullPluginFiles'] as $i => $pullPluginFile ) { // For each pushPluginFile make sure 
+		foreach( $deployData['pullPluginFiles'] as $i => $pullPluginFile ) { // For each pushPluginFile make sure
 			$firstDirSlash = strpos( str_replace( '\\', '/', $pullPluginFile ), '/', 1 );
 			$thisDir = substr( $pullPluginFile, 0, $firstDirSlash );
 			if ( ! in_array( $thisDir, $sendPluginDirs ) ) { // File is in directory we are not sending. Unset.
@@ -1375,27 +1375,27 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	if ( 'true' == pb_backupbuddy::_POST( 'sendPlugins' ) ) {
 		$deployData['sendPlugins'] = true;
 	} else {
 		$deployData['sendPlugins'] = false;
 	}
-	
+
 	if ( 'true' == pb_backupbuddy::_POST( 'sendMedia' ) ) {
 		$deployData['sendMedia'] = true;
 	} else {
 		$deployData['sendMedia'] = false;
 	}
-	
+
 	if ( 'true' == pb_backupbuddy::_POST( 'sendExtras' ) ) {
 		$deployData['sendExtras'] = true;
 	} else {
 		$deployData['sendExtras'] = false;
 	}
-	
+
 	if ( '1' == pb_backupbuddy::_POST( 'setBlogPublic' ) ) {
 		$deployData['setBlogPublic'] = true;
 	} elseif ( '0' == pb_backupbuddy::_POST( 'setBlogPublic' ) ) {
@@ -1403,17 +1403,17 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 	} else {
 		$deployData['setBlogPublic'] = '';
 	}
-	
-	
+
+
 	if ( 'true' == pb_backupbuddy::_POST( 'doImportCleanup' ) ) {
 		$deployData['doImportCleanup'] = true;
 	} else {
 		$deployData['doImportCleanup'] = false;
 	}
-	
+
 	$deployData['destination_id'] = pb_backupbuddy::_POST( 'destination_id' );
-	
-	
+
+
 	if ( 'push' == pb_backupbuddy::_GET( 'direction' ) ) {
 		$post_backup_steps = array(
 			array(
@@ -1426,8 +1426,8 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		);
 		pb_backupbuddy::status( 'details', 'Deployment PUSH set to send to remote destination `' . $deployData['destination_id'] . '`. Added to post backup function steps.' );
 	} // end if PUSH type deployment.
-	
-	
+
+
 	if ( 'pull' == pb_backupbuddy::_GET( 'direction' ) ) {
 		$post_backup_steps = array(
 			array(
@@ -1440,8 +1440,8 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		);
 		pb_backupbuddy::status( 'details', 'Deployment PULL set to send to remote destination `' . $deployData['destination_id'] . '`. Added to post backup function steps.' );
 	} // end if PULL type deployment.
-	
-	
+
+
 } // end if deployment.
 $deployDestination = null;
 if ( isset( $deployData['destination'] ) ) {

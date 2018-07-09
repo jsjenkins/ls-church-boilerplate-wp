@@ -39,11 +39,11 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 <script type="text/javascript">
 	var statusBox; // Make global.
 	var backupbuddy_errors_encountered = 0; // number of errors sent via log.
-	
+
 	rollback_loadRestoreEvents();
-	
+
 	function backupbuddy_hourpad(n) { return ("0" + n).slice(-2); }
-	
+
 	function pb_status_append( json ) {
 		if( 'undefined' === typeof statusBox ) { // No status box yet so may need to create it.
 			statusBox = jQuery( '#pb_backupbuddy_status' );
@@ -51,7 +51,7 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 				return;
 			}
 		}
-		
+
 		// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php
 		json.date = new Date();
 		json.date = new Date(  ( json.time * 1000 ) + json.date.getTimezoneOffset() * 60000 );
@@ -60,10 +60,10 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 			seconds = '0' + seconds;
 		}
 		json.date = backupbuddy_hourpad( json.date.getHours() ) + ':' + json.date.getMinutes() + ':' + seconds;
-		
+
 		triggerEvent = 'backupbuddy_' + json.event;
-		
-		
+
+
 		// Log non-text events.
 		if ( ( 'details' !== json.event ) && ( 'message' !== json.event ) && ( 'error' !== json.event ) ) {
 			//console.log( 'Non-text event `' + triggerEvent + '`.' );
@@ -71,17 +71,17 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 			//console.log( json.data );
 		}
 		//console.log( 'trigger: ' + triggerEvent );
-		
+
 		jQuery('#pb_backupbuddy_status').trigger( triggerEvent, [json] );
-		
-		
+
+
 	} // End function pb_status_append().
-	
+
 	// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php and _rollback.php
 	function backupbuddy_log( json ) {
-		
+
 		message = '';
-		
+
 		if ( 'string' == ( typeof json ) ) {
 			message = "-----------\t\t-------\t-------\t" + json;
 		} else {
@@ -90,9 +90,9 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 
 		statusBox.append( "\r\n" + message );
 		statusBox.scrollTop( statusBox[0].scrollHeight - statusBox.height() );
-		
+
 	}
-	
+
 	// Trigger an error to be logged, displayed, etc.
 	// Returns updated message with trouble URL, etc.
 	// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php
@@ -112,7 +112,7 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 				error_number_end = message.toLowerCase().indexOf( ' ', error_number_begin );
 			}
 			error_number = message.slice( error_number_begin, error_number_end );
-			troubleURL = 'http://ithemes.com/codex/page/BackupBuddy:_Error_Codes#' + error_number;
+			troubleURL = 'https://ithemeshelp.zendesk.com/hc/en-us/articles/211132377-Error-Codes-#' + error_number;
 		}
 
 		if ( '' !== troubleURL ) {

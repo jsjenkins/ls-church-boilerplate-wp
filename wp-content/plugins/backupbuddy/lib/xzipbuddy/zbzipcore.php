@@ -244,6 +244,15 @@ if ( !class_exists( "pluginbuddy_zbzipcore" ) ) {
 		
 		}
 	
+		public function decr_added_dir_count( $decr = 1 ) {
+		
+			// Note: we cannot have negative content count so limit to 0
+			$this->_added_dir_count -= $decr;
+			$this->_added_dir_count = ( 0 > $this->_added_dir_count ) ? 0 : $this->_added_dir_count ;
+			return $this;
+		
+		}
+	
 		public function get_added_file_count() {
 		
 			return $this->_added_file_count;
@@ -260,6 +269,15 @@ if ( !class_exists( "pluginbuddy_zbzipcore" ) ) {
 		public function incr_added_file_count( $incr = 1 ) {
 		
 			$this->_added_file_count += $incr;
+			return $this;
+		
+		}
+		
+		public function decr_added_file_count( $decr = 1 ) {
+		
+			// Note: we cannot have negative content count so limit to 0
+			$this->_added_file_count -= $decr;
+			$this->_added_file_count = ( 0 > $this->_added_file_count ) ? 0 : $this->_added_file_count ;
 			return $this;
 		
 		}
@@ -382,7 +400,30 @@ if ( !class_exists( "pluginbuddy_zbzipcore" ) ) {
 			$this->_burst_content_size += (double)$content[ 'size' ];
 			++$this->_burst_content_count;
 			
-			$this->_burst_content_complete = ( $this->get_burst_current_size_threshold() <= $this->_burst_content_size );
+		}
+		
+		/**
+		 * 
+		 *	burst_content_removed()
+		 *
+		 *	Gives us information on what has just been removed from burst content so we
+		 *	can assess the progress against our criteria for completion of the current
+		 *	burst content.
+		 *
+		 *	@param		array		$content	Details about the item just removed
+		 *	@return		none
+		 *
+		 */
+		public function burst_content_removed( $content ) {
+		
+			// Decrement the appropriate count
+			( true === $content[ 'directory' ] ) ? $this->decr_added_dir_count() : $this->decr_added_file_count() ;
+			
+			// Decrement the total size of current burst - note that size/count shoudl not be allowed to go negtive
+			$this->_burst_content_size -= (double)$content[ 'size' ];
+			$this->_burst_content_size = ( 0 > $this->_burst_content_size ) ? 0 : $this->_burst_content_size ;
+			--$this->_burst_content_count;
+			$this->_burst_content_count = ( 0 > $this->_burst_content_count ) ? 0 : $this->_burst_content_count ;
 			
 		}
 		
@@ -398,6 +439,8 @@ if ( !class_exists( "pluginbuddy_zbzipcore" ) ) {
 		 */
 		public function burst_content_complete() {
 		
+			$this->_burst_content_complete = ( $this->get_burst_current_size_threshold() <= $this->_burst_content_size );
+			
 			return $this->_burst_content_complete;
 		
 		}

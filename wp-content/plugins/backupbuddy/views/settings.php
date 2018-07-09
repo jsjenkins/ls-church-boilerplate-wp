@@ -1,21 +1,11 @@
 <?php
 if ( !is_admin() ) { die( 'Access Denied.' ); }
-
-// Display additional information for users on Windows systems.
-/*
-if ( stristr( PHP_OS, 'WIN' ) && ! stristr( PHP_OS, 'DARWIN' ) ) { // Show in WINdows but not darWIN.
-	pb_backupbuddy::disalert( 'windows_boost', __('Windows servers may be able to significantly boost performance, if the server allows executing .exe files (or can be configured to allow this file as an exception), by adding native Zip compatibility executable files <a href="http://ithemes.com/backupbuddy_files/backupbuddy_windows_unzip.zip">available for download here</a>. Instructions are provided within the readme.txt in the package.  This package prevents Windows from falling back to Zip compatiblity mode and works for both BackupBuddy and importbuddy.php. This is particularly useful for <a href="http://ithemes.com/codex/page/BackupBuddy:_Local_Development">local development on a Windows machine using a system like XAMPP</a>.', 'it-l10n-backupbuddy' ) );
-}
-*/
 ?>
-
-
-
 <style type="text/css">
 	.pb_backupbuddy_customize_email_error_row, .pb_backupbuddy_customize_email_scheduled_start_row, .pb_backupbuddy_customize_email_scheduled_complete_row, .pb_backupbuddy_customize_email_send_finish_row {
 		display: none;
 	}
-	
+
 	.form-table th {
 		white-space: nowrap;
 	}
@@ -34,23 +24,23 @@ if ( stristr( PHP_OS, 'WIN' ) && ! stristr( PHP_OS, 'DARWIN' ) ) { // Show in WI
 			jQuery('#emailErrorNotifyHiddenAlert').hide();
 		}
 	}
-	
-	
+
+
 	var pb_settings_changed = false;
-	
+
 	jQuery(document).ready(function() {
-		
-		
+
+
 		checkEmailNotifyErrorStatus();
 		jQuery('#pb_backupbuddy_email_notify_error').change( function(e) {
 			checkEmailNotifyErrorStatus();
 		});
-		
-		
+
+
 		jQuery( 'a' ) .click( function(e) {
 			if ( jQuery(this).attr( 'class' ) == 'ui-tabs-anchor' ) {
 				if ( true == pb_settings_changed ) {
-					
+
 					if ( confirm( 'You have made changes that you have not saved by selecting the "Save Settings" button at the bottom of the page. Abandon changes without saving?' ) ) {
 						// Abandon!
 						pb_settings_changed = false;
@@ -66,12 +56,12 @@ if ( stristr( PHP_OS, 'WIN' ) && ! stristr( PHP_OS, 'DARWIN' ) ) { // Show in WI
 		jQuery( '.pb_form' ).change( function() {
 			pb_settings_changed = true;
 		});
-		
-		
-		
-		
+
+
+
+
 	});
-	
+
 	function pb_backupbuddy_selectdestination( destination_id, destination_title, callback_data, delete_after, mode ) {
 		window.location.href = '<?php echo pb_backupbuddy::page_url(); ?>&custom=remoteclient&destination_id=' + destination_id;
 	}
@@ -150,9 +140,9 @@ pb_backupbuddy::$ui->end_tab();
 
 
 <script type="text/javascript">
-	
-	
-	
+
+
+
 	function pb_backupbuddy_selectdestination( destination_id, destination_title, callback_data ) {
 		window.location.href = '<?php
 			if ( is_network_admin() ) {

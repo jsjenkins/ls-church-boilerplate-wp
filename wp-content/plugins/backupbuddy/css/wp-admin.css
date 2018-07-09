@@ -57,7 +57,7 @@
 	/* Better Font Rendering =========== */
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	
+
 	content: "\e600" !important;
 }
 
@@ -98,4 +98,18 @@
 
 .pb_backupbuddy_alert.error {
 	background-color: #ffcad3;
+}
+
+.ithemes-updater-products h3.subtitle,
+#ithemes-updater-settings h3.subtitle {
+	font-size: 23px;
+    line-height: 30px;
+    margin: 1.5em 0 .5em;
+    padding: 0 0 0 35px;
+}
+
+.ithemes-updater-listing.widefat tfoot td input[type="text"],
+.ithemes-updater-listing.widefat tfoot td input[type="password"] {
+	padding: 5px 10px;
+	margin: 0 8px 0 0;
 }

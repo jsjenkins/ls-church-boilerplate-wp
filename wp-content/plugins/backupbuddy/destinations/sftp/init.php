@@ -3,13 +3,13 @@
 // DO NOT CALL THIS CLASS DIRECTLY. CALL VIA: pb_backupbuddy_destination in bootstrap.php.
 
 class pb_backupbuddy_destination_sftp {
-	
+
 	public static $destination_info = array(
 		'name'			=>		'sFTP',
 		'description'	=>		'Secure File Transport Protocol (over SSH) is a more secure way of sending files between servers than FTP by using SSH. Web hosting accounts are more frequently providing this feature for greater security. This implementation is fully in PHP so PHP memory limits may be a limiting factor on some servers.',
 		'category'		=>		'normal', // best, normal, legacy
 	);
-	
+
 	// Default settings. Should be public static for auto-merging.
 	public static $default_settings = array(
 		'type'			=>		'sftp',	// MUST MATCH your destination slug.
@@ -23,21 +23,21 @@ class pb_backupbuddy_destination_sftp {
 		'disable_file_management'	=>		'0',		// When 1, _manage.php will not load which renders remote file management DISABLED.
 		'disabled'					=>		'0',		// When 1, disable this destination.
 	);
-	
-	
+
+
 	public static function _init() {
-		
+
 		//die( get_include_path() . PATH_SEPARATOR . 'phpseclib' );
 		set_include_path(get_include_path() . PATH_SEPARATOR . pb_backupbuddy::plugin_path() . '/destinations/sftp/lib/phpseclib');
 		require_once( pb_backupbuddy::plugin_path() . '/destinations/sftp/lib/phpseclib/Net/SFTP.php' );
-		
+
 		if ( '3' == pb_backupbuddy::$options['log_level'] ) { // Crank up logging level if in debug mode.
 			define('NET_SFTP_LOGGING', NET_SFTP_LOG_COMPLEX);
 		}
-		
+
 	} // end _init().
-	
-	
+
+
 	public static function get_pass_or_key( $settings = array() ) {
 		$key = '';
 		$upload_dir = wp_upload_dir();
@@ -68,14 +68,14 @@ class pb_backupbuddy_destination_sftp {
 			pb_backupbuddy::status( 'details', 'Using password.' );
 			$pass_or_key = $settings['password'];
 		}
-		
+
 		return $pass_or_key;
 	}
-	
+
 	/*	send()
-	 *	
+	 *
 	 *	Send one or more files.
-	 *	
+	 *
 	 *	@param		array			$files		Array of one or more files to send.
 	 *	@return		boolean						True on success, else false.
 	 */
@@ -88,10 +88,10 @@ class pb_backupbuddy_destination_sftp {
 		if ( ! is_array( $files ) ) {
 			$files = array( $files );
 		}
-		
+
 		pb_backupbuddy::status( 'details', 'sFTP class send() function started.' );
 		self::_init();
-		
+
 		// Connect to server.
 		$server = $settings['address'];
 		$port = '22'; // Default sFTP port.
@@ -100,9 +100,9 @@ class pb_backupbuddy_destination_sftp {
 			$server = $server_params[0];
 			$port = $server_params[1];
 		}
-		
+
 		$pass_or_key = self::get_pass_or_key( $settings );
-		
+
 		pb_backupbuddy::status( 'details', 'Connecting to sFTP server...' );
 		$sftp = new Net_SFTP( $server, $port );
 		if ( ! $sftp->login( $settings['username'], $pass_or_key ) ) {
@@ -112,14 +112,14 @@ class pb_backupbuddy_destination_sftp {
 		} else {
 			pb_backupbuddy::status( 'details', 'Success connecting to sFTP server.' );
 		}
-		
+
 		pb_backupbuddy::status( 'details', 'Attempting to create path (if it does not exist)...' );
 		if ( true === $sftp->mkdir( $settings['path'] ) ) { // Try to make directory.
 			pb_backupbuddy::status( 'details', 'Directory created.' );
 		} else {
 			pb_backupbuddy::status( 'details', 'Directory not created.' );
 		}
-		
+
 		// Change to directory.
 		pb_backupbuddy::status( 'details', 'Attempting to change into directory `' . $settings['path'] . '`...' );
 		if ( true === $sftp->chdir( $settings['path'] ) ) {
@@ -129,22 +129,22 @@ class pb_backupbuddy_destination_sftp {
 			pb_backupbuddy::status( 'details', 'sFTP log (if available & enabled via full logging mode): `' . $sftp->getSFTPLog() . '`.' );
 			return false;
 		}
-		
+
 		// Upload files.
 		$total_transfer_size = 0;
 		$total_transfer_time = 0;
 		foreach( $files as $file ) {
-			
+
 			if ( ! file_exists( $file ) ) {
 				pb_backupbuddy::status( 'error', 'Error #859485495. Could not upload local file `' . $file . '` to send to sFTP as it does not exist. Verify the file exists, permissions of file, parent directory, and that ownership is correct. You may need suphp installed on the server.' );
 			}
 			if ( ! is_readable( $file ) ) {
 				pb_backupbuddy::status( 'error', 'Error #8594846548. Could not read local file `' . $file . '` to send to sFTP as it is not readable. Verify permissions of file, parent directory, and that ownership is correct. You may need suphp installed on the server.' );
 			}
-			
+
 			$filesize = filesize( $file );
 			$total_transfer_size += $filesize;
-			
+
 			$destination_file = basename( $file );
 			pb_backupbuddy::status( 'details', 'About to put to sFTP local file `' . $file . '` of size `' . pb_backupbuddy::$format->file_size( $filesize ) . '` to remote file `' . $destination_file . '`.' );
 			$send_time = -microtime( true );
@@ -152,23 +152,23 @@ class pb_backupbuddy_destination_sftp {
 			$send_time += microtime( true );
 			$total_transfer_time += $send_time;
 			if ( $upload === false ) { // Failed sending.
-				$error_message = 'ERROR #9012b ( http://ithemes.com/codex/page/BackupBuddy:_Error_Codes#9012 ).  sFTP file upload failed. Check file permissions & disk quota.';
+				$error_message = 'ERROR #9012b ( https://ithemeshelp.zendesk.com/hc/en-us/articles/211132377-Error-Codes-#9012 ).  sFTP file upload failed. Check file permissions & disk quota.';
 				pb_backupbuddy::status( 'error',  $error_message );
 				backupbuddy_core::mail_error( $error_message );
 				pb_backupbuddy::status( 'details', 'sFTP log (if available & enabled via full logging mode): `' . $sftp->getSFTPLog() . '`.' );
 				return false;
 			} else { // Success sending.
 				pb_backupbuddy::status( 'details',  'Success completely sending `' . basename( $file ) . '` to destination.' );
-				
-				
+
+
 				// Start remote backup limit
 				if ( $settings['archive_limit'] > 0 ) {
 					pb_backupbuddy::status( 'details', 'Archive limit enabled. Getting contents of backup directory.' );
 					$contents = $sftp->rawlist( '.' ); //$settings['path'] ); // already in destination directory/path.
-					
+
 					// Create array of backups
 					$bkupprefix = backupbuddy_core::backup_prefix();
-					
+
 					$backups = array();
 					foreach ( $contents as $filename => $backup ) {
 						// check if file is backup
@@ -180,14 +180,14 @@ class pb_backupbuddy_destination_sftp {
 							);
 						}
 					}
-					
+
 					function backupbuddy_number_sort( $a,$b ) {
 						return $a['modified']<$b['modified'];
 					}
 					// Sort by modified using custom sort function above.
 					usort( $backups, 'backupbuddy_number_sort' );
-					
-					
+
+
 					if ( ( count( $backups ) ) > $settings['archive_limit'] ) {
 						pb_backupbuddy::status( 'details', 'More backups found (' . count( $backups ) . ') than limit permits (' . $settings['archive_limit'] . ').' . print_r( $backups, true ) );
 						$delete_fail_count = 0;
@@ -218,10 +218,10 @@ class pb_backupbuddy_destination_sftp {
 				}
 				// End remote backup limit
 			}
-			
+
 		} // end $files loop.
-		
-		
+
+
 		// Load destination fileoptions.
 		pb_backupbuddy::status( 'details', 'About to load fileoptions data.' );
 		require_once( pb_backupbuddy::plugin_path() . '/classes/fileoptions.php' );
@@ -233,30 +233,30 @@ class pb_backupbuddy_destination_sftp {
 		}
 		pb_backupbuddy::status( 'details', 'Fileoptions data loaded.' );
 		$fileoptions = &$fileoptions_obj->options;
-		
+
 		// Save stats.
 		$fileoptions['write_speed'] = $total_transfer_size / $total_transfer_time;
 		$fileoptions_obj->save();
 		unset( $fileoptions_obj );
-		
-		
+
+
 		return true;
-		
+
 	} // End send().
-	
-	
-	
+
+
+
 	/*	test()
-	 *	
+	 *
 	 *	function description
-	 *	
+	 *
 	 *	@param		array			$settings	Destination settings.
 	 *	@return		bool|string					True on success, string error message on failure.
 	 */
 	public static function test( $settings ) {
-		
+
 		self::_init();
-		
+
 		// Connect to server.
 		$server = $settings['address'];
 		$port = '22'; // Default sFTP port.
@@ -265,9 +265,9 @@ class pb_backupbuddy_destination_sftp {
 			$server = $server_params[0];
 			$port = $server_params[1];
 		}
-		
+
 		$pass_or_key = self::get_pass_or_key( $settings );
-		
+
 		pb_backupbuddy::status( 'details', 'Connecting to sFTP server...' );
 		$sftp = new Net_SFTP( $server, $port );
 		if ( ! $sftp->login( $settings['username'], $pass_or_key ) ) {
@@ -276,22 +276,22 @@ class pb_backupbuddy_destination_sftp {
 			if ( isset( $backupbuddy_sftp_using_key_file ) && ( true === $backupbuddy_sftp_using_key_file ) ) {
 				$using_key = ' (Note: Using key file.)';
 			}
-			
+
 			pb_backupbuddy::status( 'error', 'Connection to sFTP server FAILED.' . $using_key );
 			pb_backupbuddy::status( 'details', 'sFTP log (if available & enabled via full logging mode): `' . $sftp->getSFTPLog() . '`.' );
 			return __( 'Unable to connect to server using host, username, and password combination provided.', 'it-l10n-backupbuddy' ) . $using_key;
 		} else {
 			pb_backupbuddy::status( 'details', 'Success connecting to sFTP server.' );
 		}
-		
+
 		pb_backupbuddy::status( 'details', 'Attempting to create path (if it does not exist)...' );
 		if ( true === $sftp->mkdir( $settings['path'] ) ) { // Try to make directory.
 			pb_backupbuddy::status( 'details', 'Directory created.' );
 		} else {
 			pb_backupbuddy::status( 'details', 'Directory not created.' );
 		}
-		
-		
+
+
 		if ( empty( $settings['path'] ) ) {
 			$destination_file = 'backupbuddy_test.txt';
 		} else {
@@ -305,7 +305,7 @@ class pb_backupbuddy_destination_sftp {
 			pb_backupbuddy::status( 'details', 'sFTP log (if available & enabled via full logging mode): `' . $sftp->getSFTPLog() . '`.' );
 			return __('Failure uploading. Check path & permissions.', 'it-l10n-backupbuddy' );
 		} else { // File uploaded.
-			
+
 			pb_backupbuddy::status( 'details', 'File uploaded.' );
 			if ( $settings['url'] != '' ) {
 				$response = wp_remote_get( rtrim( $settings['url'], '/\\' ) . '/backupbuddy_test.txt', array(
@@ -319,24 +319,24 @@ class pb_backupbuddy_destination_sftp {
 						'cookies' => array()
 					)
 				);
-								
+
 				if ( is_wp_error( $response ) ) {
 					return __( 'Failure. Unable to connect to the provided optional URL.', 'it-l10n-backupbuddy' );
 				}
-				
+
 				if ( stristr( $response['body'], 'backupbuddy' ) === false ) {
 					return __('Failure. The path appears valid but the URL does not correspond to it. Leave the URL blank if not using this destination for migrations.', 'it-l10n-backupbuddy' );
 				}
 			}
-			
-			
+
+
 			pb_backupbuddy::status( 'details', 'sFTP test: Deleting temp test file.' );
 			$sftp->delete( $destination_file );
 		}
-		
-		
+
+
 		return true; // Success if we got this far.
 	} // End test().
-	
-	
+
+
 } // End class.

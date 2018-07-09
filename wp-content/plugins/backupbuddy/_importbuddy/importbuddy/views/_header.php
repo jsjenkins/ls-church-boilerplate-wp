@@ -9,21 +9,21 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 		<meta charset="utf-8">
 		<title>ImportBuddy v<?php echo pb_backupbuddy::$options['bb_version']; ?> Restore / Migration Tool - Powered by BackupBuddy</title>
 		<meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
-		
+
 		<?php
 		require( '_assets.php' );
 		?>
-		
+
 		<link rel="icon" type="image/png" href="importbuddy/images/favicon.png">
 		<script type="text/javascript">
 			window.onerror=function( errorMsg, url, lineNumber, colNumber, error ){
 				alert( "Error #439743: A javascript error occurred which MAY prevent the restore from continuing. _IF_ the process lets you proceed then ignore this message. Check the Status Log or browser error console for trace details.\n\nMessage: `" + errorMsg + "`.\nURL: `" + url + "`.\nLine: `" + lineNumber + "`" );
 				backupbuddy_log( 'Javascript Error. Message: `' + errorMsg + '`, URL: `' + url + '`, Line: `' + lineNumber + '`, Col: `' + colNumber + '`, Trace: `' + error.stack + '`.' ); // Attempt to log.
 			}
-			
+
 			var statusBox; // Make global.
 			var backupbuddy_errors_encountered = 0; // number of errors sent via log.
-			
+
 			function pb_status_append( json ) {
 				if ( 'undefined' === typeof statusBox ) { // No status box yet so may need to create it.
 					statusBox = jQuery( '#backupbuddy_messages' );
@@ -31,13 +31,13 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 						return;
 					}
 				}
-				
+
 				if ( 'string' == ( typeof json ) ) {
 					backupbuddy_log( json );
 					console.log( 'Status log received string: ' + json );
 					return;
 				}
-				
+
 				// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php
 				json.date = new Date();
 				json.date = new Date(  ( json.time * 1000 ) + json.date.getTimezoneOffset() * 60000 );
@@ -46,10 +46,10 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 					seconds = '0' + seconds;
 				}
 				json.date = backupbuddy_hourpad( json.date.getHours() ) + ':' + json.date.getMinutes() + ':' + seconds;
-				
+
 				triggerEvent = 'backupbuddy_' + json.event;
-				
-				
+
+
 				// Log non-text events.
 				if ( ( 'details' !== json.event ) && ( 'message' !== json.event ) && ( 'error' !== json.event ) ) {
 					//console.log( 'Non-text event `' + triggerEvent + '`.' );
@@ -57,13 +57,13 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 					//console.log( json.data );
 				}
 				//console.log( 'trigger: ' + triggerEvent );
-				
+
 				jQuery('#backupbuddy_messages').trigger( triggerEvent, [json] );
-				
-				
+
+
 			} // End function pb_status_append().
-			
-			
+
+
 			// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php and _rollback.php
 			function backupbuddy_log( json, classType ) {
 				if ( 'undefined' === typeof statusBox ) { // No status box yet so may need to create it.
@@ -72,9 +72,9 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 						return;
 					}
 				}
-				
+
 				message = '';
-				
+
 				if ( 'string' == ( typeof json ) ) {
 					if ( '' !== classType ) {
 						json = '<span class="backupbuddy_log_' + classType + '">' + json + '</span>';
@@ -86,13 +86,13 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 					}
 					message = json.date + '.' + json.u + " \t" + json.run + "sec \t" + json.mem + "MB\t" + json.data;
 				}
-				
+
 				statusBox.append( "\r\n" + message );
 				statusBox.scrollTop( statusBox[0].scrollHeight - statusBox.height() );
-				
+
 			}
-			
-			
+
+
 			// Trigger an error to be logged, displayed, etc.
 			// Returns updated message with trouble URL, etc.
 			// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php
@@ -112,7 +112,7 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 						error_number_end = message.toLowerCase().indexOf( ' ', error_number_begin );
 					}
 					error_number = message.slice( error_number_begin, error_number_end );
-					troubleURL = 'http://ithemes.com/codex/page/BackupBuddy:_Error_Codes#' + error_number;
+					troubleURL = 'https://ithemeshelp.zendesk.com/hc/en-us/articles/211132377-Error-Codes-#' + error_number;
 				}
 
 				if ( '' !== troubleURL ) {
@@ -143,17 +143,17 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 				//jQuery( '.warning_alert_box' ).show();
 				return 'Warning: ' + message;
 			} // end backupbuddyWarning().
-			
+
 			// left hour pad with zeros
 			function backupbuddy_hourpad(n) { return ("0" + n).slice(-2); }
-			
+
 			function randomString(length, chars) {
 				var result = '';
 				for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
 				return result;
 			}
-			
-			
+
+
 		</script>
 		<script type="text/javascript" src="importbuddy/js/jquery.leanModal.min.js"></script>
 		<script type="text/javascript" src="importbuddy/js/ejs.js"></script>
@@ -161,19 +161,19 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 		<script type="text/javascript" src="importbuddy/js/restoreEvents.js"></script>
 		<script type="text/javascript">
 			EJS.config({cache: false});
-			
+
 			window.restoreData = {};
-			
+
 			jQuery(document).ready(function() {
 				jQuery('.leanModal').leanModal(
 					{ top : 45, overlay : 0.4, closeButton: ".modal_close" }
 				);
-				
+
 				/* MD5 Hash Button Clicked */
 				jQuery( '.view_hash_click' ).click( function() {
 					jQuery('#hash_view_loading').show();
 					jQuery('#hash_view_response').hide();
-					
+
 					var backupFile = jQuery(this).attr( 'data-file' );
 					jQuery.ajax({
 						type: 'POST',
@@ -193,23 +193,23 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 						jQuery('#hash_view_response').show();
 					});
 				});
-				
-				
-				
+
+
+
 				jQuery( '.main_box' ).on( 'submit', 'form', function(e) {
 					if ( 'miniFrame' == jQuery(this).attr( 'target' ) ) {
 						NProgress.start();
 					}
 					return true;
 				});
-				
+
 				// Pre-load final steps so it can be displayed even though deleted.
 				window.stepTemplateCleanupSettings = new EJS({url: 'importbuddy/views/cleanupSettings.htm'});
 				window.stepTemplatefinalCleanup = new EJS({url: 'importbuddy/views/finalCleanup.htm'});
-				
+
 			});
-			
-			
+
+
 			function bb_action( action, note ) {
 				console.log( 'bb_action: `' + action + '`.' );
 				if ( 'unzipSuccess' == action ) {
@@ -237,20 +237,20 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 					console.log( 'Unknown JS bb_action `' + action + '` with note `' + note + '`.' );
 				}
 			}
-			
-			
+
+
 			function bb_showStep( step, data ) {
 				window.restoreData = data;
 				jQuery('.step-wrap').hide();
 				console.log( 'Show step: `' + step + '`.' );
 				console.dir( window.restoreData );
 				backupbuddy_log( 'Loading step `' + step + '`.');
-				
+
 				//jQuery('.step-' + step + '-wrap').show();
 				if ( 'finished' == step ) { // In case we cannot load final template, at least say finished.
 					jQuery('.main_box_foot').html( '<h3>Finished</h3>' );
 				}
-				
+
 				if ( 'cleanupSettings' == step ) { // Preloaded template.
 					jQuery('.main_box').html( window.stepTemplateCleanupSettings.render(data) );
 				} else if ( 'finalCleanup' == step ) {
@@ -263,13 +263,13 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 					jQuery('.main_box').html( new EJS({url: 'importbuddy/views/' + step + '.htm'}).render(data) );
 				}
 			}
-			
-			
+
+
 			function tip( tip ) {
 				return '<a class="pluginbuddy_tip" title="' + tip + '"><img src="importbuddy/pluginbuddy/images/pluginbuddy_tip.png" alt="(?)"></a>';
 			}
-			
-			
+
+
 		</script>
 		<style>
 			#backupbuddy_messages {
@@ -316,24 +316,24 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 			echo '>';
 			if ( 'embed' != pb_backupbuddy::_GET( 'display_mode' ) ) {
 				echo '<div class="topNav">';
-					
+
 					if ( true === Auth::is_authenticated() ) { // Only display these links if logged in.
 						echo '<a ';
 						if ( pb_backupbuddy::_GET( 'step' ) != '' ) { echo 'class="activePage" '; }
 						echo 'href="importbuddy.php">Restore / Migrate</a>';
-						
+
 						echo '<a ';
 						if ( pb_backupbuddy::_GET( 'page' ) == 'serverinfo' ) { echo 'class="activePage" '; }
 						echo 'href="?page=serverinfo">Server Information</a>';
-						
+
 						echo '<a ';
 						if ( pb_backupbuddy::_GET( 'page' ) == 'dbreplace' ) { echo 'class="activePage" '; }
 						echo 'href="?page=dbreplace">Database Text Replace</a>';
-						
-						echo '<a href="http://ithemes.com/codex/page/BackupBuddy" target="_blank">Knowledge Base</a>';
+
+						echo '<a href="https://ithemeshelp.zendesk.com/hc/en-us/categories/200062300-BackupBuddy/" target="_blank">Knowledge Base</a>';
 						echo '<a href="http://ithemes.com/support/" target="_blank">Support</a>';
 					}
-					
+
 					$simpleVersion = pb_backupbuddy::$options['bb_version'];
 					if ( strpos( pb_backupbuddy::$options['bb_version'], ' ' ) > 0 ) {
 						$simpleVersion = substr( pb_backupbuddy::$options['bb_version'], 0, strpos( pb_backupbuddy::$options['bb_version'], ' ' ) );
@@ -342,7 +342,7 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 				echo '</div>';
 			}
 		?>
-		
+
 		<div style="position: relative; height: 70px; margin-top: 50px; width: 100%; overflow: hidden;">
 			<div style="max-width: 1000px; margin-left: auto; margin-right: auto;">
 				<!-- <span id="restorebuddy_iframe_placeholder">Welcome step 1</span> -->
@@ -351,12 +351,12 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 				<script>iframePostInit = true;</script>
 			</div>
 		</div>
-		
+
 		<div style="display: none;" id="pb_importbuddy_blankalert"><?php pb_backupbuddy::alert( '#TITLE# #MESSAGE#', true, '9021' ); ?></div>
-		
+
 		<div class="main_box_wrap">
-			
-			
+
+
 			<?php if ( true === Auth::is_authenticated() ) { // Only record logging if authenticated. ?>
 				<div class="main_box_head">
 					<span id="pageTitle">&nbsp;</span>
@@ -365,14 +365,14 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 				<?php
 				echo pb_backupbuddy::$classes['import']->status_box( 'Status Log for for ImportBuddy from BackupBuddy v' . pb_backupbuddy::$options['bb_version'] . '...' );
 				?>
-				
+
 				<script>importbuddy_loadRestoreEvents();</script>
 				<?php
 			} else { ?>
 				<div class="main_box_head">
 					<span id="pageTitle">&nbsp;</span>
 				</div>
-				
+
 			<?php } ?>
 			<div class="main_box_head error_alert_box" style="display: none;">
 				<span class="error_alert_title">Error(s)</span>
@@ -386,9 +386,9 @@ if ( ! defined( 'PB_IMPORTBUDDY' ) || ( true !== PB_IMPORTBUDDY ) ) {
 					<!-- <li>Error #123onlyAtest: A warning has NOT happened. This is a only test.</li> -->
 				</ul>
 			</div>
-			
-			
+
+
 			<div class="main_box">
-			
-			
-			
+
+
+

@@ -36,3 +36,11 @@
 	Compatibility Fix: Updated plugin and theme update data format to match changes in WordPress 4.2.
 1.4.2 - 2015-07-14 - Chris Jean
 	Enhancement: Updated link to iThemes support.
+1.5.0 - 2018-05-02 - Chris Jean
+	Bug Fix: Fixed the "View details" link failing to work properly after updating.
+	Bug Fix: Fixed an issue that could cause data changes to not save properly on specific background page requests.
+	Bug Fix: Added a compatibility fix to avoid conflicts with plugins that change the plugin_action_links filter value from an array to a string.
+	Compatibility Fix: Updated handing of wp_remote_get() response due to changes documented in https://core.trac.wordpress.org/ticket/33055.
+	Enhancement: Added ability to manage licensing from WP-CLI.
+1.5.1 - 2018-05-03 - Chris Jean
+	Bug Fix: Fixed fatal error that could occur when clicking the "View details" link for an available plugin update.

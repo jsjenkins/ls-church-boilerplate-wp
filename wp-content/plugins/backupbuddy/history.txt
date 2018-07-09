@@ -1772,3 +1772,80 @@
 	Bug Fix: Fix compat issue with PHP 5.3 in scheduling
 8.2.3.5 - 2018-04-09 - Jeremy Trask
 	Bug Fix: Fix bug that doesn't select correct default scheduling period for Stash Live Settings
+8.2.3.6 - 2018-04-23 - Brian DiChiara
+	Bug Fix: Fix Amazon S3 Destinations URL
+8.2.3.7 - 2018-05-07 - Glenn Ansley, Brian DiChiara, Jeremy Trask, Chris Jean, Rebecca Diamond
+	* Last Quick Release before 8.2.4.0 *
+	Enhancement: Added Updated Licensing module to support WP-CLI
+	Enahncement: Multiple coding standard enhancments
+	Enhancement: Multiple UI enhancements.
+	Bug Fix:     Fixed PCLZip dependancy issues
+	Bug Fix:     Modified the way .htaccess protects the backup directory from direct downloads
+	Bug Fix:     Fixed multiple minor PHP warnings and several small refactors of inefficient code.
+8.2.4.0 - 2018-05-08 - Glenn Ansley
+	Major Release of all quick releases since 8.2.3.1
+		Enhancement: BUB Scheduling Overhaul. Only show BUB Schedule Labels on Scheduling page and other fixes - Jeremy Trask.
+		Enhancement: BUB Integrity Check Overhaul. Prevent false negatives on some Backup Types if cached log is missing. Other fixes. - Glenn Ansley.
+		Bug Fix:     Fix compat issue with PHP 5.4
+		Bug Fix:     Fix compat issue with PHP 5.4
+		Bug Fix:     Fix compat issue with PHP 5.3 in scheduling
+		Bug Fix:     Fix bug that doesn't select correct default scheduling period for Stash Live Settings
+		Bug Fix:     Fix Amazon S3 Destinations URL
+		Bug Fix:     Fixed PCLZip dependancy issues
+		Bug Fix:     Modified the way .htaccess protects the backup directory from direct downloads
+		Bug Fix:     Fixed multiple minor PHP warnings and several small refactors of inefficient code.
+		Enhancement: Added Updated Licensing module to support WP-CLI
+		Enahncement: Multiple coding standard enhancments
+		Enhancement: Multiple UI enhancements.
+8.2.5.0 - 2018-05-08 - Glenn Ansley
+	Notice:      Added PHP version notice for Stash / S3 versions
+	Bug Fix:     Updated link in Loopback Error
+	Bug Fix:     Fixed bug causing some error messages to not print to screen
+	Bug Fix:     Fixed remote destination checkbox when no destination is selected
+	Enhancement: Added ftp destination error messages upon FTP failure.
+	Enhancement: Adjusted Destinations error message to add clarity.
+8.2.5.1 - 2018-05-11 - Glenn Ansley
+	Bug Fix: Fixed bug preventing Deployment from completing.
+8.2.5.2 - 2018-05-22 - Brian DiChiara, Jeremy Trask
+	Enhancement: Multiple coding standard enhancements.
+	Enhancement: Licensing page styling improvements.
+	Enhancement: Zip file handling improvements.
+	UI Fix:      New Profile UI positioning fix.
+	Bug Fix:     Resolved bug related to cPanel.
+	Bug Fix:     Corrected multiple old codex references to point to new Zendesk documentation.
+	Bug Fix:     Removed multiple instances where create_function is being used, replaced with anonymous functions, resolving PHP notices.
+8.2.5.3 - 2018-05-22 - Glenn Ansley
+	Bug Fix: Bad scope causing PHP errors.
+8.2.5.4 - 2018-05-23 - Brian DiChiara
+	Bug Fix: Replaced anonymous functions with named functions/methods for PHP 5.2 support.
+8.2.5.5 - 2018-05-24 - Brian DiChiara
+	Privacy: Added hooks to export and erase personal data.
+	Privacy: Added suggested privacy statement to WordPress privacy guide.
+8.2.6.0 - 2018-05-25 - Brian DiChiara, Glenn Ansley, Jeremy Trask
+	Major Release of all quick releases since 8.2.5.1
+		Bug Fix:     Fixed bug preventing Deployment from completing.
+		Enhancement: Multiple coding standard enhancements.
+		Enhancement: Licensing page styling improvements.
+		Enhancement: Zip file handling improvements.
+		UI Fix:      New Profile UI positioning fix.
+		Bug Fix:     Resolved bug related to cPanel.
+		Bug Fix:     Corrected multiple old codex references to point to new Zendesk documentation.
+		Bug Fix:     Removed multiple instances where create_function is being used, replaced with anonymous functions, resolving PHP notices.
+		Bug Fix:     Bad scope causing PHP errors.
+		Bug Fix:     Replaced anonymous functions with named functions/methods for PHP 5.2 support.
+		Privacy:     Added hooks to export and erase personal data.
+		Privacy:     Added suggested privacy statement to WordPress privacy guide.
+8.2.6.1 - 2018-05-25 - Brian DiChiara
+	UI Fix: Fixed issue where license page heading overlapping icons.
+8.2.6.2 - 2018-05-25 - Brian DiChiara
+	Bug Fix: Replaced anonymous function with static method
+	Bug Fix: Fixed PHP 5.2 compatibility bug.
+8.2.6.3 - 2018-05-31 - Brian DiChiara
+	Bug Fix: Resolves an error where backup dat file isn't found and PHP notices during import.
+8.2.6.4 - 2018-06-01 - Brian DiChiara, Jeremy Trask
+	Bug Fix: Gets rid of notice about exclude reporting incorrectly.
+8.2.6.5 - 2018-06-01 - Brian DiChiara, Jeremy Trask
+	Bug Fix:     Resolved problem with scheduled backups sending to remote destinations automatically.
+    Bug Fix:     Show proper MySQL version or N/A when MariaDB is used.
+    Bug Fix:     Got rid of PHP notice related to 'skip_database_dump'.
+	Enhancement: Display supported MariaDB version on Server Tools page.

@@ -3,22 +3,22 @@
 
 
 /*	pluginbuddy_ui class
- *	
+ *
  *	Handles typical user interface items used in WordPress development.
- *	
+ *
  *	@author Dustin Bolton
  *	@version 1.0.0
  */
 class pb_backupbuddy_ui {
 
 	private $_tab_interface_tag = '';
-	
-	
+
+
 	/*	pluginbuddy_ui->start_metabox()
-	 *	
+	 *
 	 *	Starts a metabox. Use with end_metabox().
 	 *	@see pluginbuddy_ui->end_metabox
-	 *	
+	 *
 	 *	@param		string				$title				Title to display for the metabox.
 	 *	@param		boolean				$echo				Echos if true; else returns.
 	 *	@param		boolean/string		$small_or_css		true: size is limited smaller. false: size is limited larger. If a string then interpreted as CSS.
@@ -32,9 +32,9 @@ class pb_backupbuddy_ui {
 		} else { // String so interpret as CSS.
 			$css = $small_or_css;
 		}
-		
+
 		$css .= ' padding-top: 0; margin-top: 10px; cursor: auto;';
-		
+
 		$response = '<div class="metabox-holder postbox" style="' . $css . '">
 						<h3 class="hndle" style="cursor: auto;"><span>' . $title . '</span></h3>
 						<div class="inside">';
@@ -44,14 +44,14 @@ class pb_backupbuddy_ui {
 			return $response;
 		}
 	} // End start_metabox().
-	
-	
-	
+
+
+
 	/*	pluginbuddy_ui->end_metabox()
-	 *	
+	 *
 	 *	Ends a metabox. Use with start_metabox().
 	 *	@see pluginbuddy_ui->start_metabox
-	 *	
+	 *
 	 *	@param		boolean		$echo		Echos if true; else returns.
 	 *	@return		null/string				Returns null if $echo is true; else returns string with HTML.
 	 */
@@ -64,13 +64,13 @@ class pb_backupbuddy_ui {
 			return $response;
 		}
 	} // End end_metabox().
-	
-	
-	
+
+
+
 	/*	pluginbuddy_ui->title()
-	 *	
+	 *
 	 *	Displays a styled, properly formatted title for pages.
-	 *	
+	 *
 	 *	@param		string		$title		Title to display.
 	 *	@param		boolean		$echo		Whether or not to echo the string or return.
 	 *	@return		null/string				Returns null if $echo is true; else returns string with HTML.
@@ -86,13 +86,13 @@ class pb_backupbuddy_ui {
 			return $return;
 		}
 	} // End title().
-	
-	
-	
+
+
+
 	/*	pluginbuddy_ui->button()
-	 *	
+	 *
 	 *	Displays a nice pretty styled button. How nice. Always returns.
-	 *	
+	 *
 	 *	@param		string		$url				URL (href) for the button to link to.
 	 *	@param		string		$text				Text to display in the button.
 	 *	@param		string		$title				Optional title text to display on hover in the title tag.
@@ -108,13 +108,13 @@ class pb_backupbuddy_ui {
 			return '<a class="button button-primary ' . $additional_class . '" style="margin-top: 3px;" id="' . $id . '" title="' . $title . '" href="' . $url . '">' . $text . '</a>';
 		}
 	} // End button().
-	
-	
-	
+
+
+
 	/*	pluginbuddy_ui->note()
-	 *	
+	 *
 	 *	Display text in a subtle way.
-	 *	
+	 *
 	 *	@param		string		$text		Text of note.
 	 *	@param		boolean		$echo		Whether or not to echo the string or return.
 	 *	@return		null/string				Returns null if $echo is true; else returns string with HTML.
@@ -127,14 +127,14 @@ class pb_backupbuddy_ui {
 			return $return;
 		}
 	} // End note().
-	
-	
-	
+
+
+
 	/*	pluginbuddy_ui->list_table()
-	 *	
+	 *
 	 *	Displays a nice table with multiple columns, rows, bulk actions, hover actions, etc similar to WordPress posts table.
 	 *	Currently only supports echo of output.
-	 *	
+	 *
 	 *	@param		array		$items		Array of rows to display. Each row array contains an array with the columns. Typically set in controller.
 	 *										Ex: array( array( 'blue', 'red' ), array( 'brown', 'green' ) ).
 	 *										If the value for an item is an array then the first value will be assigned to the rel tag of any hover actions. If not
@@ -161,10 +161,10 @@ class pb_backupbuddy_ui {
 								'after_bulk'				=>	'',
 								'css'						=>	'',
 							);
-		
+
 		// Merge defaults.
 		$settings = array_merge( $default_settings, $settings );
-		
+
 		// Function to iterate through bulk actions. Top and bottom set are the same.
 		if ( !function_exists( 'bulk_actions' ) ) {
 			function bulk_actions( $settings, $hover_note = false ) {
@@ -187,7 +187,7 @@ class pb_backupbuddy_ui {
 					}
 					echo '&nbsp;&nbsp;';
 					echo $settings['after_bulk'];
-					
+
 					echo '<div class="alignright actions">';
 					if ( $hover_note === true ) {
 						echo pb_backupbuddy::$ui->note( 'Hover over items above for additional options.' );
@@ -196,12 +196,12 @@ class pb_backupbuddy_ui {
 						echo '	<input type="submit" name="save_order" id="save_order" value="Save Order" class="button-secondary" />';
 					}
 					echo '</div>';
-					
+
 					echo '</div>';
 				}
 			} // End subfunction bulk_actions().
 		} // End if function does not exist.
-		
+
 		if ( $settings['action'] != '' ) {
 			echo '<form method="post" action="' . $settings['action'] . '">';
 			pb_backupbuddy::nonce();
@@ -209,13 +209,13 @@ class pb_backupbuddy_ui {
 				echo '<input type="hidden" name="order" value="" id="pb_order">';
 			}
 		}
-		
-		
+
+
 		echo '<div style="width: 70%; min-width: 720px; ' . $settings['css'] . '">';
-		
+
 		// Display bulk actions (top).
 		bulk_actions( $settings );
-		
+
 		echo '<table class="widefat striped"';
 		echo ' id="test">';
 		echo '		<thead>
@@ -243,7 +243,7 @@ class pb_backupbuddy_ui {
 			echo ' class="pb_reorder"';
 		}
 		echo '>';
-		
+
 		// LOOP THROUGH EACH ROW.
 		foreach ( (array)$items as $item_id => $item ) {
 			echo '	<tr class="entry-row" id="pb_rowitem-' . $item_id . '">';
@@ -251,7 +251,7 @@ class pb_backupbuddy_ui {
 				echo'	<th scope="row" class="check-column"><input type="checkbox" name="items[]" class="entries" value="' . $item_id . '"></th>';
 			}
 			echo '		<td>';
-			
+
 			if ( is_array( $item['0'] ) ) {
 				if ( $item['0'][1] == '' ) {
 					echo '&nbsp;';
@@ -265,7 +265,7 @@ class pb_backupbuddy_ui {
 					echo $item['0'];
 				}
 			}
-			
+
 			echo '			<div class="row-actions" style="margin-top: 10px;">'; //  style="margin:0; padding:0;"
 			$i = 0;
 			foreach ( $settings['hover_actions'] as $action_slug => $action_title ) { // Display all hover actions.
@@ -290,7 +290,7 @@ class pb_backupbuddy_ui {
 				if ( '.zip' == substr( $hover_link, -4 ) ) {
 					$hover_link .= '&bub_rand=' . rand( 100, 999 );
 				}
-				
+
 				echo '<a href="' . $hover_link . '" class="pb_' . pb_backupbuddy::settings( 'slug' ) . '_hoveraction_' . $action_slug . '" rel="' . $hover_action_column_value . '">' . $action_title . '</a>';
 				if ( $i < count( $settings['hover_actions'] ) ) {
 					echo ' | ';
@@ -298,14 +298,14 @@ class pb_backupbuddy_ui {
 			}
 			echo '			</div>
 						</td>';
-			
-			
+
+
 			if ( $settings['reorder'] != '' ) {
 				$count = count( $item ) + 1; // Extra row for reordering.
 			} else {
 				$count = count( $item );
 			}
-			
+
 			// LOOP THROUGH COLUMNS FOR THIS ROW.
 			for ( $i = 1; $i < $count; $i++ ) {
 				if ( ! isset( $item[$i] ) ) { continue; } // This row does not have a corresponding index-based item.  It is probably a named key not for use in table?
@@ -316,7 +316,7 @@ class pb_backupbuddy_ui {
 					}
 				}
 				echo '>';
-				
+
 				if ( ( $settings['reorder'] != '' ) && ( $i == ( $settings['reorder'] ) ) ) {
 					echo '<img src="' . pb_backupbuddy::plugin_url() . '/pluginbuddy/images/draghandle.png" alt="Click and drag to reorder">';
 				} else {
@@ -326,7 +326,7 @@ class pb_backupbuddy_ui {
 						echo $item[$i];
 					}
 				}
-				
+
 				echo '</td>';
 			}
 
@@ -335,17 +335,17 @@ class pb_backupbuddy_ui {
 
 		echo '	</tbody>';
 		echo '</table>';
-		
+
 		// Display bulk actions (bottom).
 		bulk_actions( $settings, true );
-		
+
 		echo '</div>';
 		if ( $settings['action'] != '' ) {
 			echo '</form>';
 		}
 	} // End list_table().
-	
-	
+
+
 	/**
 	 *	pb_backupbuddy::get_feed()
 	 *
@@ -359,24 +359,24 @@ class pb_backupbuddy_ui {
 	 */
 	public function get_feed( $feed, $limit, $append = '', $replace = '' ) {
 		$return = '';
-		
+
 		$feed_html = get_transient( md5( $feed ) );
-		
+
 		if ( false === $feed_html ) {
 			$feed_html = '';
-			require_once(ABSPATH.WPINC.'/feed.php');  
+			require_once(ABSPATH.WPINC.'/feed.php');
 			$rss = fetch_feed( $feed );
 			if ( is_wp_error( $rss ) ) {
 				$return .= '{Temporarily unable to load feed.}';
 				return $return;
 			}
-			$maxitems = $rss->get_item_quantity( $limit ); // Limit 
-			$rss_items = $rss->get_items(0, $maxitems); 
+			$maxitems = $rss->get_item_quantity( $limit ); // Limit
+			$rss_items = $rss->get_items(0, $maxitems);
 		}
-		
+
 		$return .= '<ul class="pluginbuddy-nodecor" style="margin-left: 10px;">';
 
-		
+
 		if ( $feed_html == '' ) {
 			foreach ( (array) $rss_items as $item ) {
 				$feed_html .= '<li style="list-style-type: none;"><a href="' . $item->get_permalink() . '" target="_blank">';
@@ -396,16 +396,16 @@ class pb_backupbuddy_ui {
 			//echo 'CACHED';
 		}
 		$return .= $feed_html;
-		
+
 		$return .= $append;
 		$return .= '</ul>';
-	
-		
+
+
 		return $return;
 	} // End get_feed().
-	
-	
-	
+
+
+
 	/**
 	 *	pb_backupbuddy::tip()
 	 *
@@ -428,9 +428,9 @@ class pb_backupbuddy_ui {
 			return $tip;
 		}
 	} // End tip().
-	
-	
-	
+
+
+
 	/**
 	 *	pb_backupbuddy::alert()
 	 *
@@ -452,7 +452,7 @@ class pb_backupbuddy_ui {
 			$log_error = true;
 		}
 		if ( $error_code != '' ) {
-			$message .= ' <a href="http://ithemes.com/codex/page/BackupBuddy:_Error_Codes#' . $error_code . '" target="_blank"><i>' . pb_backupbuddy::settings( 'name' ) . ' Error Code ' . $error_code . ' - Click for more details.</i></a>';
+			$message .= ' <a href="https://ithemeshelp.zendesk.com/hc/en-us/articles/211132377-Error-Codes-#' . $error_code . '" target="_blank"><i>' . pb_backupbuddy::settings( 'name' ) . ' Error Code ' . $error_code . ' - Click for more details.</i></a>';
 			$log_error = true;
 		}
 		if ( $log_error === true ) {
@@ -460,9 +460,9 @@ class pb_backupbuddy_ui {
 		}
 		echo '" >' . $message . '</div>';
 	} // End alert().
-	
-	
-	
+
+
+
 	/**
 	 *	pb_backupbuddy::disalert()
 	 *
@@ -474,20 +474,20 @@ class pb_backupbuddy_ui {
 	 *	@return		null
 	 */
 	public function disalert( $unique_id, $message, $error = false, $more_css = '' ) {
-		
+
 		if ( ( '' == $unique_id ) || ( ! isset( pb_backupbuddy::$options['disalerts'][$unique_id] ) ) ) {
 			$message = '<a style="float: right;" class="pb_backupbuddy_disalert" href="javascript:void(0);" title="' . __( 'Dismiss this alert. Unhide dismissed alerts on the Settings page.', 'it-l10n-backupbuddy' ) . '" alt="' . pb_backupbuddy::ajax_url( 'disalert' ) . '"><b>' . __( 'Dismiss', 'it-l10n-backupbuddy' ) . '</b></a><div style="margin-right: 120px;">' . $message . '</div>';
 			$this->alert( $message, $error, '', $unique_id, $more_css );
 		} else {
 			echo '<!-- Previously Dismissed Alert: `' . htmlentities( $message ) . '` -->';
 		}
-		
+
 		return;
-		
+
 	} // End alert().
-	
-	
-	
+
+
+
 	/**
 	 *	pb_backupbuddy::video()
 	 *
@@ -500,9 +500,9 @@ class pb_backupbuddy_ui {
 	 *	@return		string/null					If not echoing tip then the string will be returned. When echoing there is no return.
 	 */
 	public function video( $video_key, $title = '', $echo_tip = true ) {
-		
+
 		self::enqueue_thickbox();
-		
+
 		if ( strstr( $video_key, '#' ) ) {
 			$video = explode( '#', $video_key );
 			$video[1] = '&start=' . $video[1];
@@ -510,7 +510,7 @@ class pb_backupbuddy_ui {
 			$video[0] = $video_key;
 			$video[1] = '';
 		}
-		
+
 		$tip = '<a target="_blank" href="http://www.youtube.com/embed/' . urlencode( $video[0] ) . '?autoplay=1' . $video[1] . '&TB_iframe=1&width=600&height=400" class="thickbox pluginbuddy_tip" title="Video Tutorial - ' . $title . '"><img src="' . pb_backupbuddy::plugin_url() . '/pluginbuddy/images/pluginbuddy_play.png" alt="(video)" /></a>';
 		if ( $echo_tip === true ) {
 			echo $tip;
@@ -518,9 +518,9 @@ class pb_backupbuddy_ui {
 			return $tip;
 		}
 	} // End video().
-	
-	
-	
+
+
+
 	/**
 	 * pb_backupbuddy::enqueue_thickbox()
 	 *
@@ -541,14 +541,14 @@ class pb_backupbuddy_ui {
 			}
 		}
 	} // End enqueue_thickbox().
-	
-	
-	
+
+
+
 	/*	start_tabs()
-	 *	
+	 *
 	 *	Starts a tabbed interface.
  	 *	@see end_tabs().
-	 *	
+	 *
 	 *	@param		string		$interface_tag		Tag/slug for this entire tabbed interface. Should be unique.
 	 *	@param		array		$tabs				Array containing an array of settings for this tabbed interface. Ex:  array( array( 'title'> 'my title', 'slug' => 'mytabs' ) );
 	 *												Optional setting with key `ajax_url` may define a URL for AJAX loading.
@@ -559,12 +559,12 @@ class pb_backupbuddy_ui {
 	 */
 	public function start_tabs( $interface_tag, $tabs, $css = '', $echo = true, $active_tab_index = 0 ) {
 		$this->_tab_interface_tag = $interface_tag;
-		
+
 		pb_backupbuddy::load_script( 'pb_tabs.js', true );
-		
+
 		$prefix = 'pb_' . pb_backupbuddy::settings( 'slug' ) . '_'; // pb_PLUGINSLUG_
 		$return = '';
-		
+
 		/*
 		$return .= '<script type="text/javascript">';
 		$return .= '	jQuery(document).ready(function() {';
@@ -572,10 +572,10 @@ class pb_backupbuddy_ui {
 		$return .= '	});';
 		$return .= '</script>';
 		*/
-		
+
 		$return .= '<div class="backupbuddy-tabs-wrap">';
-		
-		
+
+
 		$return .= '<h2 class="nav-tab-wrapper">';
 		$i = 0;
 		foreach( $tabs as $tab ) {
@@ -596,8 +596,8 @@ class pb_backupbuddy_ui {
 			$i++;
 		}
 		$return .= '</h2>';
-		
-		
+
+
 		/*
 		$return .= '<div id="' . $prefix . $this->_tab_interface_tag . '_tabs" style="' . $css . '">';
 		$return .= '<ul>';
@@ -615,154 +615,154 @@ class pb_backupbuddy_ui {
 		$return .= '<br>';
 		$return .= '<div class="tabs-borderwrap">';
 		*/
-		
+
 		$return .= '<div class="backupbuddy-tab-blocks">';
-		
+
 		if ( $echo === true ) {
 			echo $return;
 		} else {
 			return $return;
 		}
-		
+
 	} // End start_tabs().
-	
-	
-	
+
+
+
 	/*	end_tabs()
-	 *	
+	 *
 	 *	Closes off a tabbed interface.
 	 *	@see start_tabs().
-	 *	
+	 *
 	 *	@param		boolean		$echo				Echo output instead of returning.  (optional)
 	 *	@return		null/string						null if $echo = false, all data otherwise.
 	 */
 	public function end_tabs( $echo = true ) {
-		
+
 		/*
 		$return = '';
 		$return .= '	</div>';
 		$return .= '</div>';
 		*/
 		$return = '</div></div>';
-		
+
 		$this->_tab_interface_tag = '';
-		
+
 		if ( $echo === true ) {
 			echo $return;
 		} else {
 			return $return;
 		}
-		
+
 	} // End end_tabs().
-	
-	
-	
+
+
+
 	/*	start_tab()
-	 *	
+	 *
 	 *	Opens the start of an individual page to be loaded by a tab.
 	 *	@see end_tab().
-	 *	
+	 *
 	 *	@param		string		$tab_tag			Unique tag for this tab section. Must match the tag defined when creating the tab interface.
 	 *	@param		boolean		$echo				Echo output instead of returning.  (optional)
 	 *	@return		null/string						null if $echo = false, all data otherwise.
 	 */
 	public function start_tab( $tab_tag, $echo = true ) {
-		
+
 		$prefix = 'pb_' . pb_backupbuddy::settings( 'slug' ) . '_'; // pb_PLUGINSLUG_
 		$return = '';
-		
+
 		$return .= '<div class="backupbuddy-tab" id="' . $prefix . $this->_tab_interface_tag . '_tab_' . $tab_tag . '">';
-		
-		
+
+
 		if ( $echo === true ) {
 			echo $return;
 		} else {
 			return $return;
 		}
-		
+
 	} // End start_tab().
-	
-	
-	
+
+
+
 	/*	end_tab()
-	 *	
+	 *
 	 *	Closes this tab section.
 	 *	@see start_tab().
-	 *	
+	 *
 	 *	@param		string		$tab_tag			Unique tag for this tab section. Must match the tag defined when creating the tab interface.
 	 *	@param		boolean		$echo				Echo output instead of returning.  (optional)
 	 *	@return		null/string						null if $echo = false, all data otherwise.
 	 */
 	public function end_tab( $echo = true ) {
-		
+
 		$return = '</div>';
-		
-		
+
+
 		if ( $echo === true ) {
 			echo $return;
 		} else {
 			return $return;
 		}
-		
+
 	} // End end_tab().
-	
-	
-	
+
+
+
 	/*	ajax_header()
-	 *	
+	 *
 	 *	Output HTML headers when using AJAX.
-	 *	
+	 *
 	 *	@param		boolean		$js			Whether or not to load javascript. Default false.
 	 *	@param		bool		$padding	Whether or not to padd wrapper div. Default has padding.
-	 *	@return		
+	 *	@return
 	 */
 	function ajax_header( $js = true, $padding = true ) {
 		echo '<head>';
 		echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
 		echo '<title>PluginBuddy</title>';
-		
+
 		wp_print_styles( 'wp-admin' );
 		wp_print_styles( 'dashicons' );
 		wp_print_styles( 'buttons' );
 		wp_print_styles( 'colors' );
-		
+
 		if ( $js === true ) {
 			wp_enqueue_script( 'jquery' );
 			wp_print_scripts( 'jquery' );
 		}
-		
+
 		pb_backupbuddy::load_style( 'wp-admin.css' );
 		pb_backupbuddy::load_style( 'thickboxed.css' );
-		
+
 		//echo '<link rel="stylesheet" href="' . pb_backupbuddy::plugin_url(); . '/css/admin.css" type="text/css" media="all" />';
 		pb_backupbuddy::load_script( 'admin.js', true );
 		pb_backupbuddy::load_style( 'admin.css' );
 		pb_backupbuddy::load_script( 'jquery-ui-tooltip', false );
 		pb_backupbuddy::load_style( 'jQuery-ui-1.11.2.css', true );
-		
+
 		echo '<body class="wp-core-ui" style="background: inherit;">';
 		if ( $padding === true ) {
 			echo '<div class="bb-iframe-divpadding-noscroll" style="padding: 12px; padding-left: 20px; padding-right: 20px; overflow: scroll;">';
 		} else {
 			echo '<div>';
 		}
-		
+
 	} // End ajax_header().
-	
-	
+
+
 	function ajax_footer( $js_common = true ) {
 		echo '</body>';
 		echo '</div>';
 		echo '</head>';
-		
+
 		if ( true === $js_common ) {
 			pb_backupbuddy::load_script( 'common' ); // Needed for table 'select all' feature.
 		}
-		
+
 		echo '</html>';
 	} // End ajax_footer().
-	
-	
-	
+
+
+
 } // End class pluginbuddy_ui.
 

@@ -1443,20 +1443,41 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 				$this->get_process_monitor()->initialize_monitoring_usage();
 				
 				// Now we have our command prototype we can start bursting
-				// Simply build a burst list based on content size. Currently no
-				// look-ahead so the size will always exceed the current size threshold
-				// by some amount. May consider using a look-ahead to see if the next
-				// item would exceed the threshold in which case don't add it (unless it
-				// would be the only content in which case have to add it but also log
-				// a warning).
+				// Simply build a burst list based on content size.
+				// If the burst content size exceeds the burst size threshold then we
+				// operate a take-back of the last item added to the burst (which will
+				// have been the item that caused the threshold to be exceeded) except if
+				// there is only one item in the list so a single large file that is larger
+				// than the threshold - in that case we have to go ahead but we log the
+				// fact and provide the name of the file for easy diagnosis. Could consider
+				// a tolerance on exceeding threshold but then why have the thershold?
 				// We'll stop either when noting more to add or we have exceeded our step
 				// period or we have encountered an error.
 				// Note: we might bail out immediately if previous processing has already
-				// caused us to exceed the step period.
+				// caused us to exceed the step period or we might exceed it due to an
+				// inter-burst gap.
+				// Note: burst count is 0 until first call to burst_begin() so we check for
+				// burst count being 0 as to whether we should consider inter-burst gap or not.
 				while ( $have_more_content &&
-						!( $zip_period_expired = $this->exceeded_step_period( $this->get_process_monitor()->get_elapsed_time() ) ) &&
+						!( $zip_period_expired = $this->exceeded_step_period( $this->get_process_monitor()->get_elapsed_time() + ( ( 0 == $zm->get_burst_count() ) ? 0 : $this->get_burst_gap() ) ) ) &&
 						!$zip_error_encountered ) {
-			
+
+					// Inter-burst gap if not first burst and inter-burst gap non-zero.
+					// It is less messy to do this here rather than at the end of the loop
+					// despite how it may appear 
+					if ( ( 0 < $zm->get_burst_count() ) && ( 0 < ( $burst_gap = $this->get_burst_gap() ) ) ) {	
+									
+						// Now inject a little delay until the next burst. This may be required to give the
+						// server time to catch up with finalizing file creation and/or it may be required to
+						// reduce the average load a little so there isn't a sustained "peak"
+						// Theoretically a sleep could be interrupted by a signal and it would return some
+						// non-zero value or false - but if that is the case it probably signals something
+						// more troubling so there is little point in tryng to "handle" such a condition here.
+						$this->log( 'details', sprintf( __( 'Zip process reported: Starting burst gap delay of: %1$ss', 'it-l10n-backupbuddy' ), $burst_gap ) );
+						sleep( $burst_gap );
+						
+					}
+
 					// Populate the content file for zip
 					$ilist = array();
 					
@@ -1482,6 +1503,11 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 						// criteria - this can adapt to how each successive burst goes.
 						while ( ( !$contentfile->eof() ) && ( false === $zm->burst_content_complete() ) ) {
 					
+							// Remember where we are in case we need to take back content
+							// Must do this here as current() moves things along although one might expect
+							// next() to do that?
+							$fp = $contentfile->ftell();
+
 							// Should be at least one item to grab from the list and then move to next
 							// and remember it for if we drop out because burst content complete, in
 							// that case we'll return to that point in the file at the next burst start.
@@ -1494,19 +1520,46 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 								
 							}
 							
+							$item['fp'] = $fp;
 							$contentfile->next();
 					
-							$file = $item[ 'relative_path' ] . $item[ 'filename' ];
+							$item['file'] = $item[ 'relative_path' ] . $item[ 'filename' ];
 						
 							// We shouldn't have any empty items here as we should have removed them
 							// earlier, but just in case...
-							if ( !empty( $file ) ) {
+							if ( !empty( $item['file'] ) ) {
 							
-								$ilist[] = $file;
+								// Add the file to the end of the burst content list
+								$ilist[] = $item['file'];
 							
 								// Call the helper event handler as we add each file to the list
 								$zm->burst_content_added( $item );
 							
+							}
+						
+						}
+						
+						// Check that we have not exceeded burst content size constraints and if we have then
+						// remove last item unles theer is only one item in teh busrt in which case we have to
+						// allow it through but will warn about oversize burst and what the content is.
+						if ( $zm->get_burst_current_size_threshold() < $zm->get_burst_content_size() ) {
+						
+							// We have exited the loop with content size greater than threshold
+							If ( 1 < $zm->get_burst_content_count() ) {
+							
+								// More than one item in the burst so the last item must have pushed over
+								// the size threshold so we need to take it back
+								$zm->burst_content_removed( $item );
+								array_pop( $ilist );
+								$contentfile->fseek( $item['fp']);
+								
+							
+							} else {
+							
+								// Only a single file in burst that exceeds threshold so carry on with burst
+								// but warn of large file.
+								$this->log( 'details', sprintf( __( 'Zip process reported: Single file of size: %1$s bytes exceeds current burst size threshold: %2$s bytes - File: %3$s', 'it-l10n-backupbuddy' ), number_format( (double)$item['size'], 0, ".", "" ), number_format( $zm->get_burst_current_size_threshold(), 0, ".", "" ), $item['file'] ) );
+
 							}
 						
 						}
@@ -1700,19 +1753,6 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 						// return 0. If we had any other non-zero exit code it would be a "fatal"
 						// error and we would have dropped out immediately anyway.
 						$exitcode = ( $max_exitcode > $exitcode ) ? $max_exitcode : ( $max_exitcode = $exitcode ) ;
-					}
-					
-					// Now inject a little delay until the next burst. This may be required to give the
-					// server time to catch up with finalizing file creation and/or it may be required to
-					// reduce the average load a little so there isn't a sustained "peak"
-					// Theoretically a sleep could be interrupted by a signal and it would return some
-					// non-zero value or false - but if that is the case it probably signals something
-					// more troubling so there is little point in tryng to "handle" such a condition here.
-					if ( 0 < ( $burst_gap = $this->get_burst_gap() ) ) {
-					
-						$this->log( 'details', sprintf( __( 'Zip process reported: Starting burst gap delay of: %1$ss', 'it-l10n-backupbuddy' ), $burst_gap ) );
-						sleep( $burst_gap );
-						
 					}
 				
 				}
@@ -2363,23 +2403,41 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 				$this->get_process_monitor()->initialize_monitoring_usage();
 				
 				// Now we have our command prototype we can start bursting
-				// Simply build a burst list based on content size. Currently no
-				// look-ahead so the size will always exceed the current size threshold
-				// by some amount. May consider using a look-ahead to see if the next
-				// item would exceed the threshold in which case don't add it (unless it
-				// would be the only content in which case have to add it but also log
-				// a warning).
+				// Simply build a burst list based on content size.
+				// If the burst content size exceeds the burst size threshold then we
+				// operate a take-back of the last item added to the burst (which will
+				// have been the item that caused the threshold to be exceeded) except if
+				// there is only one item in the list so a single large file that is larger
+				// than the threshold - in that case we have to go ahead but we log the
+				// fact and provide the name of the file for easy diagnosis. Could consider
+				// a tolerance on exceeding threshold but then why have the thershold?
 				// We'll stop either when nothing more to add or we have exceeded our step
 				// period or we have encountered an error.
 				// Note: we might bail out immediately if previous processing has already
-				// caused us to exceed the step period. We need to detect this as a corner
-				// case otherwise we can go into an infinite loop because we have more
-				// content and no error but we never get a chance to advance through the
-				// content.
+				// caused us to exceed the step period or we might exceed it due to an
+				// inter-burst gap.
+				// Note: burst count is 0 until first call to burst_begin() so we check for
+				// burst count being 0 as to whether we should consider inter-burst gap or not.
 				while ( $have_more_content &&
-						!( $zip_period_expired = $this->exceeded_step_period( $this->get_process_monitor()->get_elapsed_time() ) ) &&
+						!( $zip_period_expired = $this->exceeded_step_period( $this->get_process_monitor()->get_elapsed_time() + ( ( 0 == $zm->get_burst_count() ) ? 0 : $this->get_burst_gap() ) ) ) &&
 						!$zip_error_encountered ) {
-			
+
+					// Inter-burst gap if not first burst and inter-burst gap non-zero.
+					// It is less messy to do this here rather than at the end of the loop
+					// despite how it may appear 
+					if ( ( 0 < $zm->get_burst_count() ) && ( 0 < ( $burst_gap = $this->get_burst_gap() ) ) ) {	
+									
+						// Now inject a little delay until the next burst. This may be required to give the
+						// server time to catch up with finalizing file creation and/or it may be required to
+						// reduce the average load a little so there isn't a sustained "peak"
+						// Theoretically a sleep could be interrupted by a signal and it would return some
+						// non-zero value or false - but if that is the case it probably signals something
+						// more troubling so there is little point in tryng to "handle" such a condition here.
+						$this->log( 'details', sprintf( __( 'Zip process reported: Starting burst gap delay of: %1$ss', 'it-l10n-backupbuddy' ), $burst_gap ) );
+						sleep( $burst_gap );
+						
+					}
+
 					// Populate the content file for zip
 					$ilist = array();
 					
@@ -2405,6 +2463,11 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 						// criteria - this can adapt to how each successive burst goes.
 						while ( ( !$contentfile->eof() ) && ( false === $zm->burst_content_complete() ) ) {
 					
+							// Remember where we are in case we need to take back content
+							// Must do this here as current() moves things along although one might expect
+							// next() to do that?
+							$fp = $contentfile->ftell();
+
 							// Should be at least one item to grab from the list and then move to next
 							// and remember it for if we drop out because burst content complete, in
 							// that case we'll return to that point in the file at the next burst start.
@@ -2417,18 +2480,46 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 								
 							}
 							
+							$item['fp'] = $fp;
 							$contentfile->next();
 					
-							$file = $item[ 'relative_path' ] . $item[ 'filename' ];
+							$item['file'] = $item[ 'relative_path' ] . $item[ 'filename' ];
 						
 							// We shouldn't have any empty items here as we should have removed them
 							// earlier, but just in case...
-							if ( !empty( $file ) ) {
-								$ilist[] = $file;
+							if ( !empty( $item['file'] ) ) {
+
+								// Add the file to the end of the burst content list
+								$ilist[] = $item['file'];
 							
 								// Call the helper event handler as we add each file to the list
 								$zm->burst_content_added( $item );
 							
+							}
+						
+						}
+					
+						// Check that we have not exceeded burst content size constraints and if we have then
+						// remove last item unles theer is only one item in teh busrt in which case we have to
+						// allow it through but will warn about oversize burst and what the content is.
+						if ( $zm->get_burst_current_size_threshold() < $zm->get_burst_content_size() ) {
+						
+							// We have exited the loop with content size greater than threshold
+							If ( 1 < $zm->get_burst_content_count() ) {
+							
+								// More than one item in the burst so the last item must have pushed over
+								// the size threshold so we need to take it back
+								$zm->burst_content_removed( $item );
+								array_pop( $ilist );
+								$contentfile->fseek( $item['fp']);
+								
+							
+							} else {
+							
+								// Only a single file in burst that exceeds threshold so carry on with burst
+								// but warn of large file.
+								$this->log( 'details', sprintf( __( 'Zip process reported: Single file of size: %1$s bytes exceeds current burst size threshold: %2$s bytes - File: %3$s', 'it-l10n-backupbuddy' ), number_format( (double)$item['size'], 0, ".", "" ), number_format( $zm->get_burst_current_size_threshold(), 0, ".", "" ), $item['file'] ) );
+
 							}
 						
 						}
@@ -2620,19 +2711,6 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 						$exitcode = ( $max_exitcode > $exitcode ) ? $max_exitcode : ( $max_exitcode = $exitcode ) ;
 					}
 					
-					// Now inject a little delay until the next burst. This may be required to give the
-					// server time to catch up with finalizing file creation and/or it may be required to
-					// reduce the average load a little so there isn't a sustained "peak"
-					// Theoretically a sleep could be interrupted by a signal and it would return some
-					// non-zero value or false - but if that is the case it probably signals something
-					// more troubling so there is little point in tryng to "handle" such a condition here.
-					if ( 0 < ( $burst_gap = $this->get_burst_gap() ) ) {
-					
-						$this->log( 'details', sprintf( __( 'Zip process reported: Starting burst gap delay of: %1$ss', 'it-l10n-backupbuddy' ), $burst_gap ) );
-						sleep( $burst_gap );
-						
-					}
-				
 				}
 				
 				// Exited the loop for some reason so decide what to do now.

@@ -190,6 +190,10 @@ class backupbuddy_integrity_check {
 	 *
 	 */
 	function determine_backup_options() {
+		// Make sure it has an array for $options property.
+		if ( ! is_array( $this->backup_options->options ) ) {
+			$this->backup_options->options = array();
+		}
 
 		/**
 		 * First, make sure the $backup_options isn't empty.
@@ -212,10 +216,6 @@ class backupbuddy_integrity_check {
 				return false;
 			}
 
-			// Make sure it has an array for $options property
-			if ( ! is_array( $this->backup_options->options ) ) {
-				$this->backup_options->options = array();
-			}
 
 			// Flag this as Rebuilt
 			$this->backup_options->options['fileoptions_rebuilt'] = true;
@@ -262,10 +262,10 @@ class backupbuddy_integrity_check {
 	function bail_if_disabled() {
 
 		// Integrity check disabled. Skip.
-		if ( 
+		if (
 			pb_backupbuddy::$options['profiles'][0]['integrity_check'] == '0' &&
 			pb_backupbuddy::_GET( 'reset_integrity' ) == '' &&
-			isset( $this->backup_options->options['integrity_check'] ) && 
+			isset( $this->backup_options->options['integrity_check'] ) &&
 			$this->backup_options->options['integrity_check'] == '0' ) {
 				// Integrity checking disabled. Allows run if manually rescanning on backups page.
 				pb_backupbuddy::status( 'details', 'Integrity check disabled. Skipping scan.' );
@@ -340,7 +340,7 @@ class backupbuddy_integrity_check {
 		}
 	}
 
-	/** 
+	/**
 	 * Pre Test setup
 	 */
 	function pre_test_events() {
@@ -427,7 +427,7 @@ class backupbuddy_integrity_check {
 		pb_backupbuddy::status( 'details', 'Getting file details such as size, timestamp, etc.' );
 		$file_stats = @stat( $this->file );
 
-		if ( $file_stats === false ) { 
+		if ( $file_stats === false ) {
 			// stat failure.
 			pb_backupbuddy::status( 'error', 'Error #4539774b. Unable to get file details ( via stat() ) for file `' . $this->file . '`. The file may be corrupt, too large for the server, or been deleted unexpectedly. Check that the file exists and can be accessed.' );
 			$file_size     = 0;
@@ -477,12 +477,12 @@ class backupbuddy_integrity_check {
 			}
 		} else {
 			// Post 2.0 full backup
-			if ( pb_backupbuddy::$classes['zipbuddy']->file_exists( $this->file, 'wp-content/uploads/backupbuddy_temp/' . $this->serial . '/backupbuddy_dat.php' ) === true ) { 
+			if ( pb_backupbuddy::$classes['zipbuddy']->file_exists( $this->file, 'wp-content/uploads/backupbuddy_temp/' . $this->serial . '/backupbuddy_dat.php' ) === true ) {
 				$pass = true;
 			}
 
 			// Pre 2.0 full backup
-			if ( pb_backupbuddy::$classes['zipbuddy']->file_exists( $this->file, 'wp-content/uploads/temp_' . $this->serial . '/backupbuddy_dat.php' ) === true ) { 
+			if ( pb_backupbuddy::$classes['zipbuddy']->file_exists( $this->file, 'wp-content/uploads/temp_' . $this->serial . '/backupbuddy_dat.php' ) === true ) {
 				$pass = true;
 			}
 		}
@@ -504,7 +504,7 @@ class backupbuddy_integrity_check {
 		$href  = admin_url('admin.php') . '?page=pb_backupbuddy_backup&zip_viewer=' . basename( $this->file ) . '&value=' . basename( $this->file ) . '&bub_rand=' . rand( 100, 999 );
 
 		return  array(
-			'test'      => 'Basic file list scan (' . $count . ' files found inside) - <a target="_top" href="' . $href . '">Browse Files</a>', 
+			'test'      => 'Basic file list scan (' . $count . ' files found inside) - <a target="_top" href="' . $href . '">Browse Files</a>',
 			'pass'      => $pass,
 			'fileCount' => $count,
 		);
@@ -531,7 +531,7 @@ class backupbuddy_integrity_check {
 		}
 
 		pb_backupbuddy::status( 'details', 'Verifying database SQL file in zip archive.' );
-		
+
 		if ( isset( $this->backup_options->options['table_sizes'] ) && ( count( $this->backup_options->options['table_sizes'] ) > 0 ) ) {
 			// DB Test for 5.0+
 			$results = array_merge( $results, $this->_test_db_bub5() );
@@ -539,7 +539,7 @@ class backupbuddy_integrity_check {
 			// DB Test for Full Backups 2.0+
 			$results = array_merge( $results,$this->_test_db_bub2_full() );
 		} else if ( pb_backupbuddy::$classes['zipbuddy']->file_exists( $this->file, 'db_1.sql' ) === true ) {
-			// DB only backup 2.0+. 
+			// DB only backup 2.0+.
 			// BUB 5.0+ if breaking out tables only partially or forcing to single file
 			$results = array_merge( $results, $this->_test_db_single_file() );
 		} else if ( pb_backupbuddy::$classes['zipbuddy']->file_exists( $this->file, 'wp-content/uploads/temp_' . $this->serial . '/db.sql' ) === true ) {
@@ -558,7 +558,7 @@ class backupbuddy_integrity_check {
 	 */
 	private function _test_db_bub5() {
 
-		$results = array( 
+		$results = array(
 			'test' => 'Database SQL file',
 			'pass' => true
 		);
@@ -575,7 +575,7 @@ class backupbuddy_integrity_check {
 		} else {
 			pb_backupbuddy::status( 'details', 'Forcing to a single db_1.sql file was NOT enabled for this backup.' );
 		}
-		
+
 		if ( 'db' == $this->backup_type ) {
 			// DB Only BackupType
 			pb_backupbuddy::status( 'details', 'Database-only type backup.' );
@@ -584,11 +584,11 @@ class backupbuddy_integrity_check {
 				// This is a commandline based DB dump
 				pb_backupbuddy::status( 'details', 'Command line based database dump type.' );
 
-				if ( 
-					isset( $this->backup_options->options['breakout_tables'] ) && 
-					( count( $this->backup_options->options['breakout_tables'] ) > 0 ) && 
-					( true !== $this->backup_options->options['force_single_db_file'] ) 
-					) { 
+				if (
+					isset( $this->backup_options->options['breakout_tables'] ) &&
+					( count( $this->backup_options->options['breakout_tables'] ) > 0 ) &&
+					( true !== $this->backup_options->options['force_single_db_file'] )
+					) {
 						// We need to verify broken out table SQL files exist.
 						pb_backupbuddy::status( 'details', 'Some tables were broken out. Checking for them (' . implode(',', $this->backup_options->options['breakout_tables'] ) . '). (DB type)' );
 
@@ -614,7 +614,7 @@ class backupbuddy_integrity_check {
 					}
 				}
 			}
-		} else { 
+		} else {
 			// Backup type is Full, MS, or Export.
 			pb_backupbuddy::status( 'details', 'Not database-only type backup.' );
 
@@ -622,11 +622,11 @@ class backupbuddy_integrity_check {
 				// Commandline based SQL DUMP.
 				pb_backupbuddy::status( 'details', 'Command line based database dump type.' );
 
-				if ( 
-					isset( $this->backup_options->options['breakout_tables'] ) && 
-					( count( $this->backup_options->options['breakout_tables'] ) > 0 ) 
-					&& ( true !== $this->backup_options->options['force_single_db_file'] ) 
-				) { 
+				if (
+					isset( $this->backup_options->options['breakout_tables'] ) &&
+					( count( $this->backup_options->options['breakout_tables'] ) > 0 )
+					&& ( true !== $this->backup_options->options['force_single_db_file'] )
+				) {
 					// We need to verify broken out table SQL files exist.
 					pb_backupbuddy::status( 'details', 'Some tables were broken out. Checking for them (' . implode(',', $this->backup_options->options['breakout_tables'] ) . '). (DB type)' );
 
@@ -639,7 +639,7 @@ class backupbuddy_integrity_check {
 						}
 					}
 				}
-			} else { 
+			} else {
 				// PHP-based SQL Dump.
 				pb_backupbuddy::status( 'details', 'PHP based database dump type.' );
 
@@ -653,10 +653,10 @@ class backupbuddy_integrity_check {
 				}
 			}
 		}
-		
+
 		// Make test name plural and append table count to it.
 		$results['test'] .= 's (' . count( $this->backup_options->options['table_sizes'] ) . ' tables)';
-	
+
 		return $results;
 	}
 
@@ -664,13 +664,13 @@ class backupbuddy_integrity_check {
 	 * DB Test for Full Backups 2.0+
 	 */
 	private function _test_db_bub2_full() {
-		$results = array( 
+		$results = array(
 			'pass' => true
 		);
-		if ( 
-			isset( $this->backup_options->options['breakout_tables'] ) && 
-			( count( $this->backup_options->options['breakout_tables'] ) > 0 ) 
-		) { 
+		if (
+			isset( $this->backup_options->options['breakout_tables'] ) &&
+			( count( $this->backup_options->options['breakout_tables'] ) > 0 )
+		) {
 			// We have to verify broken out table SQL files exist.
 			pb_backupbuddy::status( 'details', 'Some tables were broken out. Checking for them (' . implode(',', $this->backup_options->options['breakout_tables'] ) . '). (full type)' );
 			foreach( $this->backup_options->options['breakout_tables'] as $tableName ) {
@@ -686,14 +686,14 @@ class backupbuddy_integrity_check {
 	}
 
 	/**
-	 * DB only backup 2.0+. 
+	 * DB only backup 2.0+.
 	 * BUB 5.0+ if breaking out tables only partially or forcing to single file
 	 */
 	private function _test_db_single_file() {
-		$results = array( 
+		$results = array(
 			'pass' => true
 		);
-		if ( isset( $this->backup_options->options['breakout_tables'] ) && ( count( $this->backup_options->options['breakout_tables'] ) > 0 ) ) { 
+		if ( isset( $this->backup_options->options['breakout_tables'] ) && ( count( $this->backup_options->options['breakout_tables'] ) > 0 ) ) {
 			// Need to verify broken out table SQL files exist.
 			pb_backupbuddy::status( 'details', 'Some tables were broken out. Checking for them (' . implode(',', $this->backup_options->options['breakout_tables'] ) . '). (db type)' );
 

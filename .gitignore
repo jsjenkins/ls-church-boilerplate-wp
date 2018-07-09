@@ -51,8 +51,6 @@ wp-content/upgrade/
 wp-content/uploads/
 
 # Wordfence
-wp-content/plugins/wordfence
-wp-content/plugins/wordfence
 wp-content/wflogs
 wp-content/wfcache
 wordfence-waf.php

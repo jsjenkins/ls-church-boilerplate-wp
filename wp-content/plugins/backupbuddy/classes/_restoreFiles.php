@@ -12,15 +12,15 @@ class backupbuddy_restore_files {
 	 *
 	 */
 	public static function restore( $archive_file, $files, $finalPath, &$zipbuddy = null ) {
-		if ( !defined( 'PB_STANDALONE' ) || PB_STANDALONE === false ) {
+		if ( ! pb_is_standalone() ) {
 			if ( ! current_user_can( pb_backupbuddy::$options['role_access'] ) ) {
 				die( 'Error #473623. Access Denied.' );
 			}
 		}
-		
+
 		$serial = backupbuddy_core::get_serial_from_file( $archive_file ); // serial of archive.
 		$success = false;
-		
+
 		foreach( $files as $file ) {
 			$file = str_replace( '*', '', $file ); // Remove any wildcard.
 			if ( file_exists( $finalPath . $file ) && is_dir( $finalPath . $file ) ) {
@@ -30,14 +30,14 @@ class backupbuddy_restore_files {
 				}
 			}
 		}
-		
-		
+
+
 		if ( null === $zipbuddy ) {
 			require_once( pb_backupbuddy::plugin_path() . '/lib/zipbuddy/zipbuddy.php' );
 			$zipbuddy = new pluginbuddy_zipbuddy( backupbuddy_core::getBackupDirectory() );
 		}
-		
-		
+
+
 		// Calculate temp directory & lock it down.
 		$temp_dir = get_temp_dir();
 		$destination = $temp_dir . 'backupbuddy-' . $serial;
@@ -46,8 +46,8 @@ class backupbuddy_restore_files {
 			pb_backupbuddy::status( 'error', $error );
 			return false;
 		}
-		
-		
+
+
 		// If temp directory is within webroot then lock it down.
 		$temp_dir = str_replace( '\\', '/', $temp_dir ); // Normalize for Windows.
 		$temp_dir = rtrim( $temp_dir, '/\\' ) . '/'; // Enforce single trailing slash.
@@ -56,25 +56,25 @@ class backupbuddy_restore_files {
 		}
 		unset( $temp_dir );
 		pb_backupbuddy::status( 'details', 'Extracting into temporary directory "' . $destination . '".' );
-		
+
 		$prettyFilesList = array();
 		foreach( $files as $fileSource => $fileDestination ) {
 			$prettyFilesList[] = $fileSource . ' => ' . $fileDestination;
 		}
 		pb_backupbuddy::status( 'details', 'Files to extract: `' . htmlentities( implode( ', ', $prettyFilesList ) ) . '`.' );
 		unset( $prettyFilesList );
-		
+
 		pb_backupbuddy::flush();
-		
+
 		// Do the actual extraction.
 		$extract_success = true;
 		if ( false === $zipbuddy->extract( $archive_file, $destination, $files ) ) {
 			pb_backupbuddy::status( 'error', 'Error #584984458b. Unable to extract.' );
 			$extract_success = false;
 		}
-		
+
 		if ( true === $extract_success ) {
-			
+
 			// Verify all files/directories to be extracted exist in temp destination directory. If any missing then delete everything and bail out.
 			foreach( $files as &$file ) {
 				$file = str_replace( '*', '', $file ); // Remove any wildcard.
@@ -89,13 +89,13 @@ class backupbuddy_restore_files {
 						}
 					}
 					pb_backupbuddy::status( 'error', 'Error #854783474. One or more expected files / directories missing.' );
-					
+
 					$extract_success = false;
 					break;
 				}
 			}
 			unset( $file );
-			
+
 			// Made it this far so files all exist. Move them all.
 			foreach( $files as $file ) {
 				@trigger_error( '' ); // Clear out last error.
@@ -113,10 +113,10 @@ class backupbuddy_restore_files {
 					$success = true;
 				}
 			}
-			
+
 		} // end extract success.
-		
-		
+
+
 		// Try to cleanup.
 		if ( file_exists( $destination ) ) {
 			if ( false === pb_backupbuddy::$filesystem->unlink_recursive( $destination ) ) {
@@ -125,15 +125,15 @@ class backupbuddy_restore_files {
 				pb_backupbuddy::status( 'details', 'Cleaned up temporary files.' );
 			}
 		}
-		
-		
+
+
 		if ( true === $success ) {
 			pb_backupbuddy::status( 'message', 'File retrieval completed successfully.' );
 			return true;
 		} else {
 			return false;
 		}
-		
+
 	} // End function restore().
 
 } // End class.

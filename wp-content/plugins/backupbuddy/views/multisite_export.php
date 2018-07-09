@@ -5,7 +5,7 @@ global $wpdb, $table_prefix;
 if ( $wpdb->prefix == $wpdb->base_prefix ) {
 	echo '<h3>' . __( 'Export Unavailable for Main Site', 'it-l10n-backupbuddy' ) . '</h3>';
 	_e( 'The main Network site (base: `' . $wpdb->base_prefix . '`; this site prefix: `' . $wpdb->prefix . '`; table prefix: `' . $table_prefix . '`) cannot be exported as it is tied to the Network. It can only be backed up from the main Network Admin. All other subsites can be exported for importing into the same Network (aka Duplicate), another Network, or as a standalone site.', 'it-l10n-backupbuddy' );
-	echo ' See the <a href="http://ithemes.com/codex/page/BackupBuddy_Multisite">BackupBuddy Multisite Knowledge Base</a> for additional information.';
+	echo ' See the <a href="https://ithemeshelp.zendesk.com/hc/en-us/articles/115004532967-Backup-Restore-and-Migrate-with-BackupBuddy-Multisite-Experimental-">BackupBuddy Multisite Knowledge Base</a> for additional information.';
 	echo '<br><br><br>';
 	return;
 }
@@ -13,32 +13,32 @@ if ( $wpdb->prefix == $wpdb->base_prefix ) {
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		
+
 		jQuery( '.pb_backupbuddy_hoveraction_send' ).click( function(e) {
 			tb_show( 'BackupBuddy', '<?php echo pb_backupbuddy::ajax_url( 'destination_picker' ); ?>&callback_data=' + jQuery(this).attr('rel') + '&sending=1&TB_iframe=1&width=640&height=455', null );
 			return false;
 		});
-		
+
 		jQuery( '.pb_backupbuddy_hoveraction_hash' ).click( function(e) {
 			tb_show( 'BackupBuddy', '<?php echo pb_backupbuddy::ajax_url( 'hash' ); ?>&callback_data=' + jQuery(this).attr('rel') + '&TB_iframe=1&width=640&height=455', null );
 			return false;
 		});
-		
-		
-		
+
+
+
 		jQuery( '.pb_backupbuddy_hoveraction_note' ).click( function(e) {
-			
+
 			var existing_note = jQuery(this).parents( 'td' ).find('.pb_backupbuddy_notetext').text();
 			if ( existing_note == '' ) {
 				existing_note = 'My first backup';
 			}
-			
+
 			var note_text = prompt( '<?php _e( 'Enter a short descriptive note to apply to this archive for your reference. (175 characters max)', 'it-l10n-backupbuddy' ); ?>', existing_note );
 			if ( ( note_text == null ) || ( note_text == '' ) ) {
 				// User cancelled.
 			} else {
 				jQuery( '.pb_backupbuddy_backuplist_loading' ).show();
-				jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'set_backup_note' ); ?>', { backup_file: jQuery(this).attr('rel'), note: note_text }, 
+				jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'set_backup_note' ); ?>', { backup_file: jQuery(this).attr('rel'), note: note_text },
 					function(data) {
 						data = jQuery.trim( data );
 						jQuery( '.pb_backupbuddy_backuplist_loading' ).hide();
@@ -51,14 +51,14 @@ if ( $wpdb->prefix == $wpdb->base_prefix ) {
 			}
 			return false;
 		});
-		
-		
-		
+
+
+
 	});
-	
+
 	function pb_backupbuddy_selectdestination( destination_id, destination_title, callback_data, delete_after, mode ) {
 		if ( callback_data != '' ) {
-			jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'remote_send' ); ?>', { destination_id: destination_id, destination_title: destination_title, file: callback_data, trigger: 'manual' }, 
+			jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'remote_send' ); ?>', { destination_id: destination_id, destination_title: destination_title, file: callback_data, trigger: 'manual' },
 				function(data) {
 					data = jQuery.trim( data );
 					if ( data.charAt(0) != '1' ) {
@@ -68,7 +68,7 @@ if ( $wpdb->prefix == $wpdb->base_prefix ) {
 					}
 				}
 			);
-			
+
 			/* Try to ping server to nudge cron along since sometimes it doesnt trigger as expected. */
 			jQuery.post( '<?php echo admin_url('admin-ajax.php'); ?>',
 				function(data) {
@@ -86,8 +86,8 @@ if ( $wpdb->prefix == $wpdb->base_prefix ) {
 			?>?page=pb_backupbuddy_backup&custom=remoteclient&destination_id=' + destination_id;
 		}
 	}
-	
-	
+
+
 	/*
 	function pb_backupbuddy_selectdestination( destination_id, destination_title, callback_data ) {
 		window.location.href = '<?php echo admin_url( 'admin.php' ); ?>?page=pb_backupbuddy_backup&custom=remoteclient&destination_id=' + destination_id;
@@ -96,7 +96,7 @@ if ( $wpdb->prefix == $wpdb->base_prefix ) {
 </script>
 
 
-<p>For BackupBuddy Multisite documentation, please visit the <a href='http://ithemes.com/codex/page/BackupBuddy_Multisite'>BackupBuddy Multisite Codex</a>.</p>
+<p>For BackupBuddy Multisite documentation, please visit the <a href='https://ithemeshelp.zendesk.com/hc/en-us/articles/115004532967-Backup-Restore-and-Migrate-with-BackupBuddy-Multisite-Experimental-'>BackupBuddy Multisite Codex</a>.</p>
 <br>
 
 <h3>Select plugins to include in Export</h3>
@@ -136,10 +136,10 @@ if ( $wpdb->prefix == $wpdb->base_prefix ) {
 				<td><?php echo esc_html( $name ); ?></td>
 				<td><?php echo esc_html( $description ); ?></td>
 				<td><?php esc_html_e( 'Must Use', 'it-l10n-backupbuddy' ); ?></td>
-			</tr>	
+			</tr>
 				<?php
 			} //end foreach
-			
+
 			//Get Drop INs
 			foreach ( get_dropins() as $file => $meta ) {
 				$description = !empty( $meta[ 'Description' ] ) ? $meta[ 'Description' ] : '';
@@ -150,10 +150,10 @@ if ( $wpdb->prefix == $wpdb->base_prefix ) {
 				<td><?php echo esc_html( $name ); ?></td>
 				<td><?php echo esc_html( $description ); ?></td>
 				<td><?php esc_html_e( 'Drop In', 'it-l10n-backupbuddy' ); ?></td>
-			</tr>	
+			</tr>
 				<?php
 			} //end foreach drop ins
-			
+
 			//Get Network Activated
 			foreach ( get_plugins() as $file => $meta ) {
 				if ( !is_plugin_active_for_network( $file ) ) continue;
@@ -165,7 +165,7 @@ if ( $wpdb->prefix == $wpdb->base_prefix ) {
 				<td><?php echo esc_html( $name ); ?></td>
 				<td><?php echo esc_html( $description ); ?></td>
 				<td><?php esc_html_e( 'Network Activated', 'it-l10n-backupbuddy' ); ?></td>
-			</tr>	
+			</tr>
 				<?php
 			} //end foreach drop ins
 			?>
