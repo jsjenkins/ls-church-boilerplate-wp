@@ -1,0 +1,35 @@
+h1, h2, h3, h4, h5, h6 {
+	font-family: "brandon-grotesque", 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
+	text-transform: uppercase;
+	color: #264C59;
+}
+h1 {
+	font-size: 48px;
+}
+h2 { 
+	font-size: 42px;
+}
+h3 { 
+	font-size: 28px;
+}
+h4 { 
+	font-size: 22px;
+}
+h5 { 
+	font-size: 18px;
+}
+h6 { 
+	font-size: 19px;
+	font-weight: normal;
+	color: #000;
+	text-transform: none;
+}
+h3.blue-text,
+h4.blue-text {
+	color: #A4C6D3;
+	text-transform: none;
+	font-weight: normal;
+}
+p {
+	font-family: "adobe-garamond-pro", 'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
+}

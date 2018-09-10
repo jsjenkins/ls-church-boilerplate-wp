@@ -14,8 +14,12 @@ import Foundation from 'foundation-sites';
 
 require('./lib/jquery.fitVids.js');
 
-$(document).foundation();
+$(document).ready(function() {
 
-$('body').fitVids({
-  customSelector: 'iframe[src*="facebook"]'
+	$(document).foundation();
+
+	$('body').fitVids({
+		customSelector: 'iframe[src*="facebook"], iframe[src^="https://livestream.com"]'
+	});
+
 });

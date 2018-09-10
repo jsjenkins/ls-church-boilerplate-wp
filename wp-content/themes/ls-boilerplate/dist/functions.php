@@ -329,4 +329,16 @@ require get_template_directory() . '/inc/shortcodes.php';
 
 require get_template_directory() . '/inc/display.php';
 
+/*------------------------------------*\
+    ACF Functions
+\*------------------------------------*/
+
+require get_template_directory() . '/inc/acf.php';
+
+/*------------------------------------*\
+    Text Editor
+\*------------------------------------*/
+
+require get_template_directory() . '/inc/text-editor.php';
+
 ?>
