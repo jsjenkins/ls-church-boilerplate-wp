@@ -26,7 +26,7 @@ function thumbnail_image_array() {
 
 function acf_image_array( $variable_name, $sub=FALSE, $options='' ) {
 
-	if( $sub ) {}
+	if( $sub ) {
 		$variable_image = get_sub_field($variable_name);
 	} else {
 		$variable_image = get_field($variable_name, $options);
@@ -48,7 +48,7 @@ function acf_image_array( $variable_name, $sub=FALSE, $options='' ) {
 
 function link_from_link( $variable_name, $sub=FALSE, $options='' ) {
 
-	if( $sub ) {}
+	if( $sub ) {
 		$link = get_sub_field($variable_name);
 	} else {
 		$link = get_field($variable_name, $options);
@@ -65,7 +65,7 @@ function link_from_link( $variable_name, $sub=FALSE, $options='' ) {
 
 function button_from_link( $variable_name, $sub=FALSE, $options='' ) {
 
-	if( $sub ) {}
+	if( $sub ) {
 		$link = get_sub_field($variable_name);
 	} else {
 		$link = get_field($variable_name, $options);
