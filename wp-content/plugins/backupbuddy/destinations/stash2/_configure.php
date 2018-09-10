@@ -17,10 +17,10 @@ $itxapi_token = '';
 
 
 if ( $mode == 'add' ) { // ADD MODE.
-	
-	
+
+
 	$credentials_form = new pb_backupbuddy_settings( 'pre_settings', false, 'action=pb_backupbuddy_backupbuddy&function=destination_picker&quickstart=' . htmlentities( pb_backupbuddy::_GET( 'quickstart' ) ) . '&add=' . htmlentities( pb_backupbuddy::_GET( 'add' ) ) . '&callback_data=' . htmlentities( pb_backupbuddy::_GET( 'callback_data' ) ) . '&sending=' . pb_backupbuddy::_GET( 'sending' ) . '&selecting=' . pb_backupbuddy::_GET( 'selecting' ) ); // name, savepoint|false, additional querystring
-	
+
 	$credentials_form->add_setting( array(
 		'type'		=>		'text',
 		'name'		=>		'itxapi_username',
@@ -35,16 +35,16 @@ if ( $mode == 'add' ) { // ADD MODE.
 		'tip'		=>		__( '[Example: 48dsds!s08K%x2s] - Your iThemes.com membership password.', 'it-l10n-backupbuddy' ),
 		'rules'		=>		'required|string[1-250]',
 	) );
-	
+
 	$settings_result = $credentials_form->process();
-	
+
 	$login_welcome = __( 'Log in with your iThemes.com member account to begin.', 'it-l10n-backupbuddy' );
-	
-	if ( count( $settings_result ) == 0 ) { // No form submitted.
-		
+
+	if ( count( $settings_result ) === 0 ) { // No form submitted.
+
 		echo $login_welcome;
 		$credentials_form->display_settings( 'Submit' );
-		
+
 		$pb_hide_test = true;
 		$pb_hide_save = true;
 		return;
@@ -53,27 +53,27 @@ if ( $mode == 'add' ) { // ADD MODE.
 			echo $login_welcome;
 			pb_backupbuddy::alert( implode( '<br>', $settings_result['errors'] ) );
 			$credentials_form->display_settings( 'Submit' );
-			
+
 			$pb_hide_test = true;
 			$pb_hide_save = true;
 			return;
 		} else { // No form errors; process!
 			$pb_hide_test = true;
 			$pb_hide_save = true;
-			
+
 			require_once( dirname( __FILE__ ) . '/class.itx_helper2.php' );
 			global $wp_version;
-			
+
 			$itxapi_username = strtolower( $settings_result['data']['itxapi_username'] );
 			$password_hash = iThemes_Credentials::get_password_hash( $itxapi_username, $settings_result['data']['itxapi_password_raw'] );
 			$access_token = ITXAPI_Helper2::get_access_token( $itxapi_username, $password_hash, site_url(), $wp_version );
-			
+
 			$settings = array(
 				'itxapi_username' => $itxapi_username,
 				'itxapi_password' => $access_token,
 			);
 			$response = pb_backupbuddy_destination_stash2::stashAPI( $settings, 'connect' );
-			
+
 			if ( ! is_array( $response ) ) { // Error message.
 				pb_backupbuddy::alert( 'Error #23333: Unexpected server response. Check your login and try again. Detailed response: `' . print_r( $response, true ) .'`.' );
 				$credentials_form->display_settings( 'Submit' );
@@ -90,35 +90,35 @@ if ( $mode == 'add' ) { // ADD MODE.
 					}
 				}
 			}
-			
+
 		}
-		
+
 	} // end form submitted.
-	
-	
+
+
 } elseif ( $mode == 'edit' ) { // EDIT MODE.
-	
+
 	$settings = array(
 		'itxapi_username' => $destination_settings['itxapi_username'],
 		'itxapi_token' => $destination_settings['itxapi_token'],
 	);
-	
+
 	$account_info = pb_backupbuddy_destination_stash2::get_quota( $settings );
 	$itxapi_username = $destination_settings['itxapi_username'];
-	
+
 }
 
 
 if ( ( $mode == 'save' ) || ( $mode == 'edit' ) || ( $itxapi_token != '' ) ) {
 	$default_name = NULL;
-	
+
 	if ( ( $mode != 'save' ) && ( 'edit' != $mode ) ) {
 		$settings = array(
 			'itxapi_username' => $itxapi_username,
 			'itxapi_token' => $itxapi_token,
 		);
 		$account_info = pb_backupbuddy_destination_stash2::get_quota( $settings );
-		
+
 		if ( ! is_array( $account_info ) ) {
 			$pb_hide_test = true;
 			$pb_hide_save = true;
@@ -127,7 +127,7 @@ if ( ( $mode == 'save' ) || ( $mode == 'edit' ) || ( $itxapi_token != '' ) ) {
 			$pb_hide_test = false;
 			$pb_hide_save = false;
 		}
-		
+
 		$account_details = 'Welcome to your BackupBuddy Stash, <b>' . $itxapi_username . '</b>. Your account is ';
 		if ( $account_info['subscriber_locked'] == '1' ) {
 			$account_details .= 'LOCKED';
@@ -139,17 +139,17 @@ if ( ( $mode == 'save' ) || ( $mode == 'edit' ) || ( $itxapi_token != '' ) ) {
 			$account_details .= 'Unknown';
 		}
 		$account_details .= '.';
-		
+
 		if ( $mode == 'add' ) {
 			$default_name = 'My Stash (v2)';
-			
+
 			echo $account_details;
 			//echo '<br>';
 			echo ' ' . __( 'To jump right in using the defaults just hit "Add Destination" below.', 'it-l10n-backupbuddy' );
 		} else {
 			echo '<div style="text-align: center;">' . $account_details . '</div>';
 		}
-		
+
 		if ( $mode == 'add' ) {
 			// Check to see if user already has a Stash with this username set up for this site. No need for multiple same account Stashes.
 			foreach( (array)pb_backupbuddy::$options['remote_destinations'] as $destination ) {
@@ -162,15 +162,15 @@ if ( ( $mode == 'save' ) || ( $mode == 'edit' ) || ( $itxapi_token != '' ) ) {
 				}
 			}
 		}
-		
+
 		echo '<br><br>';
 		echo pb_backupbuddy_destination_stash2::get_quota_bar( $account_info );
-		
+
 		echo '<!-- STASH DETAILS: ' . print_r( $account_info, true ) . ' -->';
-		
+
 	} // end if NOT in save mode.
-	
-	
+
+
 	// Form settings.
 	$settings_form->add_setting( array(
 		'type'		=>		'text',
@@ -198,7 +198,7 @@ if ( ( $mode == 'save' ) || ( $mode == 'edit' ) || ( $itxapi_token != '' ) ) {
 		'css'		=>		'width: 50px;',
 		'after'		=>		' backups. &nbsp;<span class="description">0 or blank for no limit.</span>',
 	) );
-	
+
 	$settings_form->add_setting( array(
 		'type'		=>		'text',
 		'name'		=>		'themes_archive_limit',
@@ -235,17 +235,17 @@ if ( ( $mode == 'save' ) || ( $mode == 'edit' ) || ( $itxapi_token != '' ) ) {
 		'css'		=>		'width: 50px;',
 		'after'		=>		' backups. &nbsp;<span class="description">0 or blank for no limit.</span>',
 	) );
-	
-	
+
+
 	$settings_form->add_setting( array(
 		'type'		=>		'title',
 		'name'		=>		'advanced_begin',
 		'title'		=>		'<span class="dashicons dashicons-arrow-right"></span> ' . __( 'Advanced Options', 'it-l10n-backupbuddy' ),
 		'row_class'	=>		'advanced-toggle-title',
 	) );
-	
-	
-	
+
+
+
 	$settings_form->add_setting( array(
 		'type'		=>		'text',
 		'name'		=>		'max_burst',

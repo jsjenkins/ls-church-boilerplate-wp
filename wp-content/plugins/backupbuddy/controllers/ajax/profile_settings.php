@@ -1,16 +1,16 @@
 <?php
-backupbuddy_core::verifyAjaxAccess();
-
-
-// Settings page backup profile editing.
-/* profile_settings()
+/**
+ * Settings page backup profile editing.
  *
  * View a specified profile's settings.
  *
+ * @package BackupBuddy
  */
 
-pb_backupbuddy::$ui->ajax_header();
-require_once( pb_backupbuddy::plugin_path() . '/views/settings/_includeexclude.php' );
-pb_backupbuddy::$ui->ajax_footer();
-die();
+backupbuddy_core::verifyAjaxAccess();
 
+pb_backupbuddy::$ui->ajax_header();
+require_once pb_backupbuddy::plugin_path() . '/views/settings/_includeexclude.php';
+pb_backupbuddy::$ui->ajax_footer();
+
+die();

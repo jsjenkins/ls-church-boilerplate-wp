@@ -1,66 +1,66 @@
 <?php
-if ( ! is_admin() ) { die( 'Access Denied.' ); }
+/**
+ * Activity Settings View
+ *
+ * @package BackupBuddy
+ */
+
+is_admin() || die( 'Access Denied.' );
 
 // Load notifications.
 $notifications = backupbuddy_core::getNotifications();
 
 // Compile table from notifications.
-$notificationTable = array();
-foreach( $notifications as $notification ) {
-	
+$notification_table = array();
+
+foreach ( $notifications as $notification ) {
+
 	$slug = $notification['slug'];
 	if ( true === $notification['urgent'] ) {
 		$slug = '<font color="red">' . $slug . '</font>';
 	}
-	
-	$additionalData = '<i>None</i>';
+
+	$additional_data = '<i>None</i>';
 	if ( count( $notification['data'] ) > 0 ) {
-		//$additionalData = '<textarea>' . print_r( $notification['data'], true ) . '</textarea>';
-		$additionalData = '<textarea class="backupbuddy-recent-activity-details" wrap="off">';
-		foreach( $notification['data'] as $thisKey => $thisData ) {
-			if ( is_array( $thisData ) ) {
-				$thisData = print_r( $thisData, true );
+		$additional_data = '<textarea class="backupbuddy-recent-activity-details" wrap="off">';
+		foreach ( $notification['data'] as $this_key => $this_data ) {
+			if ( is_array( $this_data ) ) {
+				$this_data = print_r( $this_data, true );
 			}
-			$additionalData .= str_pad( $thisKey, 15 ) . $thisData . "\n";
+			$additional_data .= str_pad( $this_key, 15 ) . $this_data . "\n";
 		}
-		$additionalData .= '</textarea>';
+		$additional_data .= '</textarea>';
 	}
-	
-	$time = pb_backupbuddy::$format->date( pb_backupbuddy::$format->localize_time( $notification['time'] ) );
+
+	$time  = pb_backupbuddy::$format->date( pb_backupbuddy::$format->localize_time( $notification['time'] ) );
 	$time .= '<br><span class="description">' . pb_backupbuddy::$format->time_ago( $notification['time'] ) . ' ago</span>';
-	
-	$notificationTable[] = array(
+
+	$notification_table[] = array(
 		$slug,
 		'<b>' . $notification['title'] . '</b><br>' . esc_html( $notification['message'] ),
 		$time,
-		$additionalData,
+		$additional_data,
 	);
 }
 
-
 // Flip newest up top.
-$notificationTable = array_reverse( $notificationTable );
+$notification_table = array_reverse( $notification_table );
 
-echo '<p>';
-if ( count( $notificationTable ) > 0 ) {
-	//_e( 'Below lists some of the recent activity for this site.', 'it-l10n-backupbuddy' );
-} else {
-	_e( 'No recent activity logged yet.', 'it-l10n-backupbuddy' );
+if ( count( $notification_table ) <= 0 ) {
+	printf( '<p>%s</p>', esc_html__( 'No recent activity logged yet.', 'it-l10n-backupbuddy' ) );
 	return;
 }
-echo '</p>';
 
 // Display table.
 pb_backupbuddy::$ui->list_table(
-	$notificationTable, // Array of cron items set in code section above.
+	$notification_table, // Array of cron items set in code section above.
 	array(
-		//'action'					=>	pb_backupbuddy::page_url() . '#pb_backupbuddy_getting_started_tab_tools',
-		'columns'					=>	array(
-											__( 'Action', 'it-l10n-backupbuddy' ),
-											__( 'Title & Message', 'it-l10n-backupbuddy' ),
-											__( 'When', 'it-l10n-backupbuddy' ),
-											__( 'Additional Data', 'it-l10n-backupbuddy' ),
-										),
-		'css'						=>		'width: 100%;',
+		'columns' => array(
+			__( 'Action', 'it-l10n-backupbuddy' ),
+			__( 'Title & Message', 'it-l10n-backupbuddy' ),
+			__( 'When', 'it-l10n-backupbuddy' ),
+			__( 'Additional Data', 'it-l10n-backupbuddy' ),
+		),
+		'css'     => 'width: 100%;',
 	)
 );

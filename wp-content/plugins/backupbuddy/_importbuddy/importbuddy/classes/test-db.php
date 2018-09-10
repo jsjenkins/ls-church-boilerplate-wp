@@ -184,26 +184,24 @@ class importbuddy_test_db{
 	 * Tests for existing tables with the same prefix
 	 *
 	 * @since 6.4.0.13
-	 *
-	 * @return void
 	 */
-	function test_prefix() {
+	public function test_prefix() {
 		// Make sure we've already connected. This should never be true.
 		if ( empty( $this->tests['connect'] ) ) {
 			$this->test_connect();
 		}
 
-        // WordPress tables exist matching prefix?
-        $prefix_exists_sql = $this->wpdb->prepare( "SHOW TABLES LIKE '%s';", str_replace( '_', '\_', $this->creds['prefix'] ) . "%" );
+		// WordPress tables exist matching prefix?
+		$prefix_exists_sql = $this->wpdb->prepare( "SHOW TABLES LIKE '%s';", str_replace( '_', '\_', $this->creds['prefix'] ) . "%" );
 		$result            = $this->wpdb->get_results( $prefix_exists_sql );
-		if ( empty( $result ) ) { // WordPress prefix does not exist
-            $this->tests['prefix_exists'] = false;
-        }
+		if ( empty( $result ) ) { // WordPress prefix does not exist.
+			$this->tests['prefix_exists'] = false;
+		}
 
-		// Make sure prefix meets wp standards
-		if ( ! preg_match('|[^a-z0-9_]|i', $this->creds['prefix'] ) ) { // Prefix meets WP standards
+		// Make sure prefix meets wp standards.
+		if ( ! preg_match( '|[^a-z0-9_]|i', $this->creds['prefix'] ) ) { // Prefix meets WP standards.
 			$this->tests['prefix'] = true;
-			if ( preg_match('/^[a-z0-9]+_$/i', $this->creds['prefix'] ) ) { // Prefix passes with no warning.
+			if ( preg_match( '/^[a-z0-9]+((_[a-z0-9]+)?)+?_$/i', $this->creds['prefix'] ) ) { // Prefix passes with no warning.
 				$this->tests['prefix_warn'] = false;
 			} else {
 				$this->tests['prefix_warn'] = true;

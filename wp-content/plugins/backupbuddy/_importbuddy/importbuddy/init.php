@@ -27,7 +27,10 @@ error_reporting( E_ERROR | E_WARNING | E_PARSE | E_NOTICE ); // HIGH.
 define( 'PB_STANDALONE', true );
 define( 'PB_IMPORTBUDDY', true );
 
-$pluginbuddy_settings = array(
+require_once ABSPATH . 'importbuddy/importbuddy-hooks.php';
+it_bub_importbuddy_do_action( 'init' );
+
+$pluginbuddy_settings = it_bub_importbuddy_apply_filters( 'pluginbuddy_settings', array(
 	'slug'                    => 'backupbuddy',
 	'php_minimum'             => '5.2',
 	'series'                  => '',
@@ -43,7 +46,7 @@ $pluginbuddy_settings = array(
 		'filesystem' => true,                       // File system helper methods.
 		'format'     => true,                       // Text / data formatting helper methods.
 	),
-);
+) );
 
 // $settings is expected to be populated prior to including PluginBuddy framework. Do not edit below.
 require dirname( __FILE__ ) . '/pluginbuddy/_pluginbuddy.php';

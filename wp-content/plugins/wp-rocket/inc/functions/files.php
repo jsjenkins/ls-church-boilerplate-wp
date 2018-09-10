@@ -179,6 +179,8 @@ function rocket_generate_config_file() {
 	list( $config_files_path, $buffer ) = get_rocket_config_file();
 
 	if ( count( $config_files_path ) ) {
+		rocket_init_config_dir();
+
 		foreach ( $config_files_path as $file ) {
 			rocket_put_content( $file, $buffer );
 		}
@@ -289,7 +291,7 @@ function set_rocket_wp_cache_define( $turn_it_on ) {
 	 *
 	 * @param string $turn_it_on The value of WP_CACHE constant.
 	*/
-	apply_filters( 'set_rocket_wp_cache_define', $turn_it_on );
+	$turn_it_on = apply_filters( 'set_rocket_wp_cache_define', $turn_it_on );
 
 	// Lets find out if the constant WP_CACHE is defined or not.
 	$is_wp_cache_exist = false;
@@ -337,11 +339,8 @@ function set_rocket_wp_cache_define( $turn_it_on ) {
  * @return void
  */
 function rocket_clean_minify( $extensions = array( 'js', 'css' ) ) {
-	if ( version_compare( PHP_VERSION, '5.3' ) < 0 ) {
-		return;
-	}
-
 	$extensions = is_string( $extensions ) ? (array) $extensions : $extensions;
+
 	try {
 		$dir = new RecursiveDirectoryIterator( WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id(), FilesystemIterator::SKIP_DOTS );
 	} catch ( Exception $e ) {
@@ -391,6 +390,21 @@ function rocket_clean_minify( $extensions = array( 'js', 'css' ) ) {
 			rocket_direct_filesystem()->delete( $item );
 		}
 	}
+
+	$third_party = WP_ROCKET_MINIFY_CACHE_PATH . '3rd-party';
+
+	try {
+		$files = new FilesystemIterator( $third_party );
+
+		foreach ( $files as $file ) {
+			if ( rocket_direct_filesystem()->is_file( $file ) ) {
+				rocket_direct_filesystem()->delete( $file );
+			}
+		}
+	} catch ( Exception $e ) {
+		// No logging yet.
+		return;
+	}
 }
 
 /**
@@ -403,10 +417,6 @@ function rocket_clean_minify( $extensions = array( 'js', 'css' ) ) {
  * @return void
  */
 function rocket_clean_cache_busting( $extensions = array( 'js', 'css' ) ) {
-	if ( version_compare( PHP_VERSION, '5.3' ) < 0 ) {
-		return;
-	}
-
 	$extensions = is_string( $extensions ) ? (array) $extensions : $extensions;
 
 	try {
@@ -1045,13 +1055,16 @@ function rocket_find_wpconfig_path() {
 /**
  * Get WP Rocket footprint
  *
+ * @since 3.0.5 White label footprint if WP_ROCKET_WHITE_LABEL_FOOTPRINT is defined.
  * @since 2.0
  *
  * @param bool $debug (default: true) If true, adds the date of generation cache file.
  * @return string The footprint that will be printed
  */
 function get_rocket_footprint( $debug = true ) {
-	$footprint = "\n" . '<!-- This website is like a Rocket, isn\'t it? Performance optimized by ' . WP_ROCKET_PLUGIN_NAME . '. Learn more: https://wp-rocket.me';
+	$footprint = defined( 'WP_ROCKET_WHITE_LABEL_FOOTPRINT' ) ?
+					"\n" . '<!-- Cached for great performance' :
+					"\n" . '<!-- This website is like a Rocket, isn\'t it? Performance optimized by ' . WP_ROCKET_PLUGIN_NAME . '. Learn more: https://wp-rocket.me';
 	if ( $debug ) {
 		$footprint .= ' - Debug: cached@' . time();
 	}
@@ -1091,7 +1104,7 @@ function rocket_fetch_and_cache_busting( $src, $cache_busting_paths, $abspath_sr
 		 *
 		 * @param string The Document Root path.
 		*/
-		$document_root = apply_filters( 'rocket_min_documentRoot', ABSPATH );
+		$document_root = apply_filters( 'rocket_min_documentRoot', wp_normalize_path( dirname( $_SERVER['SCRIPT_FILENAME'] ) ) );
 
 		// Rewrite import/url in CSS content to add the absolute path to the file.
 		$content = Minify_CSS_UriRewriter::rewrite( $content, dirname( $abspath_src ), $document_root );

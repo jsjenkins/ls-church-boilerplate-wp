@@ -1,56 +1,80 @@
 <?php
+/**
+ * Deploy Status AJAX Controller
+ *
+ * @package BackupBuddy
+ */
+
 backupbuddy_core::verifyAjaxAccess();
 
+$backup_serial = pb_backupbuddy::_POST( 'serial' );
+$profile_id    = pb_backupbuddy::_POST( 'profileID' );
+$this_step     = pb_backupbuddy::_POST( 'step' );
+$step_counter  = pb_backupbuddy::_POST( 'stepCounter' );
 
-$backupSerial = pb_backupbuddy::_POST( 'serial' );
-$profileID = pb_backupbuddy::_POST( 'profileID' );
-$thisStep = pb_backupbuddy::_POST( 'step' );
-$stepCounter = pb_backupbuddy::_POST( 'stepCounter' );
-
-
-if ( '0' == $thisStep ) {
-	$backupFiles = glob( backupbuddy_core::getBackupDirectory() . 'backup*' . $backupSerial . '*.zip' );
-	if ( ! is_array( $backupFiles ) ) { $backupFiles = array(); }
-	if ( count( $backupFiles ) > 0 ) {
-		$backupFile = $backupFiles[0];
-		die( json_encode( array(
-			'statusStep' => 'backupComplete',
-			'stepTitle' => 'Backup finished. File: ' . $backupFile . ' -- Next step start sending the file chunks to remote API server via curl.',
-			'nextStep' => 'sendFiles',
-		) ) );
+if ( '0' == $this_step ) {
+	$backup_files = glob( backupbuddy_core::getBackupDirectory() . 'backup*' . $backup_serial . '*.zip' );
+	if ( ! is_array( $backup_files ) ) {
+		$backup_files = array();
+	}
+	if ( count( $backup_files ) > 0 ) {
+		$backup_file = $backup_files[0];
+		die(
+			json_encode(
+				array(
+					'statusStep' => 'backupComplete',
+					'stepTitle'  => 'Backup finished. File: ' . $backup_file . ' -- Next step start sending the file chunks to remote API server via curl.',
+					'nextStep'   => 'sendFiles',
+				)
+			)
+		);
 	}
 
-	$lastBackupStats = backupbuddy_api::getLatestBackupStats();
-	if ( $backupSerial != $lastBackupStats['serial'] ) {
-		die( json_encode( array( 'stepTitle' => 'Waiting for backup to begin.', 'statusStep' => 'waitingBackupBegin' ) ) );
+	$last_backup_stats = backupbuddy_api::getLatestBackupStats();
+	if ( $backup_serial != $last_backup_stats['serial'] ) {
+		die(
+			json_encode(
+				array(
+					'stepTitle'  => 'Waiting for backup to begin.',
+					'statusStep' => 'waitingBackupBegin',
+				)
+			)
+		);
 	} else { // Last backup stats is our deploy backup.
-		die( json_encode( array(
-			'stepTitle' => $lastBackupStats['processStepTitle'] . ' with profile "' . pb_backupbuddy::$options['profiles'][ $profileID ]['title'] . '".',
-			'statusStep' => 'backupStats',
-			'stats' => $lastBackupStats,
-		) ) );
-		
-	}
+		die(
+			json_encode(
+				array(
+					'stepTitle'  => $last_backup_stats['processStepTitle'] . ' with profile "' . pb_backupbuddy::$options['profiles'][ $profile_id ]['title'] . '".',
+					'statusStep' => 'backupStats',
+					'stats'      => $last_backup_stats,
+				)
+			)
+		);
 
-} elseif ( 'sendFiles' == $thisStep ) {
-	
-	if ( '0' == $stepCounter ) {
-		die( json_encode( array(
-			'stepTitle' => 'FIRST SENDFILES RUN',
-			'statusStep' => 'sendFiles',
-			'nextStep' => 'sendFiles',
-		) ) );
-	} else {
-		die( json_encode( array(
-			'stepTitle' => 'Sending files...',
-			'statusStep' => 'sendFiles',
-			'nextStep' => 'sendFiles',
-		) ) );
 	}
-	
-} else {
-	die( 'Invalid step `' . htmlentities( $thisStep ) . '`.' );
+} elseif ( 'sendFiles' == $this_step ) {
+
+	if ( '0' == $step_counter ) {
+		die(
+			json_encode(
+				array(
+					'stepTitle'  => 'FIRST SENDFILES RUN',
+					'statusStep' => 'sendFiles',
+					'nextStep'   => 'sendFiles',
+				)
+			)
+		);
+	} else {
+		die(
+			json_encode(
+				array(
+					'stepTitle'  => 'Sending files...',
+					'statusStep' => 'sendFiles',
+					'nextStep'   => 'sendFiles',
+				)
+			)
+		);
+	}
 }
 
-
-//'nextStep' => '-1', // Finished.
+die( 'Invalid step `' . esc_html( $this_step ) . '`.' );

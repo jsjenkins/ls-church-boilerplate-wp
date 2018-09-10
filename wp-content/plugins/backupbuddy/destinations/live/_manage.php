@@ -24,19 +24,19 @@ pb_backupbuddy::alert( '{error placeholder}', false, $error_code = '', $rel_tag 
 	var loadingIndicator = '';
 	jQuery(document).ready(function() {
 		loadingIndicator = jQuery( '.pb_backupbuddy_loading' );
-		
+
 		jQuery( '.backupbuddy-live-stats-container' ).on( 'click', '.backupbuddy-stats-help-link', function(){
 			tb_show( 'BackupBuddy', '<?php echo pb_backupbuddy::ajax_url( 'live_last_snapshot_details' ); ?>&TB_iframe=1&width=640&height=455', null );
 			return false;
 		});
 	});
-	
+
 	function backupbuddy_resizeIframe(obj) {
 		newHeight = obj.contentWindow.document.body.scrollHeight;
 		obj.style.height = newHeight + 'px';
 	}
-	
-	
+
+
 </script>
 
 <?php
@@ -58,7 +58,7 @@ include( '_stats.php' ); // Recalculate stats. Populates $stats var.
 if ( 0 == $state['stats']['first_completion'] ) {
 	$first_backup_message = '<h3 id="backupbuddy_live_first_completion_pending">' . __( 'Your first BackupBuddy Stash Live Backup has started!', 'it-l10n-backupbuddy' ) . '</h3>';
 	$first_backup_message .= '<div class="col col-1-3"><span class="dashicons dashicons-clock"></span>';
-	$first_backup_message .= sprintf( '<p><strong>%s</strong> %s</p>', __( 'This first backup may take a while,', 'it-l10n-backupbuddy' ), sprintf( '%1$s <a href="%2$s" target="_blank">%3$s</a>', __( 'depending on your site size and hosting. Feel free to take a nap, go for a walk, or', 'it-l10n-backupbuddy' ), 'https://www.youtube.com/watch?v=BCHuH6hnSyQ&index=5&list=PL7F27C55A2081E63E"', __( 'watch some badger videos.', 'it-l10n-backupbuddy' ), __( 'You may leae this page though it will go faster if you stay.', 'it-l10n-backupbuddy' ) ) ); 
+	$first_backup_message .= sprintf( '<p><strong>%s</strong> %s</p>', __( 'This first backup may take a while,', 'it-l10n-backupbuddy' ), sprintf( '%1$s <a href="%2$s" target="_blank">%3$s</a>', __( 'depending on your site size and hosting. Feel free to take a nap, go for a walk, or', 'it-l10n-backupbuddy' ), 'https://www.youtube.com/watch?v=BCHuH6hnSyQ&index=5&list=PL7F27C55A2081E63E"', __( 'watch some badger videos.', 'it-l10n-backupbuddy' ), __( 'You may leae this page though it will go faster if you stay.', 'it-l10n-backupbuddy' ) ) );
 	$first_backup_message .= '</div>';
 	$first_backup_message .= '<div class="col col-1-3"><span class="dashicons dashicons-email-alt"></span>';
 	$first_backup_message .= sprintf( '<p><strong>%s</strong> %s</p>', __('Keep an eye on your inbox.', 'it-l10n-backupbuddy' ), __( 'You\'ll receive an email notification once your first Stash Live backup completes. You can configure your Stash Live email settings from the Settings link above.', 'it-l10n-backupbuddy' ) );
@@ -83,7 +83,7 @@ function bb_show_unsent_files( $show_permissions = true ) {
 	// Set up ZipBuddy when within BackupBuddy
 	require_once( pb_backupbuddy::plugin_path() . '/lib/zipbuddy/zipbuddy.php' );
 	pb_backupbuddy::$classes['zipbuddy'] = new pluginbuddy_zipbuddy( backupbuddy_core::getBackupDirectory() );
-	
+
 	echo '<h3>Unsent Files Listing (except deleted):</h3>';
 	$catalog = backupbuddy_live_periodic::get_catalog();
 	$unsent = array();
@@ -92,7 +92,7 @@ function bb_show_unsent_files( $show_permissions = true ) {
 			if ( isset( $catalogItem['d'] ) && ( true === $catalogItem['d'] ) ) { // Don't list items pending delete since we will not send this anyways.
 				continue;
 			}
-			
+
 			$details = '';
 			if ( true === $show_permissions ) {
 				$stats = pluginbuddy_stat::stat( ABSPATH . $file );
@@ -104,7 +104,7 @@ function bb_show_unsent_files( $show_permissions = true ) {
 					$details = ' - [UNKNOWN PERMISSIONS]';
 				}
 			}
-			
+
 			$unsent[] = $file . $details;
 		}
 	}
@@ -115,10 +115,10 @@ function bb_show_unsent_files( $show_permissions = true ) {
 // RUN ACTIONS FROM BUTTON PRESS.
 if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 	pb_backupbuddy::verify_nonce();
-	
+
 	$action = pb_backupbuddy::_GET( 'live_action' );
 	if ( 'clear_log' == $action ) {
-		
+
 		$sumLogFile = backupbuddy_core::getLogDirectory() . 'status-live_periodic_' . pb_backupbuddy::$options['log_serial'] . '.txt';
 		@unlink( $sumLogFile );
 		if ( file_exists( $sumLogFile ) ) {
@@ -126,7 +126,7 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 		} else {
 			pb_backupbuddy::alert( 'Log file cleared.' );
 		}
-		
+
 	} elseif ( 'create_snapshot' == $action ) { // < 100% backed up _OR_ ( we are on a step other than daily_init and the last_activity is more recent than the php runtime )
 		/*
 		if ( '' != pb_backupbuddy::_GET( 'get_snapshot_status' ) ) { // Check existing snapshot status.
@@ -137,117 +137,117 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 			);
 		}
 		*/
-		
+
 		if ( true === backupbuddy_api::runLiveSnapshot() ) {
 			pb_backupbuddy::alert( '<h3>' . __( 'Verifying everything is up to date before Snapshot', 'it-l10n-backupbuddy' ) . '</h3><p class="description" style="max-width: 700px; display: inline-block;">' . __( 'Please wait while we verify your backup is completely up to date before we create the Snapshot. This may take a few minutes...', 'it-l10n-backupbuddy' ) . '</p>', false, '', 'backupbuddy_live_snapshot_verify_uptodate' );
 			require( '_manual_snapshot.php' );
 		}
-		
+
 	} elseif ( 'resume_periodic_step' == $action ) {
-		
+
 		pb_backupbuddy::alert( 'Launching BackupBuddy Stash Live Periodic Process to run now where it left off.' );
 		backupbuddy_live_periodic::run_periodic_process();
-		
+
 	} elseif ( 'uncache_credentials' == $action ) {
-		
+
 		require_once( pb_backupbuddy::plugin_path() . '/destinations/live/init.php' );
 		delete_transient( pb_backupbuddy_destination_live::LIVE_ACTION_TRANSIENT_NAME );
 		pb_backupbuddy::alert( 'Deleted cached Live credentials.' );
-		
+
 	} elseif ( 'restart_periodic' == $action ) {
-		
-		
+
+
 		pb_backupbuddy::$options['remote_destinations'][$destination_id]['pause_periodic'] = '0';
 		$destination = pb_backupbuddy::$options['remote_destinations'][$destination_id]; // Update local var.
 		pb_backupbuddy::save();
-		
+
 		backupbuddy_live::queue_step( 'daily_init', $args = array() );
-		
+
 		pb_backupbuddy::alert( __( 'Enabled Live Files Backup and Restarted Periodic Process (only running if between steps or timed out).', 'it-l10n-backupbuddy' ) );
-		
+
 	} elseif ( 'restart_periodic_force' == $action ) {
-		
-		
+
+
 		pb_backupbuddy::$options['remote_destinations'][$destination_id]['pause_periodic'] = '0';
 		$destination = pb_backupbuddy::$options['remote_destinations'][$destination_id]; // Update local var.
 		pb_backupbuddy::save();
-		
+
 		backupbuddy_live::queue_step( 'daily_init', $args = array(), $skip_run_now = false, $force_run_now  = true );
-		
+
 		pb_backupbuddy::alert( __( 'Enabled Live Files Backup and Restarted Periodic Process (forced to run now).', 'it-l10n-backupbuddy' ) );
-		
+
 	} elseif( 'restart_at_step' == $action ) {
-		
+
 		$step = pb_backupbuddy::_POST( 'live_step' );
 		pb_backupbuddy::alert( 'Reset Periodic Process to run at step `' . $step . '` (FORCED). This may take a few minutes for the current process to complete.' );
-		
+
 		backupbuddy_live::queue_step( $step, $args = array(), $skip_run_now = false, $force_run_now  = true );
-		
+
 	} elseif ( 'view_files' == $action ) {
-		
+
 		if ( '1' == $destination['disable_file_management'] ) {
 			pb_backupbuddy::alert( __( 'Remote file management has been disabled for Stash Live. Its files cannot be viewed & managed from within BackupBuddy. To re-enable you must Disconnect and Re-connect Stash Live. You may also manage your files at <a href="https://sync.ithemes.com" target="_new">https://sync.ithemes.com</a>.', 'it-l10n-backupbuddy' ) );
 		} else {
 			require( '_viewfiles.php' );
 			echo '<br><hr><br><br>';
 		}
-		
+
 	/*} elseif ( 'view_stash_files' == $action ) {
-		
+
 		require( '_viewstashfiles.php' );
 		echo '<br><hr><br><br>';
 		*/
 	} elseif ( 'view_files_tables' == $action ) {
-		
+
 		if ( '1' == $destination['disable_file_management'] ) {
 			pb_backupbuddy::alert( __( 'Remote file management has been disabled for Stash Live. Its files cannot be viewed & managed from within BackupBuddy. To re-enable you must Disconnect and Re-connect Stash Live. You may also manage your files at <a href="https://sync.ithemes.com" target="_new">https://sync.ithemes.com</a>.', 'it-l10n-backupbuddy' ) );
 		} else {
 			require( '_viewfiles_tables.php' );
 			echo '<br><hr><br><br>';
 		}
-		
+
 	} elseif ( 'view_tables' == $action ) {
-		
+
 		require( '_viewtables.php' );
 		echo '<br><hr><br><br>';
-		
+
 	} elseif ( 'view_catalog_raw' == $action ) {
-		
+
 		echo '<h3>Local Catalog File Signatures (raw):</h3>';
 		$catalog = backupbuddy_live_periodic::get_catalog();
 		echo '<textarea readonly="readonly" style="width: 100%;" wrap="off" cols="65" rows="20">' . print_r( $catalog, true ) . '</textarea>';
 		echo '<br><br><br>';
-		
+
 	} elseif ( 'view_unsent_files' == $action ) {
-		
+
 		bb_show_unsent_files( true );
-		
+
 	} elseif ( 'view_unsent_files_noperms' == $action ) {
-		
+
 		bb_show_unsent_files( false );
-		
+
 	} elseif ( 'view_signatures_raw' == $action ) {
-		
+
 		echo '<h3>Local Catalog File Signatures (raw - contents and file count may fluctuate if periodic files process is not pasued):</h3>';
 		$catalog = backupbuddy_live_periodic::get_catalog();
 		echo '<textarea readonly="readonly" style="width: 100%;" wrap="off" cols="65" rows="20">' . print_r( $catalog, true ) . '</textarea>';
 		echo '<br><br><br>';
-	
+
 	} elseif ( 'troubleshooting' == $action ) {
-		
+
 		echo '<h3>Stash Live Troubleshooting Scan Details</h3>';
-		
+
 		require( '_troubleshooting.php' );
 		backupbuddy_live_troubleshooting::run();
 		$results = backupbuddy_live_troubleshooting::get_raw_results();
-		
+
 		echo '<button style="margin-bottom: 10px;" class="button button-primary" onClick="backupbuddy_save_textarea_as_file(\'#backupbuddy_live_troubleshooting_results\', \'stash_live_troubleshooting\' );">Download Troubleshooting Log (.txt)</button>';
 		echo '<textarea readonly="readonly" style="width: 100%;" wrap="off" cols="65" rows="10" id="backupbuddy_live_troubleshooting_results">' . print_r( $results, true ) . '</textarea><br>';
 		echo '<button style="margin-top: 10px;" class="button button-primary" onClick="backupbuddy_save_textarea_as_file(\'#backupbuddy_live_troubleshooting_results\', \'stash_live_troubleshooting\' );">Download Troubleshooting Log (.txt)</button>';
-		
+
 		echo '<br><br><br><br>';
-	
-	
+
+
 	} elseif ( 'last_snapshot_details' == $action ) {
 		if ( '' == $state['stats']['last_remote_snapshot_id'] ) {
 			pb_backupbuddy::alert( 'No Snapshot creations have been requested yet.' );
@@ -256,7 +256,7 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 			$additionalParams = array(
 				'snapshot' => $state['stats']['last_remote_snapshot_id'],
 			);
-			
+
 			echo '<h3>Last Snapshot Details</h3>';
 			echo '<b>Status as reported from server as of just now:</b><br>';
 			$response = pb_backupbuddy_destination_live::stashAPI( $destination_settings, 'live-snapshot-status', $additionalParams );
@@ -266,20 +266,20 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 				echo '<textarea readonly="readonly" style="width: 100%;" wrap="off" cols="65" rows="15">' . print_r( $response, true ) . '</textarea>';
 				echo '<br><br>';
 			}
-			
+
 			echo '<b>Server response to request to initiate ( ' . pb_backupbuddy::$format->date( pb_backupbuddy::$format->localize_time( $state['stats']['last_remote_snapshot_response_time'] ) ) . '; ' . pb_backupbuddy::$format->time_ago( $state['stats']['last_remote_snapshot_response_time'] ) . ' ago):</b><br>';
 			echo '<textarea readonly="readonly" style="width: 100%;" wrap="off" cols="65" rows="15">' . print_r( $state['stats']['last_remote_snapshot_response'], true ) . '</textarea>';
 			echo '<br><br><br>';
 		}
 	} elseif ( 'view_tables_raw' == $action ) {
-		
+
 		echo '<h3>Local Catalog Tables (raw):</h3>';
 		$tables = backupbuddy_live_periodic::get_tables();
 		echo '<textarea readonly="readonly" style="width: 100%;" wrap="off" cols="65" rows="20">' . print_r( $tables, true ) . '</textarea>';
 		echo '<br><br><br>';
-		
+
 	} elseif ( 'view_signatures' == $action ) {
-		
+
 		echo '<h3>Local Files Catalog (contents and file count may fluctuate if periodic files process is not pasued):</h3>';
 		$siteSize = 0;
 		$catalog = backupbuddy_live_periodic::get_catalog();
@@ -327,10 +327,10 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 			);
 		}
 		unset( $catalog );
-		
+
 		$catalogInfo = 'Total catalog site size: `' . pb_backupbuddy::$format->file_size( $siteSize ) . '`. Total files in catalog: `' . count( $catalogTable ) . '`. Catalog file size: `' . pb_backupbuddy::$format->file_size( filesize( backupbuddy_core::getLogDirectory() . 'live/catalog-' . pb_backupbuddy::$options['log_serial'] . '.txt' ) ) . '`.';
 		echo $catalogInfo;
-		
+
 		pb_backupbuddy::$ui->list_table(
 			$catalogTable, // Array of cron items set in code section above.
 			array(
@@ -349,19 +349,19 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 			)
 		); // end list_table.
 		unset( $catalogTable );
-		
+
 		echo $catalogInfo;
 		echo '<br><br><br>';
-		
+
 	} elseif ( 'reset_send_attempts' == $action ) {
-		
+
 		if ( false === backupbuddy_live_periodic::reset_send_attempts() ) {
 			pb_backupbuddy::alert( 'Error attempting to reset send attempt counts. The catalog may be busy. Try again in a moment or see the Status Log for details.' );
 		} else {
 			pb_backupbuddy::alert( 'Success resetting send attempt counts back to zero for all files and global recent send fail counter.' );
 		}
-		
-		
+
+
 	} elseif ( 'reset_last_activity' == $action ) {
 		pb_backupbuddy::alert( 'Reset last activity timestamp.' );
 		backupbuddy_live_periodic::reset_last_activity();
@@ -375,13 +375,13 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 		pb_backupbuddy::alert( 'Reset last remote snapshot timestamp.' );
 		backupbuddy_live_periodic::reset_last_remote_snapshot();
 	} elseif ( 'view_state' == $action ) {
-		
+
 		echo '<h3>State Data:</h3>';
 		echo '<textarea readonly="readonly" style="width: 100%;" wrap="off" cols="65" rows="20">' . print_r( $state, true ) . '</textarea>';
 		echo '<br><br><br>';
-		
+
 	} elseif ( 'view_log' == $action ) {
-		
+
 		$sumLogFile = backupbuddy_core::getLogDirectory() . 'status-live_periodic_' . pb_backupbuddy::$options['log_serial'] . '.txt';
 		echo '<div style="padding: 4px;">';
 			echo '<b>Status Log</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; File size: ' . pb_backupbuddy::$format->file_size( @filesize( $sumLogFile ) ) . ' ';
@@ -440,33 +440,33 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 		<br><br>
 		<?php
 	} elseif ( 'delete_catalog' == $action ) {
-		
+
 		$catalogFile = backupbuddy_core::getLogDirectory() . 'live/catalog-' . pb_backupbuddy::$options['log_serial'] . '.txt';
 		@unlink( $catalogFile );
 		sleep( 1 );
 		@unlink( $catalogFile );
 		sleep( 1 );
 		@unlink( $catalogFile );
-		
+
 		if ( file_exists( $catalogFile ) ) {
 			pb_backupbuddy::alert( 'Error #3927273: Unable to delete catalog file `' . $catalogFile . '`. Check permissions or manually delete.' );
 		} else {
 			pb_backupbuddy::alert( 'Catalog deleted.' );
 		}
-		
+
 		$stateFile = backupbuddy_core::getLogDirectory() . 'live/state-' . pb_backupbuddy::$options['log_serial'] . '.txt';
 		@unlink( $stateFile );
 		sleep( 1 );
 		@unlink( $stateFile );
 		sleep( 1 );
 		@unlink( $stateFile );
-		
+
 		if ( file_exists( $stateFile ) ) {
 			pb_backupbuddy::alert( 'Error #434554: Unable to delete state file `' . $stateFile . '`. Check permissions or manually delete.' );
 		} else {
 			pb_backupbuddy::alert( 'State file deleted.' );
 		}
-		
+
 	} elseif ( 'pause_periodic' == $action ) {
 		backupbuddy_api::setLiveStatus( $pause_continuous = '', $pause_periodic = true );
 		$destination = pb_backupbuddy::$options['remote_destinations'][$destination_id]; // Update local var.
@@ -479,10 +479,10 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 			$launchNowText = '';
 			$start_run = true;
 		}
-		
+
 		backupbuddy_api::setLiveStatus( $pause_continuous = '', $pause_periodic = false, $start_run );
 		pb_backupbuddy::disalert( '', __( 'Live File Backup has resumed.', 'it-l10n-backupbuddy' ) . $launchNowText );
-		
+
 		include( '_stats.php' ); // Recalculate stats.
 	} elseif ( 'pause_continuous' == $action ) {
 		backupbuddy_api::setLiveStatus( $pause_continuous = true, $pause_periodic = '' );
@@ -507,7 +507,7 @@ if ( '' != pb_backupbuddy::_GET( 'live_action' ) ) {
 		echo '<textarea readonly="readonly" style="width: 100%;" wrap="off" cols="65" rows="20">' . print_r( backupbuddy_live_periodic::getFullExcludes(), true ) . '</textarea>';
 		echo '<br><br><br>';
 	}
-	
+
 } // end if action.
 
 
@@ -606,7 +606,7 @@ if ( count( $cron_warnings ) > 2 ) {
 		}
 		$cronText .= 'Cron `' . $cron[0] . '` running `' . $cron[2] . '` should have ran `' . pb_backupbuddy::$format->time_ago( $time ) . '` ago.<br>';
 	}
-	pb_backupbuddy::alert( 'Warning #839984343: ' . count( $cron_warnings ) . ' cron(s) warnings were found (such as past due). _IF_ you encounter problems AND this persists there may be a problem with your WordPress cron (such as caused by a caching plugin). This can also be caused if there is very little site activity (not enough visitors). WordPress requires visitors to access the site to trigger scheduled activity. Use an uptime checker to help push this along if this is the case.uld be due to these files being large or a temporary transfer err Potentially stuck crons:<br>' . $cronText );
+	pb_backupbuddy::alert( 'Warning #839984343: ' . count( $cron_warnings ) . ' cron(s) warnings were found (such as past due). _IF_ you encounter problems AND this persists there may be a problem with your WordPress cron (such as caused by a caching plugin). This can also be caused if there is very little site activity (not enough visitors). WordPress requires visitors to access the site to trigger scheduled activity. Use an uptime checker to help push this along if this is the case. This could be due to these files being large or a temporary transfer error. Potentially stuck crons:<br>' . $cronText );
 }
 
 // BUB Schedule with Stash Destination Warning
@@ -624,7 +624,7 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 
 
 <script>
-	
+
 	var backupbuddy_live_snapshot_status_pretty = '';
 	var backupbuddy_live_snapshot_step = 1;
 	function backupbuddy_live_stats( stats ) {
@@ -633,13 +633,13 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 		} else {
 			jQuery( '.pb_backupbuddy_alert[rel="stash_live_error_alert"]' ).text( '' ).hide();
 		}
-		
-		// Display progress bar if needed. When not on daily_init AND ( during first completion OR during manual snapshot ) 
+
+		// Display progress bar if needed. When not on daily_init AND ( during first completion OR during manual snapshot )
 		if ( ( ( 'daily_init' != stats.current_function ) && ( '0' == stats.first_completion || 2 === backupbuddy_live_snapshot_step ) ) || ( ( 'undefined' != typeof window.backupbuddy_live_snapshot_request_time ) && ( '' != window.backupbuddy_live_snapshot_request_time ) ) ) {
 			//jQuery( '.pb_backupbuddy_alert' ).hide();
 			//jQuery( '.pb_backupbuddy_alert[rel="live_first_completion"]' ).show();
 			jQuery( '.backupbuddy-live-snapshot-progress-bar' ).show();
-			
+
 			// if we're on db step, update UI
 			if ( ( 'database_snapshot' == stats.current_function ) || ( 'send_pending_db_snapshots' == stats.current_function ) || ( 'process_table_deletions' == stats.current_function ) ) {
 				jQuery( '.bb_progress-step-completed' ).removeClass( 'bb_progress-step-completed' ); // Reset.
@@ -652,7 +652,7 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 				jQuery( '.bb_progress-step-files' ).removeClass('bb_progress-step-active').addClass( 'bb_progress-step-completed' ); // FILES done.
 				jQuery( '.bb_progress-step-snapshot' ).addClass('bb_progress-step-active' ); // SNAPSHOT active.
 			}
-			
+
 			// While 'SnapShot' portion of progress bar is active, replace current function details to reflect this.
 			if ( jQuery( '.bb_progress-step-snapshot' ).hasClass( 'bb_progress-step-active' ) ) {
 				stats.current_function_pretty = '<?php _e( 'Building Snapshot', 'it-l10n-backupbuddy' ); ?>' + backupbuddy_live_snapshot_status_pretty; // backupbuddy_live_snapshot_status_pretty contains snapshot details returned from Stash server during snapshot building.
@@ -665,11 +665,11 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 				jQuery( '.bb_progress-step-snapshot' ).removeClass('bb_progress-step-active').removeClass( 'bb_progress-step-completed' );
 			}
 		}
-		
-		
+
+
 		// Is manual snapshot pending?
 		if ( 'undefined' != typeof window.backupbuddy_live_snapshot_request_time ) {
-			
+
 			// On remote snapshot function?
 			if ( ( 1 == backupbuddy_live_snapshot_step ) && ( ( 'run_remote_snapshot' == stats.current_function ) || ( stats.last_remote_snapshot_response_time > window.backupbuddy_live_snapshot_request_time ) ) ) {
 				jQuery( '.pb_backupbuddy_alert' ).hide();
@@ -684,25 +684,25 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 					console.dir( stats.last_remote_snapshot_response );
 				<?php } ?>
 				setTimeout( 'backupbuddy_live_snapshot_status_check( "' + stats.last_remote_snapshot_response.snapshot + '" )', 3000 );
-				
+
 				jQuery( '.bb_progress-step-files' ).removeClass('bb_progress-step-active').addClass( 'bb_progress-step-completed' );
 				backupbuddy_live_snapshot_step = 3;
 			}
 		}
-		
+
 		// If new snapshot has begun since loading the page (and it's automatic triggered), then start watching for the status to update.
 		stash_iframe = jQuery( '#backupbuddy_live-stash_iframe' );
 		if ( ( ( parseInt( stash_iframe.attr( 'data-refreshed' ) ) < ( stats.last_remote_snapshot ) ) ) && ( 'automatic' == stats.last_remote_snapshot_trigger ) ) {
 			setTimeout( 'backupbuddy_live_snapshot_status_check( "' + stats.last_remote_snapshot_response.snapshot + '" )', 3000 );
 		}
-		
+
 		// Has there been a snapshot since the Stash frame was last refreshed?
 		/*
 		stash_iframe = jQuery( '#backupbuddy_live-stash_iframe' );
 		if ( ( parseInt( stash_iframe.attr( 'data-refreshed' ) ) < ( stats.last_remote_snapshot ) ) ) {
 			refresh_delay_min = (60*15);
 			refresh_time = stats.current_time + refresh_delay_min;
-			
+
 			// Refresh in `refresh_delay_min` minutes.
 			setTimeout(
 				function(refresh_time){
@@ -714,7 +714,7 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 			);
 		}
 		*/
-		
+
 		// This grabs the template, and inserts HTML ( with appropriate data ) into the DOM
 		_.templateSettings.variable    = 'stats';
 		_.templateSettings.evaluate    = /<#([\s\S]+?)#>/g;
@@ -731,34 +731,34 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 			}
 			jQuery( '.pb_backupbuddy_alert[rel="live_first_completion"]' ).remove();
 		}
-		
+
 	} // End backupbuddy_live_stats().
-	
-	
-	
+
+
+
 	var snapshot_infected_warning = false; // Set true if malware is found to warn on download attempt.
 	function backupbuddy_live_snapshot_status_check( snapshot_id ) {
 		if ( '' == snapshot_id ) {
 			return false;
 		}
 		loadingIndicator.show();
-		
+
 		console.log( 'live_snapshot_status_check' );
-		
+
 		jQuery.ajax({
-			
+
 			url:	snapshotStatusURL,
 			type:	'post',
 			data:	{ snapshot_id: snapshot_id },
 			context: document.body,
-			
+
 			success: function( data ) {
 				if ( 0 != loadingIndicator.length ) {
 					loadingIndicator.hide();
 				}
 				jQuery( '.pb_backupbuddy_alert' ).hide();
 				jQuery( '.pb_backupbuddy_alert[rel="live_first_completion"]' ).show();
-				
+
 				try {
 					snapshotStatus = jQuery.parseJSON( data );
 				} catch(e) { // NOT json or some error.
@@ -767,48 +767,48 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 					console.dir( data );
 					return false;
 				}
-				
+
 				<?php if ( pb_backupbuddy::$options['log_level'] == '3' ) { // Full logging enabled. ?>
 					console.log( 'BackupBuddy Snapshot Status:' );
 					console.dir( snapshotStatus );
 				<?php } ?>
-				
+
 				if ( '1' == snapshotStatus.complete ) { // Snapshot FINISHED.
 					window.backupbuddy_live_snapshot_request_time = ''; // Unset.
-					
+
 					// Error encountered.
 					if ( 'error' == snapshotStatus.status ) {
 						alert( 'An unexpected error was encountered while creating your Snapshot: `' + snapshotStatus.message + '`. Check your Snapshot listing below to check whether the Snapshot was created or not.' );
 					}
-					
+
 					// Snapshot info is missing from response.
 					if ( 'undefined' == typeof snapshotStatus.snapshot ) {
 						jQuery( '.backupbuddy-live-snapshot-progress-bar' ).hide(); // No download info available so hide bar.
-						
+
 						// Refresh Stash iFrame to show new file IF it happened to work...
 						jQuery( '.backupbuddy_live_iframe_load' ).show();
 						jQuery( '#backupbuddy_live-stash_iframe' ).attr( 'src', jQuery( '#backupbuddy_live-stash_iframe' ).attr( 'src' ) );
 						jQuery( '#backupbuddy_live-stash_iframe' ).attr( 'data-refreshed', snapshotStatus.current_time ); // Update refresh timestamp.
-						
+
 						return false;
 					}
-					
+
 					jQuery( '.bb_progress-step-snapshot, .bb_progress-step-files' ).removeClass('bb_progress-step-active').addClass( 'bb_progress-step-completed' );
 					jQuery( '.bb_progress-step-finished' ).addClass('bb_progress-step-completed');
-					
+
 					jQuery( '#backupbuddy_live_snapshot-working' ).hide();
 					jQuery( '#backupbuddy_live_snapshot-success' ).show();
-					
+
 					// Refresh Stash iFrame to show new file.
 					jQuery( '.backupbuddy_live_iframe_load' ).show();
 					jQuery( '#backupbuddy_live-stash_iframe' ).attr( 'src', jQuery( '#backupbuddy_live-stash_iframe' ).attr( 'src' ) );
 					jQuery( '#backupbuddy_live-stash_iframe' ).attr( 'data-refreshed', snapshotStatus.current_time ); // Update refresh timestamp.
-					
+
 					// Malware scanning.
 					jQuery.each( snapshotStatus.snapshot.malware.stats, function(index,value){
 						jQuery( '#backupbuddy_live_snapshot-success-malware .backupbuddy_live_malware_result[data-result="' + index + '"]' ).text( value );
 					});
-					
+
 					if ( jQuery( snapshotStatus.snapshot.malware.files ).size() > 0 ) {
 						snapshot_infected_warning = true;
 						jQuery( '.backupbuddy_live_malware_result[data-result="infected_files"]' ).css( 'color', 'red' );
@@ -819,13 +819,13 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 					} else {
 						snapshot_infected_warning = false;
 					}
-					
+
 					jQuery( '#backupbuddy_live_snapshot-success-duration' ).text( snapshotStatus.duration ).attr( 'title', 'Start: `' + snapshotStatus.timestamp_start + '`. Finish: `' + snapshotStatus.timestamp_finish + '`.' );;
-					
+
 					if ( true === snapshotStatus.snapshot.stash_copy ) {
 						jQuery( '#backupbuddy_live_snapshot-stashed' ).show();
 					}
-					
+
 					if ( 'undefined' != typeof snapshotStatus.snapshot.zips.full ) {
 						jQuery( '#backupbuddy_live_snapshot-success-backup_full' ).show().find('a').attr( 'href', snapshotStatus.snapshot.zips.full );
 					}
@@ -844,15 +844,15 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 				} else { // Snapshot IN PROGRESS.
 					jQuery( '#backupbuddy_live_snapshot-success' ).hide();
 					//jQuery( '#backupbuddy_live_snapshot-working' ).show();
-					
+
 					backupbuddy_live_snapshot_status_pretty = ' - ' + snapshotStatus.message;
 					//jQuery( '#backupbuddy_live_snapshot-working-status' ).text( snapshotStatus.message );
 					//jQuery( '#backupbuddy_live_snapshot-working-duration' ).text( snapshotStatus.duration );
-					
+
 					setTimeout( 'backupbuddy_live_snapshot_status_check( "' + snapshot_id + '" )', 15000 );
 				}
 			}
-			
+
 		});
 	} // End backupbuddy_live_snapshot_status_check().
 </script>
@@ -989,7 +989,7 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 							<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=pause_periodic' ); ?>" class="backupbuddy-live-button secondary"><span class="dashicons dashicons-controls-pause"></span><?php _e( 'Pause', 'it-l10n-backupbuddy' ); ?></a>
 						<# } #>
 					</div>
-					
+
 				</div>
 			</div>
 			<div class="col col-1-3">
@@ -1039,7 +1039,7 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 				<a href="javascript:void(0);" class="backupbuddy-stats-help-link">
 					<?php _e( 'View Last Snapshot Details', 'it-l10n-backupbuddy' ); ?></a>
 				</a>
-				
+
 				<div class="backupbuddy-stats-overview-create-snapshot">
 					<p><?php _e( 'Need a more recent snapshot?', 'it-l10n-backupbuddy' ); ?></p>
 					<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=create_snapshot' ); ?>" class="backupbuddy-live-button primary"><?php _e( 'Create Manual Snapshot', 'it-l10n-backupbuddy' ); ?></a>
@@ -1053,17 +1053,17 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 
 <script>
 	var snapshotStatusURL = '<?php echo pb_backupbuddy::ajax_url( 'live_snapshot_status' ); ?>'; // AJAX status check URL.
-	
+
 	jQuery(document).ready(function() {
-		
+
 		backupbuddy_live_stats( jQuery.parseJSON( '<?php echo json_encode( $stats ); ?>' ) );
 		loadingIndicator = jQuery( '.pb_backupbuddy_loading' );
-		
+
 		jQuery(document).on( 'click', '.backupbuddy-stats-help-link', function(e) {
 			e.preventDefault();
 			jQuery( '.backupbuddy-stats-time-ago-explanation' ).addClass('visible');
 		});
-		
+
 		jQuery(document).on( 'mouseleave', '.backupbuddy-stats-time-ago-explanation', function() {
 			jQuery( '.backupbuddy-stats-time-ago-explanation' ).removeClass('visible');
 		});
@@ -1088,7 +1088,7 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 	<h1>Advanced Troubleshooting Options</h1>
 	Support may advise you to use these options to help work around a problem or troubleshoot issues. Caution is advised if using these options without guidance.
 	<br><br>
-	
+
 	<b>Function running at page load:</b><br>
 	<code><?php echo $state['step']['function']; ?> - <?php
 		if ( 'update_files_list' == $state['step']['function'] ) {
@@ -1098,11 +1098,11 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 		}
 	?></code>
 	<br><br>
-	
+
 	<b>Account:</b><br>
 	<?php echo $destination['itxapi_username']; ?> (<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=disconnect' ); ?>">Disconnect</a>)
 	<br><br>
-	
+
 	<b>Stats by Day:</b><br>
 	<table class="widefat">
 		<thead>
@@ -1151,23 +1151,23 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 		</tbody>
 	</table>
 	<br><br>
-	
+
 	<h4>Actions:</h4>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=resume_periodic&skip_run_live_now=1' ); ?>" class="button button-secondary button-tertiary">Unpause Periodic Without Running</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=reset_send_attempts' ); ?>" class="button button-secondary button-tertiary">Reset Send Attempts</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=reset_file_audit_times' ); ?>" class="button button-secondary button-tertiary">Reset File Audit Times</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=uncache_credentials' ); ?>" class="button button-secondary button-tertiary">Uncache Live Credentials</a>
-	
+
 	<h4>Time Stats:</h4>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=reset_last_activity' ); ?>" class="button button-secondary button-tertiary">Reset Last Activity Time</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=reset_first_completion' ); ?>" class="button button-secondary button-tertiary">Reset First Completion Time</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=reset_last_remote_snapshot' ); ?>" class="button button-secondary button-tertiary">Reset Last Remote Snapshot Time</a>
-	
+
 	<h4>Misc:</h4>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=last_snapshot_details' ); ?>" class="button button-secondary button-tertiary" style="<?php if ( '' == $state['stats']['last_remote_snapshot_id'] ) { echo 'opacity: 0.4;'; } ?>">Last Snapshot Details</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=delete_catalog' ); ?>" class="button button-secondary button-tertiary" onclick="if ( !confirm('WARNING: This will erase your local catalog of files. All files may need to be re-uploaded. Are you sure you want to do this?') ) { return false; }">Delete Catalog & State</a>
-	
-	
+
+
 	<h4>Steps:</h4>
 	<div style="float: left;">
 		<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=restart_periodic' ); ?>" class="button button-secondary button-tertiary">Restart Periodic Process</a>
@@ -1192,8 +1192,8 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 		</form>
 	</div>
 	<br style="clear: both;">
-	
-	
+
+
 	<h4>Raw Data:</h4>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_tables_raw' ); ?>" class="button button-secondary button-tertiary">View Catalog Tables</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_signatures_raw' ); ?>" class="button button-secondary button-tertiary">View Catalog Files</a>
@@ -1204,18 +1204,18 @@ foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_exclusions' ); ?>" class="button button-secondary button-tertiary">View Calculated Exclusions</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_unsent_files' ); ?>" class="button button-secondary button-tertiary">View Unsent Files</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_unsent_files_noperms' ); ?>" class="button button-secondary button-tertiary">View Unsent Files (hide permissions info)</a>
-	
+
 	<h4>Pretty Data:</h4>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_signatures' ); ?>" class="button button-secondary button-tertiary">View Formatted Catalog Files</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_tables' ); ?>" class="button button-secondary button-tertiary">View Formatted Catalog Tables</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_files' ); ?>" class="button button-secondary button-tertiary">View Remotely Stored Files</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_files_tables' ); ?>" class="button button-secondary button-tertiary">View Remotely Stored Tables</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=troubleshooting' ); ?>" class="button button-secondary button-tertiary">View Troubleshooting Data</a>
-	
+
 	<h4>Logging:</h4>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=view_log' ); ?>" class="button button-secondary button-tertiary">View Status Log</a>
 	<a href="<?php echo pb_backupbuddy::nonce_url( $admin_url . '?page=pb_backupbuddy_live&live_action=clear_log' ); ?>" class="button button-secondary button-tertiary">Clear Status Log</a>
-	
+
 </div>
 
 

@@ -1,27 +1,25 @@
 <?php
+/**
+ * File restorer (actual unzip/restore) in the file restore page.
+ * AJAX page for thickbox for restoring a file from inside an archive..
+ *
+ * @package BackupBuddy
+ */
+
 backupbuddy_core::verifyAjaxAccess();
 
+$files_array = explode( ',', pb_backupbuddy::_GET( 'files' ) );
+$files       = array();
 
-// File restorer (actual unzip/restore) in the file restore page.
-/* restore_file_restore()
-*
-* AJAX page for thickbox for restoring a file from inside an archive..
-*
-*/
-
-
-$files = pb_backupbuddy::_GET( 'files' ); // file to extract.
-$files_array = explode( ',', $files );
-$files = array();
-foreach( $files_array as $file ) {
+foreach ( $files_array as $file ) {
 	if ( substr( $file, -1 ) == '/' ) { // If directory then add wildcard.
 		$file = $file . '*';
 	}
-	$files[$file] = $file;
+	$files[ $file ] = $file;
 }
 unset( $files_array );
 
-pb_backupbuddy::$ui->ajax_header( true, false ); // js, no padding
+pb_backupbuddy::$ui->ajax_header( true, false ); // js, no padding.
 ?>
 
 <style>html { background: inherit !important; }</style>
@@ -33,13 +31,13 @@ pb_backupbuddy::$ui->ajax_header( true, false ); // js, no padding
 				return;
 			}
 		}
-		
+
 		if ( 'string' == ( typeof json ) ) {
 			backupbuddy_log( json );
 			console.log( 'Status log received string: ' + json );
 			return;
 		}
-		
+
 		// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php
 		json.date = new Date();
 		json.date = new Date(  ( json.time * 1000 ) + json.date.getTimezoneOffset() * 60000 );
@@ -48,10 +46,10 @@ pb_backupbuddy::$ui->ajax_header( true, false ); // js, no padding
 			seconds = '0' + seconds;
 		}
 		json.date = backupbuddy_hourpad( json.date.getHours() ) + ':' + json.date.getMinutes() + ':' + seconds;
-		
+
 		triggerEvent = 'backupbuddy_' + json.event;
-		
-		
+
+
 		// Log non-text events.
 		if ( ( 'details' !== json.event ) && ( 'message' !== json.event ) && ( 'error' !== json.event ) ) {
 			//console.log( 'Non-text event `' + triggerEvent + '`.' );
@@ -59,23 +57,23 @@ pb_backupbuddy::$ui->ajax_header( true, false ); // js, no padding
 			//console.log( json.data );
 		}
 		//console.log( 'trigger: ' + triggerEvent );
-		
+
 		backupbuddy_log( json );
-		
-		
+
+
 	} // End function pb_status_append().
-	
-	
+
+
 	// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php and _rollback.php
 	function backupbuddy_log( json ) {
 		message = '';
-		
+
 		if ( 'string' == ( typeof json ) ) {
 			message = "-----------\t\t-------\t-------\t" + json;
 		} else {
 			message = json.date + '.' + json.u + " \t" + json.run + "sec \t" + json.mem + "MB\t" + json.data;
 		}
-		
+
 		target_id = 'pb_backupbuddy_status'; // importbuddy_status or pb_backupbuddy_status
 		if( jQuery( '#' + target_id ).length == 0 ) { // No status box yet so suppress.
 			return;
@@ -84,7 +82,7 @@ pb_backupbuddy::$ui->ajax_header( true, false ); // js, no padding
 		textareaelem = document.getElementById( target_id );
 		textareaelem.scrollTop = textareaelem.scrollHeight;
 	}
-	
+
 	function backupbuddy_hourpad(n) { return ("0" + n).slice(-2); }
 </script>
 <?php
@@ -101,17 +99,12 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 
 
 $archive_file = pb_backupbuddy::_GET( 'archive' ); // archive to extract from.
-require( pb_backupbuddy::plugin_path() . '/classes/_restoreFiles.php' );
-$result = backupbuddy_restore_files::restore( backupbuddy_core::getBackupDirectory() . $archive_file, $files, $finalPath = ABSPATH );
+require pb_backupbuddy::plugin_path() . '/classes/_restoreFiles.php';
+$result = backupbuddy_restore_files::restore( backupbuddy_core::getBackupDirectory() . $archive_file, $files, ABSPATH );
 
 echo '<script type="text/javascript">jQuery("#pb_backupbuddy_working").hide();</script>';
 pb_backupbuddy::flush();
-if ( false === $result ) {
-	
-} else {
-}
 pb_backupbuddy::$ui->ajax_footer();
 
 pb_backupbuddy::$ui->ajax_footer();
 die();
-

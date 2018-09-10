@@ -12,7 +12,7 @@ function rocket_need_api_key() {
 		<p><strong><?php echo WP_ROCKET_PLUGIN_NAME; ?></strong>: <?php _e( 'There seems to be an issue with outgoing connections from your server. Resolve per documentation, or contact support.', 'rocket' ); ?>
 		</p>
 	</div>
-<?php
+	<?php
 }
 
 /**
@@ -38,8 +38,9 @@ function rocket_user_agent( $user_agent ) {
 		$consumer_email = (string) get_rocket_option( 'consumer_email' );
 	}
 
-	$bonus  = ! get_rocket_option( 'do_beta' ) ? '' : '+';
-	$new_ua = sprintf( '%s;WP-Rocket|%s%s|%s|%s|%s|;', $user_agent, WP_ROCKET_VERSION, $bonus, $consumer_key, $consumer_email, esc_url( home_url() ) );
+	$bonus       = ! get_rocket_option( 'do_beta' ) ? '' : '+';
+	$php_version = preg_replace( '@^(\d\.\d+).*@', '\1', phpversion() );
+	$new_ua      = sprintf( '%s;WP-Rocket|%s%s|%s|%s|%s|%s;', $user_agent, WP_ROCKET_VERSION, $bonus, $consumer_key, $consumer_email, esc_url( home_url() ), $php_version );
 
 	return $new_ua;
 }
@@ -441,4 +442,3 @@ function rocket_settings_import_redirect( $message, $status ) {
 	wp_safe_redirect( esc_url_raw( $goback ) );
 	die();
 }
-

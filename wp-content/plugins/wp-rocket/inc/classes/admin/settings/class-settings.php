@@ -237,7 +237,7 @@ class Settings {
 			'DAY_IN_SECONDS'    => 1,
 		];
 
-		$input['purge_cron_unit'] = isset( $allowed_cron_units[ $input['purge_cron_unit'] ] ) ? $input['purge_cron_unit'] : $this->options->get( 'purge_cron_unit' );
+		$input['purge_cron_unit'] = isset( $input['purge_cron_unit'], $allowed_cron_units[ $input['purge_cron_unit'] ] ) ? $input['purge_cron_unit'] : $this->options->get( 'purge_cron_unit' );
 
 		// Force a minimum 10 minutes value for the purge interval.
 		if ( $input['purge_cron_interval'] < 10 && 'MINUTE_IN_SECONDS' === $input['purge_cron_unit'] ) {
@@ -404,8 +404,9 @@ class Settings {
 			$input['sitemaps'] = [];
 		}
 
-		// Option : CloudFlare Domain.
-		$input['cloudflare_domain']           = ! empty( $input['cloudflare_domain'] ) ? rocket_get_domain( $input['cloudflare_domain'] ) : '';
+		$input['cloudflare_email']            = isset( $input['cloudflare_email'] ) ? sanitize_email( $input['cloudflare_email'] ) : '';
+		$input['cloudflare_api_key']          = isset( $input['cloudflare_api_key'] ) ? sanitize_text_field( $input['cloudflare_api_key'] ) : '';
+		$input['cloudflare_zone_id']          = isset( $input['cloudflare_zone_id'] ) ? sanitize_text_field( $input['cloudflare_zone_id'] ) : '';
 		$input['cloudflare_devmode']          = isset( $input['cloudflare_devmode'] ) && is_numeric( $input['cloudflare_devmode'] ) ? (int) $input['cloudflare_devmode'] : 0;
 		$input['cloudflare_auto_settings']    = ( isset( $input['cloudflare_auto_settings'] ) && is_numeric( $input['cloudflare_auto_settings'] ) ) ? (int) $input['cloudflare_auto_settings'] : 0;
 		$input['cloudflare_protocol_rewrite'] = ! empty( $input['cloudflare_protocol_rewrite'] ) ? 1 : 0;

@@ -318,7 +318,8 @@ class GF_Query_Condition {
 					)
 				);
 
-				if ( ( in_array( $this->operator, array( self::NIN, self::NBETWEEN, self::NEQ ) ) && ! empty( $this->right ) )
+				if ( ( in_array( $this->operator, array( self::NIN, self::NBETWEEN ) ) && ! in_array( new GF_Query_Literal(''), $this->right->values ) )
+				     || ( $this->operator == self::NEQ && ! $this->right->value == '')
 				     || ( $this->operator == self::EQ && $this->right->value == '' )
 				) {
 					/**

@@ -78,17 +78,17 @@ if ( ( 'db' == $restore->_state['dat']['backup_type'] ) || ( false == $restore->
 
 // Parse submitted options for saving to state.
 function parse_options( $restoreData ) {
-	
+
 	if ( '1' == pb_backupbuddy::_POST( 'restoreFiles' ) ) { $restoreData['restoreFiles'] = true; } else { $restoreData['restoreFiles'] = false; }
 	if ( '1' == pb_backupbuddy::_POST( 'restoreDatabase' ) ) { $restoreData['restoreDatabase'] = true; } else { $restoreData['restoreDatabase'] = false; }
 	if ( '1' == pb_backupbuddy::_POST( 'migrateHtaccess' ) ) { $restoreData['migrateHtaccess'] = true; } else { $restoreData['migrateHtaccess'] = false; }
-	
+
 	if ( ( 'all' == pb_backupbuddy::_POST( 'zipMethodStrategy' ) ) || ( 'ziparchive' == pb_backupbuddy::_POST( 'zipMethodStrategy' ) ) || ( 'pclzip' == pb_backupbuddy::_POST( 'zipMethodStrategy' ) ) ) {
 		$restoreData['zipMethodStrategy'] = pb_backupbuddy::_POST( 'zipMethodStrategy' );
 	}
-	
+
 	return $restoreData;
-	
+
 } // End parse_options().
 
 
@@ -101,13 +101,13 @@ if ( true !== $restore->_state['skipUnzip'] ) {
 	// Unzip backup archive. For DB-only only restores SQL files to temp directory. For files, unzips all to ABSPATH.
 	$results = $restore->restoreFiles();
 	if ( true !== $results ) { // Unzip failed.
-		
+
 		pb_backupbuddy::alert( 'File extraction process did not complete successfully. Unable to continue to next step. Manually extract the backup ZIP file and choose to "Skip File Extraction" from the advanced options on Step 1. Details: ' . $restore->getErrors(), true, '9005' );
-		
+
 	} else { // Unzip success.
-		
+
 		echo "<script>bb_action( 'unzipSuccess' );</script>";
-		
+
 		if ( false === $restore->_state['restoreFiles'] ) { // Skip restoring files.
 			pb_backupbuddy::status( 'details', 'SKIPPING restore of files based on settings from Step 1.' );
 			echo "<script>bb_action( 'filesRestoreSkipped' );</script>";
@@ -116,7 +116,7 @@ if ( true !== $restore->_state['skipUnzip'] ) {
 		}
 
 	}
-	
+
 } else {
 	$results = true;
 	pb_backupbuddy::status( 'details', 'Completely skipping ALL file extraction based on skipUnzip advanced setting.' );
@@ -153,7 +153,7 @@ if ( 'true' == pb_backupbuddy::_GET( 'deploy' ) ) {
 	$deployModeOn = '1';
 	$nextStepNum = 4;
 	echo '<!-- AUTOPROCEED TO STEP ' . $nextStepNum . ' -->';
-	
+
 	// Write default state overrides.
 	global $importbuddy_file;
 	$importFileSerial = backupbuddy_core::get_serial_from_file( $importbuddy_file );

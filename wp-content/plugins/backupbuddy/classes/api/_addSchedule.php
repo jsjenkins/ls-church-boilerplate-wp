@@ -44,12 +44,13 @@ $next_index = pb_backupbuddy::$options['next_schedule_index']; // v2.1.3: $next_
 pb_backupbuddy::$options['next_schedule_index']++; // This change will be saved in savesettings function below.
 pb_backupbuddy::$options['schedules'][$next_index] = $schedule;
 
+pb_backupbuddy::log( 'details', 'Attempting to scheudle with the following parameters: ' . print_r( $schedule['first_run'], true ) . print_r( $schedule['interval'], true ). print_r( $next_index, true ) );
 $result = backupbuddy_core::schedule_event( $schedule['first_run'], $schedule['interval'], 'run_scheduled_backup', array( $next_index ) );
 if ( $result === false ) {
 	return 'Error scheduling event with WordPress. Your schedule may not work properly. Please try again. Error #3488439b. Check your BackupBuddy error log for details.';
 } else {
 	pb_backupbuddy::save();
 	backupbuddy_core::addNotification( 'schedule_created', 'Backup schedule created', 'A new backup schedule "' . $schedule['title'] . '" has been created.', $schedule );
-	
+
 	return true;
 }

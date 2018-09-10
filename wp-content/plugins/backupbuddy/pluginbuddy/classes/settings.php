@@ -201,9 +201,9 @@ class pb_backupbuddy_settings {
 	 * This should usually happen in the controller prior to loading a view.
 	 * IMPORTANT: Applies trim() to all submitted form values!
 	 *
-	 * @return null/array  When a savepoint was defined in class constructor nothing is returned. (normal operation)
-	 *                     When savepoint === false an array is returned for custom form processing.
-	 *                     Format: array( 'errors' => false/array, 'data' => array( 'form_keys' => 'form_values' ) ).
+	 * @return array  When a savepoint was defined in class constructor an empty array is returned. (normal operation)
+	 *                When savepoint === false an array is returned for custom form processing.
+	 *                Format: array( 'errors' => false/array, 'data' => array( 'form_keys' => 'form_values' ) ).
 	 */
 	public function process() {
 		// This form was indeed submitted. PROCESS IT!
@@ -299,6 +299,7 @@ class pb_backupbuddy_settings {
 			} // End if savepoint !=== false.
 		} // end submitted form.
 
+		return array();
 	} // End process().
 
 	/**

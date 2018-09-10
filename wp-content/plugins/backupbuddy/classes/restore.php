@@ -229,7 +229,7 @@ class backupbuddy_restore {
 		} else { // Look for DAT file inside of zip archive.
 			pb_backupbuddy::status( 'details', 'Looking for DAT file in zip archive itself.' );
 			foreach ( $possibleDatLocations as $possibleDatLocation ) { // Look for DAT file in zip.
-				if ( true === $zipbuddy->file_exists( $this->_state['archive'], $possibleDatLocation, $leave_open = true ) ) {
+				if ( true === $zipbuddy->file_exists( $this->_state['archive'], $possibleDatLocation, true ) ) {
 					$detectedDatLocation = $possibleDatLocation;
 					break;
 				}
@@ -659,7 +659,7 @@ class backupbuddy_restore {
 
 		// Get newly imported tables with the temp prefix.
 		pb_backupbuddy::status( 'details', 'Checking for newly imported rollback tables with temp prefix `' . $newPrefix . '`.' );
-		$sql = "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '" . str_replace( '_', '\_', $newPrefix ) . "%' AND table_schema = DATABASE()";
+		$sql = "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_name LIKE '" . str_replace( '_', '\_', $newPrefix ) . "%' AND table_schema = DATABASE()";
 		$results = $wpdb->get_results( $sql, ARRAY_A );
 		pb_backupbuddy::status( 'details', 'Found ' . count( $results ) . ' matching tables.' );
 		if ( 0 == count( $results ) ) {
@@ -715,7 +715,7 @@ class backupbuddy_restore {
 		$this->_before( __FUNCTION__ );
 
 		global $wpdb;
-		$sql = "SELECT table_name FROM information_schema.tables WHERE table_name LIKE 'bbold-" . substr( $this->_state['serial'], 0, 4 ) . "\_%' AND table_schema = DATABASE()";
+		$sql = "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_name LIKE 'bbold-" . substr( $this->_state['serial'], 0, 4 ) . "\_%' AND table_schema = DATABASE()";
 		//echo $sql;
 		$results = $wpdb->get_results( $sql, ARRAY_A );
 		pb_backupbuddy::status( 'details', 'Found ' . count( $results ) . ' tables to drop.' );
@@ -758,7 +758,8 @@ class backupbuddy_restore {
 		}
 
 		// Extract zip file & verify it worked.
-		if ( true !== ( $result = pb_backupbuddy::$classes['zipbuddy']->unzip( $this->_state['archive'], $this->_state['restoreFileRoot'], $compatibilityMode ) ) ) {
+		$result = pb_backupbuddy::$classes['zipbuddy']->unzip( $this->_state['archive'], $this->_state['restoreFileRoot'], $compatibilityMode );
+		if ( true !== $result ) {
 			pb_backupbuddy::status( 'error', 'Failure extracting backup archive.' );
 			return false;
 		} else {
@@ -785,7 +786,7 @@ class backupbuddy_restore {
 		$shortSerial = substr( $this->_state['serial'], 0, 4 );
 
 		// NEW prefix
-		$sql = "SELECT table_name FROM information_schema.tables WHERE table_name LIKE 'bbnew-" . $shortSerial . "\_%' AND table_schema = DATABASE()";
+		$sql = "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_name LIKE 'bbnew-" . $shortSerial . "\_%' AND table_schema = DATABASE()";
 		$results = $wpdb->get_results( $sql, ARRAY_A );
 		pb_backupbuddy::status( 'details', 'Found ' . count( $results ) . ' tables to drop with the prefix `bbnew-' . $shortSerial . '_`.' );
 		$dropCount = 0;
@@ -799,7 +800,7 @@ class backupbuddy_restore {
 		pb_backupbuddy::status( 'details', 'Dropped `' . $dropCount . '` new tables.' );
 
 		// OLD prefix
-		$sql = "SELECT table_name FROM information_schema.tables WHERE table_name LIKE 'bbold-" . $shortSerial . "\_%' AND table_schema = DATABASE()";
+		$sql = "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_name LIKE 'bbold-" . $shortSerial . "\_%' AND table_schema = DATABASE()";
 		$results = $wpdb->get_results( $sql, ARRAY_A );
 		pb_backupbuddy::status( 'details', 'Found ' . count( $results ) . ' tables to drop with the prefix `bbold-' . $shortSerial . '_`.' );
 		$dropCount = 0;
@@ -947,11 +948,12 @@ class backupbuddy_restore {
 			// Useful REGEX site: http://gskinner.com/RegExr/
 
 			$updated_home_url = false;
-			$wp_config = array();
-			$lines = file( $configFile );
+			$wp_config        = array();
+			$lines            = file( $configFile );
+			$original_lines   = $lines;
 
-			$patterns = array();
-			$replacements = array();
+			$patterns         = array();
+			$replacements     = array();
 
 			/*
 			Update WP_SITEURL, WP_HOME if they exist.
@@ -959,12 +961,15 @@ class backupbuddy_restore {
 			RegExp: /define\([\s]*('|")WP_SITEURL('|"),[\s]*('|")(.)*('|")[\s]*\);/gi
 			pattern: define\([\s]*('|")WP_SITEURL('|"),[\s]*('|")(.)*('|")[\s]*\);
 			*/
+			$WP_SITE_URL = pb_is_standalone() ? it_bub_importbuddy_apply_filters( 'config_constant_siteurl', $this->_state['siteurl'] ) : $this->_state['siteurl'];
+			$WP_HOME     = pb_is_standalone() ? it_bub_importbuddy_apply_filters( 'config_constant_home', $this->_state['homeurl'] ) : $this->_state['homeurl'];
+
 			$pattern[0] = '/define\([\s]*(\'|")WP_SITEURL(\'|"),[\s]*(\'|")(.)*(\'|")[\s]*\);/i';
-			$replace[0] = "define( 'WP_SITEURL', '" . trim( $this->_state['siteurl'], '/' ) . "' );";
-			pb_backupbuddy::status( 'details', 'wp-config.php: Setting WP_SITEURL (if applicable) to `' . trim( $this->_state['siteurl'], '/' ) . '`.' );
+			$replace[0] = "define( 'WP_SITEURL', '" . trim( $WP_SITE_URL, '/' ) . "' );";
+			pb_backupbuddy::status( 'details', 'wp-config.php: Setting WP_SITEURL (if applicable) to `' . trim( $WP_SITE_URL, '/' ) . '`.' );
 			$pattern[1] = '/define\([\s]*(\'|")WP_HOME(\'|"),[\s]*(\'|")(.)*(\'|")[\s]*\);/i';
-			$replace[1] = "define( 'WP_HOME', '" . trim( $this->_state['homeurl'], '/' ) . "' );";
-			pb_backupbuddy::status( 'details', 'wp-config.php: Setting WP_HOME (if applicable) to `' . trim( $this->_state['homeurl'], '/' ) . '`.' );
+			$replace[1] = "define( 'WP_HOME', '" . trim( $WP_HOME, '/' ) . "' );";
+			pb_backupbuddy::status( 'details', 'wp-config.php: Setting WP_HOME (if applicable) to `' . trim( $WP_HOME, '/' ) . '`.' );
 
 			$pattern[2] = '/define\([\s]*(\'|")DB_NAME(\'|"),[\s]*(\'|")(.)*(\'|")[\s]*\);/i';
 			$replace[2] = "define( 'DB_NAME', '" . $this->_state['databaseSettings']['database'] . "' );";
@@ -1007,6 +1012,9 @@ class backupbuddy_restore {
 			// Perform the actual replacement.
 			$lines = preg_replace( $pattern, $replace, $lines );
 
+			// Importbuddy Droping Hooks
+			$lines = it_bub_importbuddy_apply_filters( 'wp_config_lines', $lines );
+
 			// Check that we can write to this file.
 			if ( ! is_writable( $configFile ) ) {
 				pb_backupbuddy::status( 'warning', 'Warning #28572: wp-config.php shows to be unwritable. Attempting to override permissions temporarily.' );
@@ -1018,6 +1026,14 @@ class backupbuddy_restore {
 			if ( false === ( file_put_contents( $configFile, $lines ) ) ) {
 				pb_backupbuddy::alert( 'ERROR #84928: Unable to save changes to wp-config.php. Verify this file has proper write permissions. You may need to manually edit it.', true, '9020' );
 				return implode( "\n", $lines );
+			} else {
+				$args = array(
+					'configFile' => $configFile,
+					'original'   => $original_lines,
+					'updated'    => $lines,
+					'perms'      => empty( $oldPerms ) ? false : $oldPerms,
+				);
+				it_bub_importbuddy_do_action( 'wp_config_rewrite_complete', $args );
 			}
 
 			// Restore prior permissions if applicable.
@@ -1122,7 +1138,8 @@ class backupbuddy_restore {
 
 		// .htaccess
 		if ( ! file_exists( ABSPATH . '.htaccess' ) ) {
-			$trouble[] = 'Warning only: .htaccess file not found in WordPress root. This is used for permalinks on servers which support it. If needed or URLs result in a 404 you may regenerate this file by logging into the wp-admin & navigating to Settings: Permalinks and clicking "Save".';
+			$no_htaccess_warning = 'Warning only: .htaccess file not found in WordPress root. This is used for permalinks on servers which support it. If needed or URLs result in a 404 you may regenerate this file by logging into the wp-admin & navigating to Settings: Permalinks and clicking "Save".';
+			$trouble[] = it_bub_importbuddy_apply_filters( 'no_htaccess_warning', $no_htaccess_warning );
 		} else { // Exists, check if AddHandler inside.
 			$contents = @file_get_contents( ABSPATH . '.htaccess' );
 			if ( strstr( $contents, 'AddHandler' ) ) {
@@ -1195,6 +1212,8 @@ class backupbuddy_restore {
 		if ( ! file_exists( ABSPATH . '.htaccess' ) ) {
 			pb_backupbuddy::status( 'details', 'No .htaccess file found. Skipping temporary file rename.' );
 		}
+
+		it_bub_importbuddy_do_action( 'backup_htaccess_file', ABSPATH . '.htaccess' );
 
 		$result = @rename( ABSPATH . '.htaccess', ABSPATH . '.htaccess.bb_temp' );
 		if ( $result === true ) { // Rename succeeded.
@@ -1318,16 +1337,16 @@ class backupbuddy_restore {
 
 			// Default .htaccess file.
 			$htaccess_contents =
-				"# BEGIN WordPress\n
-				<IfModule mod_rewrite.c>\n
-				RewriteEngine On\n
-				RewriteBase /\n
-				RewriteRule ^index\\.php$ - [L]\n
-				RewriteCond %{REQUEST_FILENAME} !-f\n
-				RewriteCond %{REQUEST_FILENAME} !-d\n
-				RewriteRule . /index.php [L]\n
-				</IfModule>\n
-				# END WordPress\n";
+"# BEGIN WordPress - BUB Importbuddy
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress";
 			file_put_contents( $htaccessFile, $htaccess_contents );
 			unset( $htaccess_contents );
 		}
@@ -1346,9 +1365,9 @@ class backupbuddy_restore {
 			}
 		}
 
-		$rewrite_lines = array();
-		$got_rewrite = false;
-		$file_array = file( $htaccessFile );
+		$rewrite_lines         = array();
+		$got_rewrite           = false;
+		$file_array            = file( $htaccessFile );
 		$htaccessNeedsUpdating = false;
 
 		// TODO: Consider using extract_from_markers() here.
@@ -1424,6 +1443,9 @@ class backupbuddy_restore {
 		} // end foreach.
 
 		// If the URL (domain and/or URL subdirectory ) has changed, then need to update .htaccess.bb_temp file.
+
+		$rewrite_lines         = it_bub_importbuddy_apply_filters( 'htaccess_content_array', $rewrite_lines );
+		$htaccessNeedsUpdating = it_bub_importbuddy_apply_filters( 'htaccess_needs_updating', $htaccessNeedsUpdating );
 
 		if ( true === $htaccessNeedsUpdating ) {
 			// Check that we can write to this file (if it already exists).

@@ -13,6 +13,11 @@
  */
 class pb_backupbuddy {
 
+	/**
+	 * PluginBuddy Framework Version
+	 *
+	 * @var string
+	 */
 	private static $pbframework_version = '1.0.28';
 
 	/**
@@ -155,6 +160,7 @@ class pb_backupbuddy {
 	 * Controller for WordPress widgets.
 	 */
 	// private static $_widgets;
+
 	/**
 	 * Controller for WordPress pages. See /controllers/pages/ directory.
 	 *
@@ -194,12 +200,14 @@ class pb_backupbuddy {
 
 	/**
 	 * DISABLED. Using create_function() to bypass need for this. Currently only holding callback for the admin menu.
+	 * Note: Try not to use create_function().
 	 *
 	 * @see pluginbuddy_callbacks class
 	 *
 	 * @var array
 	 */
 	// private static $_callbacks;
+
 	/**
 	 * Holds tag and title for unconstructed dashboard widgets temporarily.
 	 *
@@ -215,7 +223,7 @@ class pb_backupbuddy {
 	public static $_updater;
 
 	/**
-	 * if unable to write to log then skip all future attempts.
+	 * If unable to write to log then skip all future attempts.
 	 *
 	 * @var bool
 	 */
@@ -334,7 +342,7 @@ class pb_backupbuddy {
 	/**
 	 * Retrieves misc plugin settings both passed from the init file ( defined in pb_backupbuddy::settings( 'init' ) ) into self::$_settings
 	 *
-	 * also plugin settings defined in the init file ( defined in pb_backupbuddy::settings( 'init' ) ) header including:
+	 * Also plugin settings defined in the init file ( defined in pb_backupbuddy::settings( 'init' ) ) header including:
 	 * name, title, description, author, authoruri, version, pluginuri OR url, textdomain, domainpath, network.
 	 *
 	 * @see self::init()
@@ -344,7 +352,6 @@ class pb_backupbuddy {
 	 * @return mixed Value associated with that settings. Null if not found.
 	 */
 	public static function settings( $type ) {
-		// if ( !self::blank( @self::$_settings[$type] ) ) { // Return value if it already exists.
 		if ( isset( self::$_settings[ $type ] ) ) {
 			return self::$_settings[ $type ];
 		}
@@ -445,7 +452,7 @@ class pb_backupbuddy {
 	 * Ex usage: $group = &self::get_group( 'groups#' . $_GET['edit'] );
 	 *
 	 * @param string $savepoint_root  Path in the array to return a reference to.
-	 *                                Ex: groups#5 will grab self::$options['groups'][5]
+	 *                                Ex: groups#5 will grab self::$options['groups'][5].
 	 *
 	 * @return mixed  Value within the array at the specified point.
 	 *                Can be used as a reference. See example in description.
@@ -479,7 +486,6 @@ class pb_backupbuddy {
 	 * @return mixed  $settings or false.
 	 */
 	public static function load_from_backup() {
-		// error_log( 'BackupBuddy settings missing/corrupt. Attempting to restore from settings backup (if exists).' );
 		$restore_fail_message    = 'Error #84938943: Your BackupBuddy Settings were detected as missing or corrupt. BackupBuddy has attempted to load BackupBuddy settings from its settings backup file but failed. Verify your BackupBuddy settings are still intact and valid. This could have been caused by a database error or corruption.';
 		$restore_success_message = 'Warning #894384: Your BackupBuddy Settings were detected as missing or corrupt. BackupBuddy has restored your previous BackupBuddy settings from its settings backup file. Please verify your restored BackupBuddy settings look okay. This could have been caused by a database error or corruption.';
 
@@ -547,12 +553,12 @@ class pb_backupbuddy {
 		}
 
 		// Merge defaults into temporary $options variable and save if it differs with the pre-merge options. Only retries this once.
-		if ( ( empty( self::$options ) || ( ! isset( self::$options['data_version'] ) ) ) && ( true === $retry_db ) ) { // If empty options or corrupt.
+		if ( ( empty( self::$options ) || ! isset( self::$options['data_version'] ) ) && true === $retry_db ) { // If empty options or corrupt.
 			global $wpdb;
 			// If the database goes away in the middle of a query, wait 5 seconds and try again. Otherwise, we unintentionally overwrite the settings.
-			if ( ! empty( $wpdb->last_error ) && ( false !== strpos( $wpdb->last_error, "SELECT option_value FROM `$wpdb->options` WHERE option_name = 'pb_backupbuddy'" ) ) ) {
+			if ( ! empty( $wpdb->last_error ) && false !== strpos( $wpdb->last_error, "SELECT option_value FROM `$wpdb->options` WHERE option_name = 'pb_backupbuddy'" ) ) {
 				sleep( 5 );
-				self::load( $retry_db = false ); // TODO: This is always false? /bd.
+				self::load( false );
 				return;
 			} else { // Missing or corrupt options when loading. Either a new install or settings went missing.
 
@@ -694,8 +700,10 @@ class pb_backupbuddy {
 	 * Helps security by attempting to block directory browsing by creating
 	 * both index.htm files and .htaccess files turning browsing off.
 	 *
-	 * @param string $directory  Full absolute pass to insert anti-directory-browsing files into. No trailing slash.
-	 * @param bool   $deny_all   When true also enforce denying ALL web-based access to directory. default false
+	 * @param string $directory       Full absolute pass to insert anti-directory-browsing files into. No trailing slash.
+	 * @param bool   $die_on_fail     When true also enforce denying ALL web-based access to directory. Default false.
+	 * @param bool   $deny_all        Deny all.
+	 * @param bool   $suppress_alert  Suppress alert.
 	 *
 	 * @return bool  True on success securing directory, false otherwise.
 	 */
@@ -703,7 +711,7 @@ class pb_backupbuddy {
 
 		// Check directory exists & create if it doesn't.
 		if ( ! file_exists( $directory ) ) {
-			$mode    = 0755;
+			$mode    = apply_filters( 'itbub-default-file-mode', 0755 );
 			$recurse = true;
 			if ( self::$filesystem->mkdir( $directory, $mode, $recurse ) === false ) {
 				$error = 'Error #9002: BackupBuddy unable to create directory `' . $directory . '`. Please verify write permissions for the parent directory `' . dirname( $directory ) . '` or manually create the specified directory & set permissions.';
@@ -740,7 +748,6 @@ class pb_backupbuddy {
 
 		$error = '';
 
-		// index.php
 		if ( ! file_exists( $directory . '/index.php' ) ) {
 			// FIXME: Avoid @ symbol here. Possibly use try/catch?
 			if ( false === @file_put_contents( $directory . '/index.php', '<html></html>' ) ) {
@@ -748,7 +755,6 @@ class pb_backupbuddy {
 			}
 		}
 
-		// index.htm
 		if ( ! file_exists( $directory . '/index.htm' ) ) {
 			// FIXME: Avoid @ symbol here. Possibly use try/catch?
 			if ( false === @file_put_contents( $directory . '/index.htm', '<html></html>' ) ) {
@@ -756,7 +762,6 @@ class pb_backupbuddy {
 			}
 		}
 
-		// index.html
 		if ( ! file_exists( $directory . '/index.html' ) ) {
 			// FIXME: Avoid @ symbol here. Possibly use try/catch?
 			if ( false === @file_put_contents( $directory . '/index.html', '<html></html>' ) ) {
@@ -764,7 +769,7 @@ class pb_backupbuddy {
 			}
 		}
 
-		// .htaccess if we aren't in the importbuddy script
+		// .htaccess if we aren't in the importbuddy script.
 		if ( ! file_exists( $directory . '/.htaccess' ) ) {
 			// FIXME: Avoid @ symbol here. Possibly use try/catch?
 			if ( false === @file_put_contents( $directory . '/.htaccess', 'Options -Indexes' . $deny_all ) ) {
@@ -823,14 +828,14 @@ class pb_backupbuddy {
 	 * @return null
 	 */
 	public static function remove_status_serial( $serial ) {
-		if ( is_array( self::$_status_serial ) ) { // array
+		if ( is_array( self::$_status_serial ) ) {
 			foreach ( self::$_status_serial as $i => $this_serial ) {
 				if ( $this_serial == $serial ) {
 					unset( self::$_status_serial[ $i ] );
 					return;
 				}
 			}
-		} else { // string
+		} else { // should be a string.
 			if ( self::$_status_serial == $serial ) {
 				self::$_status_serial = '';
 			}
@@ -877,7 +882,7 @@ class pb_backupbuddy {
 			self::$options['log_level'] = 0;
 		}
 
-		if ( '' != self::$_status_serial  && '' == $serials ) {
+		if ( '' != self::$_status_serial && '' == $serials ) {
 			$serials = self::$_status_serial;
 		}
 
@@ -954,15 +959,22 @@ class pb_backupbuddy {
 				}
 			}
 
-			// Function for writing actual log CSV data. Used later.
 			if ( ! function_exists( 'write_status_line' ) ) {
+				/**
+				 * Function for writing actual log CSV data. Used later.
+				 *
+				 * @param string $file           File to write.
+				 * @param array  $content_array  Array of content to write.
+				 * @param bool   $echo           Echo instead of write.
+				 */
 				function write_status_line( $file, $content_array, $echo ) {
 					$write_data = json_encode( $content_array ) . PHP_EOL;
-					if ( true === $echo ) { // echo data instead of writing to file. used by ajax when checking status log and needing to prepend before log.
+					if ( true === $echo ) { // Echo data instead of writing to file. Used by ajax when checking status log and needing to prepend before log.
 						echo $write_data;
 					} else {
 						// FIXME: Avoid @ symbol here.
-						if ( false !== ( $file_handle = @fopen( $file, 'a' ) ) ) { // Append mode.
+						$file_handle = @fopen( $file, 'a' );
+						if ( false !== $file_handle ) { // Append mode.
 							// FIXME: Avoid @ symbol here.
 							@fwrite( $file_handle, $write_data );
 							// FIXME: Avoid @ symbol here.
@@ -1279,7 +1291,7 @@ class pb_backupbuddy {
 	 * Displays a message to the user at the top of the page when in the dashboard.
 	 *
 	 * @param string $message     Message you want to display to the user.
-	 * @param bool   $error       OPTIONAL! true indicates this alert is an error and displays as red. Default: false
+	 * @param bool   $error       OPTIONAL! true indicates this alert is an error and displays as red. Default: false.
 	 * @param string $error_code  OPTIONAL! Error code number to use in linking in the wiki for easy reference.
 	 * @param string $rel_tag     If not echoing alert then the string will be returned. When echoing there is no return.
 	 *
@@ -1299,8 +1311,6 @@ class pb_backupbuddy {
 	 * @param string $message    Message you want to display to the user.
 	 * @param bool   $error      Optional. Error code number to use in linking to the wiki for easy reference.
 	 * @param string $more_css   Additional css to apply to alert.
-	 *
-	 * @return null
 	 */
 	public static function disalert( $unique_id, $message, $error = false, $more_css = '' ) {
 		self::init_class_controller( 'ui' ); // $ui class required pages controller and may not be set up if not in our own pages.
@@ -1311,9 +1321,9 @@ class pb_backupbuddy {
 	 * Displays a message to the user when they hover over the question mark. Gracefully falls back to normal tooltip.
 	 * HTML is allowed within tooltips.
 	 *
-	 * @param string $message  Actual message to show to user.
-	 * @param string $title    Title of message to show to user. This is displayed at top of tip in bigger letters. Default is blank. (optional)
-	 * @param bool   $echo_tip   Whether to echo the tip (default; true), or return the tip (false). (optional)
+	 * @param string $message   Actual message to show to user.
+	 * @param string $title     Title of message to show to user. This is displayed at top of tip in bigger letters. (optional) Default is blank.
+	 * @param bool   $echo_tip  (Optional) Whether to echo the tip (default; true), or return the tip (false).
 	 *
 	 * @return mixed  If not echoing tip then the string will be returned. When echoing there is no return.
 	 */
@@ -1334,8 +1344,6 @@ class pb_backupbuddy {
 	 * @param string $icon         Menu icon graphic. Automatically prefixes this value with the full URL to plugin's images directory. Default: icon_16x16.png.
 	 * @param string $slug_prefix  Prefix to use with this menu. Override if needing to add menu under another plugin or core menus. Default: DEFAULT.
 	 * @param int    $position     Priority on where in the menu to add this. By default it is added to the bottom of the menu. It's possible to overwrite another menu item if this number matches. Use caution. Default: null.
-	 *
-	 * @return null
 	 */
 	public static function add_page( $parent_slug, $page_slug, $page_title, $capability = 'activate_plugins', $icon = 'icon_menu_16x16.png', $slug_prefix = 'DEFAULT', $position = null ) {
 		if ( 'DEFAULT' == $slug_prefix ) {
@@ -1448,8 +1456,6 @@ class pb_backupbuddy {
 	 * @param string/array $tag            Tag / slug for the action. If an array the first item is the tag, the second is an optional custom callback method name.
 	 * @param int          $priority       Integer priority number for the action.
 	 * @param int          $accepted_args  Number of arguments this action may accept in its method.
-	 *
-	 * @return null
 	 */
 	public static function add_action( $tag, $priority = 10, $accepted_args = 1 ) {
 		if ( ! is_object( self::$_actions ) ) {
@@ -1470,8 +1476,6 @@ class pb_backupbuddy {
 	 * Registers a WordPress ajax action. Ajax action of the name $tag will call the method in /controllers/ajax.php with the matching name.
 	 *
 	 * @param string/array $tag  Tag / slug for the action. If an array the first item is the tag, the second is an optional custom callback method name.
-	 *
-	 * @return null
 	 */
 	public static function add_ajax( $tag ) {
 		if ( ! is_object( self::$_ajax ) ) {
@@ -1494,8 +1498,6 @@ class pb_backupbuddy {
 	 * @param string/array $tag                Tag / slug for the cron action. If an array the first item is the tag, the second is an optional custom callback method name.
 	 * @param int          $priority           Integer priority number for the cron action.
 	 * @param int          $accepted_args_num  Number of arguments this action may accept in its method.
-	 *
-	 * @return null
 	 */
 	public static function add_cron( $tag, $priority = 10, $accepted_args_num = 1 ) {
 		if ( ! is_object( self::$_cron ) ) {
@@ -1519,8 +1521,6 @@ class pb_backupbuddy {
 	 * @param string       $title       Dashboard widget title.
 	 * @param string       $capability  Required capability to display. Also accepts `godmode` to only allow superadmins in multisite and admins in standalone.
 	 * @param bool         $force_top   Number of arguments this action may accept in its method.
-	 *
-	 * @return null
 	 */
 	public static function add_dashboard_widget( $tag, $title, $capability, $force_top = false ) {
 		if ( ! is_object( self::$_dashboard ) ) {
@@ -1548,8 +1548,6 @@ class pb_backupbuddy {
 	 * @param string/array $tag            Tag / slug for the action. If an array the first item is the tag, the second is an optional custom callback method name.
 	 * @param int          $priority       Integer priority number for the filter.
 	 * @param int          $accepted_args  Number of arguments this filter may accept in its method.
-	 *
-	 * @return null
 	 */
 	public static function add_filter( $tag, $priority = 10, $accepted_args = 1 ) {
 		if ( ! is_object( self::$_filters ) ) {
@@ -1570,8 +1568,6 @@ class pb_backupbuddy {
 	 * Registers a WordPress shortcode. Shortcode of the name $tag will call the method in /controllers/shortcodes.php with the matching name.
 	 *
 	 * @param string/array $tag  Tag / slug for the shortcode. If an array the first item is the tag, the second is an optional custom callback method name.
-	 *
-	 * @return null
 	 */
 	public static function add_shortcode( $tag ) {
 		if ( ! is_object( self::$_shortcodes ) ) {
@@ -1593,9 +1589,7 @@ class pb_backupbuddy {
 	 *
 	 * @see pages controller
 	 *
-	 * @param [type] $class_slug [description]
-	 *
-	 * @return null
+	 * @param string $class_slug  Slug of class.
 	 */
 	public static function init_class_controller( $class_slug ) {
 		if ( ! is_object( self::$$class_slug ) ) {
@@ -1614,8 +1608,6 @@ class pb_backupbuddy {
 	 * Initialize a core controller class (ex: pages, ajax, filters, etc) for pluginbuddy framework usage.
 	 *
 	 * @param string $name  Name of the controller to register. Valid controllers: actions, ajax, cron, dashboard, filters, shortcodes, pages.
-	 *
-	 * @return null
 	 */
 	private static function _init_core_controller( $name ) {
 		if ( ! is_array( self::$options ) ) {
@@ -1636,7 +1628,14 @@ class pb_backupbuddy {
 	 * @return null/string  wp_nonce_field()
 	 */
 	public static function nonce( $echo = true ) {
-		return wp_nonce_field( 'pb_' . self::settings( 'name' ) . '-nonce', '_wpnonce', true, $echo );
+		$name        = '_wpnonce';
+		$nonce_field = wp_nonce_field( 'pb_' . self::settings( 'name' ) . '-nonce', $name, true, false );
+		$nonce_id    = $name . '_' . uniqid();
+		$nonce_field = str_replace( array( ' id="' . $name, ' id=\'' . $name ), array( ' id="' . $nonce_id, ' id=\'' . $nonce_id ), $nonce_field );
+		if ( false === $echo ) {
+			return $nonce_field;
+		}
+		echo $nonce_field;
 	} // End nonce().
 
 	/**
@@ -1652,8 +1651,7 @@ class pb_backupbuddy {
 
 	/**
 	 * Verifies the nonce submitted in form.
-	 *
-	 * @return null  Script die()'s on failure, returns true on success.
+	 * Script die()'s on failure
 	 */
 	public static function verify_nonce() {
 		check_admin_referer( 'pb_' . self::settings( 'name' ) . '-nonce' );
@@ -1666,8 +1664,6 @@ class pb_backupbuddy {
 	 *                             Ex: load_script( 'sort.js' ) will load /wp-content/plugins/my_plugin/js/sort.js;
 	 *                             load_script( 'jquery' ) will load internal jquery library in WordPress if it exists.
 	 * @param bool   $core_script  If true scripts are loaded from /pluginbuddy/js/SCRIPT.js. Else scripts loaded from plugin's js directory.
-	 *
-	 * @return null
 	 */
 	public static function load_script( $script, $core_script = false ) {
 		if ( strstr( $script, '.js' ) ) { // Loading a file specifically.
@@ -1712,8 +1708,6 @@ class pb_backupbuddy {
 	 *                            Ex: load_style( 'sort.css' ) will load /wp-content/plugins/my_plugin/css/sort.css;
 	 *                            load_style( 'dashboard' ) will load internal dashboard css in WordPress if it exists.
 	 * @param bool   $core_style  If true styles are loaded from /pluginbuddy/css/STYLE.css. Else styles loaded from plugin's css directory.
-	 *
-	 * @return null
 	 */
 	public static function load_style( $style, $core_style = false ) {
 		if ( strstr( $style, '.css' ) ) { // Loading a file specifically.
@@ -1754,10 +1748,8 @@ class pb_backupbuddy {
 	/**
 	 * Loads a view. Typically called from within a controller. Data passed as second argument will has extract() ran on it within the view for easy variable access.
 	 *
-	 * @param string $view_name         Name of view. Corresponds to the view filename: /views/view_name.php
+	 * @param string $view_name         Name of view. Corresponds to the view filename: /views/view_name.php.
 	 * @param array  $pluginbuddy_data  Array of variables to be extracted for use by the view.
-	 *
-	 * @return null
 	 */
 	public static function load_view( $view_name, $pluginbuddy_data = array() ) {
 		// Variable named this way as the included file inherits this variable and we don't want an accidental collision.
@@ -1769,7 +1761,6 @@ class pb_backupbuddy {
 			} else {
 				echo '{Warning: Data parameter passed to view was not an array.}';
 			}
-			// global $dionysus_controller; // Gives the view the ability to access functions within the controller if needed.
 			require $pluginbuddy_view_file;
 		} else {
 			echo '{INVALID VIEW: `' . $view_name . '`; file not found.}';
@@ -1779,9 +1770,7 @@ class pb_backupbuddy {
 	/**
 	 * Loads a controller. Controllers may load controllers. Controller uses require_once to avoid problems.
 	 *
-	 * @param string $controller  Name of controller. Corresponds to the controller filename: /controllers/controller_name.php
-	 *
-	 * @return null
+	 * @param string $controller  Name of controller. Corresponds to the controller filename: /controllers/controller_name.php.
 	 */
 	public static function load_controller( $controller ) {
 		// Using this method so load_controller() may be used anywhere.
@@ -1795,18 +1784,23 @@ class pb_backupbuddy {
 	/**
 	 * Registers a widget. Will register widget class in /controllers/widget/slug.php. Widget class extend WP_Widgets.
 	 *
-	 * @param string $slug  Name / slug for widget. Must match filename in controllers\widgets\ directory. Class name in the format: pb_{PLUGINSLUG}_widget_{WIDGETSLUG}
-	 *
-	 * @return null
+	 * @param string $slug  Name / slug for widget. Must match filename in controllers\widgets\ directory. Class name in the format: pb_{PLUGINSLUG}_widget_{WIDGETSLUG}.
 	 */
 	public static function register_widget( $slug ) {
 		if ( file_exists( self::plugin_path() . '/controllers/widgets/' . $slug . '.php' ) ) {
 			require self::plugin_path() . '/controllers/widgets/' . $slug . '.php';
-			add_action( 'widgets_init', create_function( '', 'register_widget(\'pb_' . self::settings( 'slug' ) . '_widget_' . $slug . '\');' ) );
+			add_action( 'widgets_init', array( 'pb_backupbuddy', 'do_register_widget' ) );
 		} else {
 			echo '{Error #3444548922: Unable to load widget file `controllers/widgets/' . $slug . '.php`.}';
 		}
 	} // End register_widget().
+
+	/**
+	 * Handle the widget registration.
+	 */
+	public static function do_register_widget() {
+		register_widget( 'pb_' . self::settings( 'slug' ) . '_widget_' . $slug );
+	}
 
 	/**
 	 * Removes array values in $remove from $array.

@@ -17,11 +17,6 @@ function rocket_init() {
 		return;
 	}
 
-	// Nothing to do if XMLRPC request.
-	if ( defined( 'XMLRPC_REQUEST' ) ) {
-		return;
-	}
-
 	// Necessary to call correctly WP Rocket Bot for cache json.
 	global $do_rocket_bot_cache_json;
 	$do_rocket_bot_cache_json = false;
@@ -42,7 +37,6 @@ function rocket_init() {
 	require WP_ROCKET_FUNCTIONS_PATH . 'admin.php';
 	require WP_ROCKET_FUNCTIONS_PATH . 'formatting.php';
 	require WP_ROCKET_FUNCTIONS_PATH . 'cdn.php';
-	require WP_ROCKET_FUNCTIONS_PATH . 'minify.php';
 	require WP_ROCKET_FUNCTIONS_PATH . 'i18n.php';
 	require WP_ROCKET_FUNCTIONS_PATH . 'bots.php';
 	require WP_ROCKET_FUNCTIONS_PATH . 'htaccess.php';
@@ -82,10 +76,8 @@ function rocket_init() {
 		require WP_ROCKET_ADMIN_UI_PATH . 'notices.php';
 		require WP_ROCKET_ADMIN_UI_PATH . 'meta-boxes.php';
 	} elseif ( rocket_valid_key() ) {
-		require WP_ROCKET_FRONT_PATH . 'minify.php';
 		require WP_ROCKET_FRONT_PATH . 'cookie.php';
 		require WP_ROCKET_FRONT_PATH . 'images.php';
-		require WP_ROCKET_FRONT_PATH . 'enqueue.php';
 		require WP_ROCKET_FRONT_PATH . 'dns-prefetch.php';
 
 		if ( get_rocket_option( 'defer_all_js' ) ) {
@@ -192,6 +184,7 @@ function rocket_activation() {
 	require WP_ROCKET_FUNCTIONS_PATH . 'i18n.php';
 	require WP_ROCKET_FUNCTIONS_PATH . 'htaccess.php';
 	require WP_ROCKET_3RD_PARTY_PATH . 'hosting/godaddy.php';
+	require WP_ROCKET_3RD_PARTY_PATH . 'hosting/o2switch.php';
 
 	if ( rocket_valid_key() ) {
 		// Add All WP Rocket rules of the .htaccess file.

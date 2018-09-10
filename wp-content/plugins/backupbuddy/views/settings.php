@@ -1,5 +1,11 @@
 <?php
-if ( !is_admin() ) { die( 'Access Denied.' ); }
+/**
+ * Settings Page View
+ *
+ * @package BackupBuddy
+ */
+
+is_admin() || die( 'Access Denied.' );
 ?>
 <style type="text/css">
 	.pb_backupbuddy_customize_email_error_row, .pb_backupbuddy_customize_email_scheduled_start_row, .pb_backupbuddy_customize_email_scheduled_complete_row, .pb_backupbuddy_customize_email_send_finish_row {
@@ -25,17 +31,15 @@ if ( !is_admin() ) { die( 'Access Denied.' ); }
 		}
 	}
 
-
 	var pb_settings_changed = false;
 
-	jQuery(document).ready(function() {
-
+	jQuery(function() {
 
 		checkEmailNotifyErrorStatus();
+
 		jQuery('#pb_backupbuddy_email_notify_error').change( function(e) {
 			checkEmailNotifyErrorStatus();
 		});
-
 
 		jQuery( 'a' ) .click( function(e) {
 			if ( jQuery(this).attr( 'class' ) == 'ui-tabs-anchor' ) {
@@ -57,9 +61,6 @@ if ( !is_admin() ) { die( 'Access Denied.' ); }
 			pb_settings_changed = true;
 		});
 
-
-
-
 	});
 
 	function pb_backupbuddy_selectdestination( destination_id, destination_title, callback_data, delete_after, mode ) {
@@ -67,19 +68,15 @@ if ( !is_admin() ) { die( 'Access Denied.' ); }
 	}
 </script>
 
-
-
 <?php
+$active_tab = 0;
 if ( is_numeric( pb_backupbuddy::_GET( 'tab' ) ) ) {
 	$active_tab = pb_backupbuddy::_GET( 'tab' );
-} else {
-	$active_tab = 0;
 }
 
+$license_url = admin_url( 'options-general.php' );
 if ( is_network_admin() ) {
 	$license_url = network_admin_url( 'settings.php' );
-} else {
-	$license_url = admin_url( 'options-general.php' );
 }
 $license_url .= '?page=ithemes-licensing';
 
@@ -87,25 +84,25 @@ pb_backupbuddy::$ui->start_tabs(
 	'settings',
 	array(
 		array(
-			'title'		=>		__( 'General Settings', 'it-l10n-backupbuddy' ),
-			'slug'		=>		'general',
+			'title' => __( 'General Settings', 'it-l10n-backupbuddy' ),
+			'slug'  => 'general',
 		),
 		array(
-			'title'		=>		__( 'Advanced Settings / Troubleshooting', 'it-l10n-backupbuddy' ),
-			'slug'		=>		'advanced',
+			'title' => __( 'Advanced Settings / Troubleshooting', 'it-l10n-backupbuddy' ),
+			'slug'  => 'advanced',
 		),
 		array(
-			'title'		=>		__( 'Recent Activity', 'it-l10n-backupbuddy' ),
-			'slug'		=>		'activity',
+			'title' => __( 'Recent Activity', 'it-l10n-backupbuddy' ),
+			'slug'  => 'activity',
 		),
 		array(
-			'title'		=>		__( 'Other', 'it-l10n-backupbuddy' ),
-			'slug'		=>		'other',
+			'title' => __( 'Other', 'it-l10n-backupbuddy' ),
+			'slug'  => 'other',
 		),
 		array(
-			'title'		=>		__( 'Licensing', 'it-l10n-backupbuddy' ),
-			'slug'		=>		'licensing',
-			'url'		=>		$license_url,
+			'title' => __( 'Licensing', 'it-l10n-backupbuddy' ),
+			'slug'  => 'licensing',
+			'url'   => $license_url,
 		),
 	),
 	'width: 100%;',
@@ -113,63 +110,38 @@ pb_backupbuddy::$ui->start_tabs(
 	$active_tab
 );
 
+echo '<!-- opening div.backupbuddy-tab-blocks -->';
 
+	pb_backupbuddy::$ui->start_tab( 'general' );
+	require_once 'settings/_general.php';
+	pb_backupbuddy::$ui->end_tab();
 
-pb_backupbuddy::$ui->start_tab( 'general' );
-require_once( 'settings/_general.php' );
-pb_backupbuddy::$ui->end_tab();
+	pb_backupbuddy::$ui->start_tab( 'advanced' );
+	require_once 'settings/_advanced.php';
+	pb_backupbuddy::$ui->end_tab();
 
+	pb_backupbuddy::$ui->start_tab( 'activity' );
+	require_once 'settings/_activity.php';
+	pb_backupbuddy::$ui->end_tab();
 
-pb_backupbuddy::$ui->start_tab( 'advanced' );
-require_once( 'settings/_advanced.php' );
-pb_backupbuddy::$ui->end_tab();
+	pb_backupbuddy::$ui->start_tab( 'other' );
+	pb_backupbuddy::flush(); // Flush before we start loading in the log.
+	require_once 'settings/_other.php';
+	pb_backupbuddy::$ui->end_tab();
+	?>
 
-pb_backupbuddy::$ui->start_tab( 'activity' );
-require_once( 'settings/_activity.php' );
-pb_backupbuddy::$ui->end_tab();
-
-pb_backupbuddy::$ui->start_tab( 'other' );
-pb_backupbuddy::flush(); // Flush before we start loading in the log.
-require_once( 'settings/_other.php' );
-pb_backupbuddy::$ui->end_tab();
-
-?>
-
-
-
-
-
-<script type="text/javascript">
-
-
-
-	function pb_backupbuddy_selectdestination( destination_id, destination_title, callback_data ) {
-		window.location.href = '<?php
-			if ( is_network_admin() ) {
-				echo network_admin_url( 'admin.php' );
-			} else {
-				echo admin_url( 'admin.php' );
-			}
-		?>?page=pb_backupbuddy_backup&custom=remoteclient&destination_id=' + destination_id;
+	<?php $admin_url = is_network_admin() ? network_admin_url( 'admin.php' ) : admin_url( 'admin.php' ); ?>
+	<script type="text/javascript">
+		function pb_backupbuddy_selectdestination( destination_id, destination_title, callback_data ) {
+			window.location.href = '<?php echo $admin_url; ?>?page=pb_backupbuddy_backup&custom=remoteclient&destination_id=' + destination_id;
+		}
+	</script>
+	<?php
+	// Handles thickbox auto-resizing. Keep at bottom of page to avoid issues.
+	if ( ! wp_script_is( 'media-upload' ) ) {
+		wp_enqueue_script( 'media-upload' );
+		wp_print_scripts( 'media-upload' );
 	}
-</script>
+	?>
 
-
-<?php
-// Handles thickbox auto-resizing. Keep at bottom of page to avoid issues.
-if ( !wp_script_is( 'media-upload' ) ) {
-	wp_enqueue_script( 'media-upload' );
-	wp_print_scripts( 'media-upload' );
-}
-?>
-
-
-
-
-
-
-
-</div>
-
-
-
+</div><!-- end .backupbuddy-tab-blocks -->

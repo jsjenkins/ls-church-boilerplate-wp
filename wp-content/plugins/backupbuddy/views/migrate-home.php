@@ -1,16 +1,20 @@
-
 <?php
-if ( pb_backupbuddy::$options['importbuddy_pass_hash'] == '' ) { // NO HASH SET.
-	$importAlert = '<span class="pb_label pb_label">Important</span> <b>Set an ImportBuddy password on the <a href="';
-	if ( is_network_admin() ) {
-		$importAlert .= network_admin_url( 'admin.php' );
-	} else {
-		$importAlert .= admin_url( 'admin.php' );
-	}
-	$importAlert .= '?page=pb_backupbuddy_settings">Settings</a> page before attempting to Migrate to a new server.</b>';
-	pb_backupbuddy::alert( $importAlert, true );
-}
+/**
+ * Migrate Home View File
+ *
+ * @package BackupBuddy
+ */
 
+if ( '' == pb_backupbuddy::$options['importbuddy_pass_hash'] ) { // NO HASH SET.
+	$import_alert = '<span class="pb_label pb_label">Important</span> <b>Set an ImportBuddy password on the <a href="';
+	if ( is_network_admin() ) {
+		$import_alert .= network_admin_url( 'admin.php' );
+	} else {
+		$import_alert .= admin_url( 'admin.php' );
+	}
+	$import_alert .= '?page=pb_backupbuddy_settings">Settings</a> page before attempting to Migrate to a new server.</b>';
+	pb_backupbuddy::alert( $import_alert, true );
+}
 
 pb_backupbuddy::disalert( 'importbuddy_in_backup_note', __( 'TIP: An additional copy of the restore script, importbuddy.php, is also saved inside your backup zip file for your added convenience. It can be found inside the zip file at /wp-content/uploads/backupbuddy_temp/XXXXXX/importbuddy.php, replacing XXXXXX with the random characters in the backup zip filename.', 'it-l10n-backupbuddy' ) );
 ?>
@@ -48,38 +52,17 @@ site/backup specific.
 	<li>Follow the on-screen directions until the restore / migration is complete.</li>
 </ol>
 
-
-<?php
-/*
-<br>
-<h3>Database Rollback</h3>
-You may roll back the database on this site to a database contained in a backup (full or database only) by selecting the "Rollback Database" option when
-hovering below. This lets you easily undo changes made to the site. You will be given the opportunity to verify the rollback was successful
-before making it permanent.
-<br><br><br>
-*/
-?>
 <br><br>
-
 
 <h3 id="pb_backupbuddy_restoremigratelisttitle">Hover Backup for Additional Options</h3>
 <?php
-
-
 $listing_mode = 'restore_migrate';
-require_once( '_backup_listing.php' );
-
+require_once '_backup_listing.php';
 
 echo '<br><br>';
 
-
-
-
-
-
 // Handles thickbox auto-resizing. Keep at bottom of page to avoid issues.
-if ( !wp_script_is( 'media-upload' ) ) {
+if ( ! wp_script_is( 'media-upload' ) ) {
 	wp_enqueue_script( 'media-upload' );
 	wp_print_scripts( 'media-upload' );
 }
-?>

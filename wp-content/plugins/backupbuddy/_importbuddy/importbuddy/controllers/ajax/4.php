@@ -93,7 +93,7 @@ if ( false === $restore->_state['restoreDatabase'] ) {
 		// Drop any previous incomplete deployment / rollback tables.
 		pb_backupbuddy::status( 'details', 'Dropping any existing temporary deployment or rollback tables.' );
 		
-		$results = $wpdb->get_results( "SELECT table_name FROM information_schema.tables WHERE ( ( table_name LIKE 'bbnew-\_%' ) OR ( table_name LIKE 'bbold-\_%' ) ) AND table_schema = DATABASE()", ARRAY_A );
+		$results = $wpdb->get_results( "SELECT table_name AS `table_name` FROM information_schema.tables WHERE ( ( table_name LIKE 'bbnew-\_%' ) OR ( table_name LIKE 'bbold-\_%' ) ) AND table_schema = DATABASE()", ARRAY_A );
 		if ( count( $results ) > 0 ) {
 			foreach( $results as $result ) {
 				if ( false === $wpdb->query( "DROP TABLE `" . backupbuddy_core::dbEscape( $result['table_name'] ) . "`" ) ) {

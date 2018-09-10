@@ -1,4 +1,10 @@
 <?php
+/**
+ * Rollback Page
+ *
+ * @package BackupBuddy
+ */
+
 pb_backupbuddy::load_script( 'rollbackEvents.js' );
 
 pb_backupbuddy::$ui->title(
@@ -140,7 +146,6 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 	// Used in BackupBuddy _backup-perform.php and ImportBuddy _header.php
 	function backupbuddyWarning( message ) {
 		jQuery( '.backupbuddy_warning_list' ).append( '<li>' +  message + '</li>' );
-		//jQuery( '.warning_alert_box' ).show();
 		return 'Warning: ' + message;
 	} // end backupbuddyWarning().
 </script>
@@ -168,7 +173,7 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 
 
 <div id="message" style="display: none; padding: 9px;" rel="" class="pb_backupbuddy_alert updated fade below-h2">
-	<?php _e( 'If the rollback should fail for any reason you may undo its changes at any time by visiting the URL', 'it-l10n-backupbuddy' ); ?>:<br>
+	<?php esc_html_e( 'If the rollback should fail for any reason you may undo its changes at any time by visiting the URL', 'it-l10n-backupbuddy' ); ?>:<br>
 	<a href="" id="pb_backupbuddy_undourl" target="pb_backupbuddy_modal_iframe"></a>
 </div>
 

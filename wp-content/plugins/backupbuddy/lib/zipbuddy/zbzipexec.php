@@ -1533,13 +1533,11 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 				
 				// Determine if we are using an absolute path
 				if ( !empty ( $zippath ) ) {
-				
 					pb_backupbuddy::status( 'details', __( 'Using absolute unzip path: ','it-l10n-backupbuddy' ) . $zippath );
-					
 				}
 				
 				// Add the trailing slash if required
-				$command = $this->slashify( $zippath ) . 'unzip';	
+				$command = $this->slashify( $zippath ) . 'unzip';
 	
 				// We'll try and extract from the backup file to the given directory, very quietly with overwrite
 				// If we just did -o we could try and get file count from processing $output but it would be a bit time-consuming
@@ -1547,7 +1545,32 @@ if ( !class_exists( "pluginbuddy_zbzipexec" ) ) {
 				
 				$unzip_command = ( self::OS_TYPE_WIN === $this->get_os_type() ) ? str_replace( '\'', '"', $unzip_command ) : $unzip_command;
 				
-				@exec( $unzip_command, $output, $exit_code);
+				// This code keeps load balancer connections open until process is complete
+				pb_backupbuddy::status( 'details', __( 'Attempting to use popen to call unzip via exec', 'it-l10n-backupbuddy' ) );
+				$pipe = @popen( $unzip_command, 'r' );
+				if ( empty( $pipe ) ) {
+					pb_backupbuddy::status( 'details', __( '`popen()` not available. Calling unzip directly via `exec()`', 'it-l10n-backupbuddy' ) );
+					@exec( $unzip_command, $output, $exit_code);
+				} else {
+					pb_backupbuddy::status( 'details', __( 'Unzipping with `exec()` via `popen()`', 'it-l10n-backupbuddy' ) );
+
+					// Tell the stream we want all the data as its available
+					stream_set_blocking( $pipe, false );
+
+					// Unzip 1024 at a time and then update the browser so it doesn't timeout.
+					while ( ! feof( $pipe ) ) {
+						fread( $pipe, 1024 );
+
+						// This echo is required to keep Load Balancer connection open
+						echo "<!-- Processing... -->";
+						flush();
+					}
+
+					// Close the pipe and get the unzip exit code.
+					$exit_code = pclose( $pipe );
+
+				} // END LoadBalancer Code
+
 				
 				// Note: we don't open the file and then do stuff but it's all done in one action
 				// so we need to interpret the return code to dedide what to do

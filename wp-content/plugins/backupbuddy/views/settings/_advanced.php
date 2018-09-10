@@ -26,7 +26,7 @@ if ( ! is_admin() ) {
 
 		jQuery( 'input#pb_backupbuddy_profiles__0__integrity_check' ).change( function(){
 			if ( jQuery(this).is( ':checked' ) ) {
-				alert( "<?php _e( 'WARNING: Use with caution as this could result in BAD or incomplete backups going undetected, resulting in future data loss if you rely on these potentially bad backups. Without the integrity scan your backups cannot be guaranteed as valid and complete.', 'it-l10n-backupbuddy' ); ?>" );
+				alert( "<?php esc_html_e( 'WARNING: Use with caution as this could result in BAD or incomplete backups going undetected, resulting in future data loss if you rely on these potentially bad backups. Without the integrity scan your backups cannot be guaranteed as valid and complete.', 'it-l10n-backupbuddy' ); ?>" );
 			}
 		});
 

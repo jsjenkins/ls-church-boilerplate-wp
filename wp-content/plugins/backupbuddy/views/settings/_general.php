@@ -29,14 +29,15 @@ if ( ! is_admin() ) {
 			return false;
 		});
 
-		jQuery( '#pb_backupbuddy_email_error_test' ).click( function() {
-			jQuery.post( '<?php echo esc_url( pb_backupbuddy::ajax_url( 'email_error_test' ) ); ?>', { email: jQuery( '#pb_backupbuddy_email_notify_error' ).val() },
+		jQuery( '#pb_backupbuddy_email_error_test' ).on( 'click', function() {
+			jQuery.post( '<?php echo pb_backupbuddy::ajax_url( 'email_error_test' ); ?>', {
+				email: jQuery( '#pb_backupbuddy_email_notify_error' ).val() },
 				function(data) {
 					data = jQuery.trim( data );
 					if ( data.charAt(0) != '1' ) {
 						alert( "<?php esc_html_e( 'Error testing', 'it-l10n-backupbuddy' ); ?>:" + "\n\n" + data );
 					} else {
-						alert( "<?php esc_html_e( 'Email has been sent. If you do not receive it check your WordPress & server settings.', 'it-l10n-backupbuddy' ); ?>" + "\n\n" + data.slice(1) );
+						alert( "<?php esc_html_e( 'Email has been sent. If you do not receive it check your WordPress and server settings.', 'it-l10n-backupbuddy' ); ?>" + "\n\n" + data.slice(1) );
 					}
 				}
 			);
@@ -231,13 +232,14 @@ $settings_form->add_setting(
 require_once pb_backupbuddy::plugin_path() . '/views/settings/_files.php';
 
 $process_result = $settings_form->process();// Handles processing the submitted form (if applicable).
+$process_errors = isset( $process_result['errors'] ) ? (array) $process_result['errors'] : array();
 if ( isset( $process_result['data'] ) ) { // This form was saved.
 	require_once pb_backupbuddy::plugin_path() . '/destinations/live/live.php';
 	if ( false !== backupbuddy_live::getLiveID() ) { // Only jump if Live is enabled.
 		set_transient( 'backupbuddy_live_jump', array( 'daily_init', array() ), 60 * 60 * 48 ); // Tells Live process to restart from the beginning (if mid-process) so new settigns apply.
 	}
 }
-if ( 0 === count( (array) $process_result['errors'] ) ) {
+if ( 0 === count( $process_errors ) ) {
 	$table_excludes = pb_backupbuddy::_POST( 'pb_backupbuddy_profiles#0#mysqldump_additional_excludes' );
 	$table_excludes = backupbuddy_core::alert_core_table_excludes( explode( "\n", trim( $table_excludes ) ) );
 	foreach ( $table_excludes as $table_exclude_id => $table_exclude ) {

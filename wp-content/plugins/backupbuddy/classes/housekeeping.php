@@ -1053,7 +1053,7 @@ DENY_EXTERNAL;
 		}
 
 		// Check for orphaned tables.
-		$possible_orphans = $wpdb->get_results( 'SELECT table_name, create_time FROM information_schema.tables WHERE table_name LIKE "bbold%" OR table_name LIKE "bbnew%"' );
+		$possible_orphans = $wpdb->get_results( 'SELECT table_name AS `table_name`, create_time AS `create_time` FROM information_schema.tables WHERE table_name LIKE "bbold%" OR table_name LIKE "bbnew%"' );
 		foreach ( (array) $possible_orphans as $possible_orphan ) {
 			$serial = substr( $possible_orphan->table_name, 6, 4 );
 			if ( empty( $force_serial ) && ! isset( $cleanups[ $serial ] ) ) {
@@ -1066,7 +1066,7 @@ DENY_EXTERNAL;
 
 		foreach ( $cleanups as $cleanup_serial => $start_time ) {
 
-			$results = $wpdb->get_results( "SELECT table_name FROM information_schema.tables WHERE ( ( table_name LIKE 'bbnew-" . substr( $cleanup_serial, 0, 4 ) . "\_%' ) OR ( table_name LIKE 'bbold-" . substr( $cleanup_serial, 0, 4 ) . "\_%' ) ) AND table_schema = DATABASE()", ARRAY_A );
+			$results = $wpdb->get_results( "SELECT table_name AS `table_name` FROM information_schema.tables WHERE ( ( table_name LIKE 'bbnew-" . substr( $cleanup_serial, 0, 4 ) . "\_%' ) OR ( table_name LIKE 'bbold-" . substr( $cleanup_serial, 0, 4 ) . "\_%' ) ) AND table_schema = DATABASE()", ARRAY_A );
 			if ( count( $results ) > 0 ) {
 				foreach ( $results as $result ) {
 					if ( false === $wpdb->query( 'DROP TABLE `' . backupbuddy_core::dbEscape( $result['table_name'] ) . '`' ) ) {
@@ -1103,6 +1103,12 @@ DENY_EXTERNAL;
 
 		// Loop through each BB schedule and create WP schedule to match.
 		foreach ( pb_backupbuddy::$options['schedules'] as $schedule_id => $schedule ) {
+
+			// Remove invalid schedule arrays.
+			if ( ! isset( $schedule['interval'] ) ) {
+				unset( pb_backupbuddy::$options['schedules'][ $schedule_id ] );
+				continue;
+			}
 
 			// Retrieve current interval WordPress cron thinks the schedule is at.
 			$cron_inverval = wp_get_schedule( 'backupbuddy_cron', array( 'run_scheduled_backup', array( (int) $schedule_id ) ) );

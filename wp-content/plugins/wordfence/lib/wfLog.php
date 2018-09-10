@@ -290,7 +290,7 @@ class wfLog {
 					}
 				}
 			}
-			if(isset($_SERVER['HTTP_USER_AGENT']) && wfCrawl::isCrawler($_SERVER['HTTP_USER_AGENT'])){
+			if((isset($_SERVER['HTTP_USER_AGENT']) && wfCrawl::isCrawler($_SERVER['HTTP_USER_AGENT'])) || empty($_SERVER['HTTP_USER_AGENT'])){
 				if($type == 'hit' && wfConfig::get('maxRequestsCrawlers') != 'DISABLED' && $hitsPerMinute > wfConfig::getInt('maxRequestsCrawlers')){
 					$this->takeBlockingAction('maxRequestsCrawlers', "Exceeded the maximum number of requests per minute for crawlers."); //may not exit
 				} else if($type == '404' && wfConfig::get('max404Crawlers') != 'DISABLED' && $hitsPerMinute > wfConfig::getInt('max404Crawlers')){
@@ -753,6 +753,7 @@ class wfLog {
 		if($secsToGo){
 			header('Retry-After: ' . $secsToGo);
 		}
+		$customText = wpautop(wp_strip_all_tags(wfConfig::get('blockCustomText', '')));
 		require_once('wf503.php');
 		exit();
 	}
@@ -1271,7 +1272,22 @@ class wfAdminUserMonitor {
 }
 
 /**
- *
+ * Represents a request record
+ * 
+ * @property int $id
+ * @property float $attackLogTime
+ * @property float $ctime
+ * @property string $IP
+ * @property bool $jsRun
+ * @property int $statusCode
+ * @property bool $isGoogle
+ * @property int $userID
+ * @property string $URL
+ * @property string $referer
+ * @property string $UA
+ * @property string $action
+ * @property string $actionDescription
+ * @property string $actionData
  */
 class wfRequestModel extends wfModel {
 

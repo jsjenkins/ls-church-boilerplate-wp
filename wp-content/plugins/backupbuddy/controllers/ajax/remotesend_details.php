@@ -1,14 +1,12 @@
 <?php
-backupbuddy_core::verifyAjaxAccess();
-
-
-// Display backup integrity status.
-/* remotesend_details()
- *
+/**
+ * Display backup integrity status.
  * View log for a remote destination file transfer. Outputs HTML and information and die()'s.
  *
+ * @package BackupBuddy
  */
 
+backupbuddy_core::verifyAjaxAccess();
 
 $send_id = pb_backupbuddy::_GET( 'send_id' );
 $send_id = str_replace( '/\\', '', $send_id );
@@ -27,9 +25,8 @@ if ( false === $lines ) {
 	echo 'Error #849834: Unable to read log file `' . $log_file . '`.';
 } else {
 	$lines = explode( "\n", $lines );
-	foreach( (array)$lines as $rawline ) {
+	foreach ( (array) $lines as $rawline ) {
 		$line = json_decode( $rawline, true );
-		//print_r( $line );
 		if ( is_array( $line ) ) {
 			$u = '';
 			if ( isset( $line['u'] ) ) { // As off v4.2.15.6. TODO: Remove this in a couple of versions once old logs without this will have cycled out.
@@ -52,5 +49,5 @@ echo '</textarea>
 <small>Last modified: ' . pb_backupbuddy::$format->date( filemtime( $log_file ) ) . ' (' . pb_backupbuddy::$format->time_ago( filemtime( $log_file ) ) . ' ago)';
 
 pb_backupbuddy::$ui->ajax_footer();
-die();
 
+die();

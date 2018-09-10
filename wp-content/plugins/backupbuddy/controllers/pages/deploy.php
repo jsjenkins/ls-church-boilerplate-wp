@@ -1,19 +1,19 @@
 <?php
+/**
+ * Deploy Page
+ *
+ * @package BackupBuddy
+ */
+
 pb_backupbuddy::$ui->title(
 	__( 'Deploy Database', 'it-l10n-backupbuddy' ) .
 	' &nbsp;&nbsp; <a style="font-size: 0.6em;" href="#" onClick="jQuery(\'#pb_backupbuddy_status_wrap\').toggle();">Display Status Log</a>'
 );
 
-if ( ! defined( 'BACKUPBUDDY_API_ENABLE' ) || ( TRUE != BACKUPBUDDY_API_ENABLE ) ) {
+if ( ! defined( 'BACKUPBUDDY_API_ENABLE' ) || true != BACKUPBUDDY_API_ENABLE ) {
 	pb_backupbuddy::alert( "Make sure the following is in your wp-config.php file on this server:<br><textarea style='width: 100%;' disabled='disabled'>define( 'BACKUPBUDDY_API_ENABLE', true ); // Requires API key to access.</textarea>" );
 	return false;
 }
-/*
-if ( ! defined( 'BACKUPBUDDY_API_SALT' ) || ( 'CHANGEME' == BACKUPBUDDY_API_SALT ) || ( strlen( BACKUPBUDDY_API_SALT ) < 5 ) ) {
-	pb_backupbuddy::alert( "Make sure the following is in your wp-config.php file on this server:<br><textarea style='width: 100%;' disabled='disabled'>define( 'BACKUPBUDDY_API_SALT', 'CHANGEME' ); // !!! IMPORTANT !!! Change CHANGEME to the left to a unique password/phrase for generating API keys. 5+ characters.</textarea>" );
-	return false;
-}
-*/
 
 if ( '1' == pb_backupbuddy::_POST( 'regenerate_api_key' ) ) {
 	pb_backupbuddy::verify_nonce(); // Security check.
@@ -32,38 +32,15 @@ if ( '1' == pb_backupbuddy::_POST( 'regenerate_api_key' ) ) {
 	<br>
 	<div class="backupbuddy_api_key-hide" style="display: none;">
 		<b>Api Key:</b><br>
-		<textarea style="width: 100%; padding: 15px;" readonly="readonly" onClick="this.focus();this.select();"><?php echo pb_backupbuddy::$options['api_key']; ?></textarea>
+		<textarea style="width: 100%; padding: 15px;" readonly="readonly" onClick="this.focus();this.select();"><?php echo esc_html( pb_backupbuddy::$options['api_key'] ); ?></textarea>
 	</div>
 </form>
 
 <br><br>
 
 <?php
-/*
-pb_backupbuddy::$options['deployments'] = array(
-	array( 'siteurl' => 'http://backupbuddy2', 'api_key' => 'xxx' )
-);
-pb_backupbuddy::save();
-
-if ( pb_backupbuddy::_GET( 'deployment' ) == '' ) {
-	foreach( pb_backupbuddy::$options['deployments'] as $deployment_id => $deployment ) {
-		echo '<a href="' . pb_backupbuddy::page_url() . '&deployment=' . $deployment_id . '">' . $deployment['siteurl'] . '</a>';
-		
-		echo '<pre>';
-		print_r( $deployment );
-		echo '</pre>';
-	}
-	return;
-}
-*/
-
-
 $deployment_id = pb_backupbuddy::_GET( 'deployment' );
 ?>
-
-
-
-
 
 <script>
 function pb_status_undourl( undo_url ) {
@@ -84,16 +61,13 @@ function pb_status_undourl( undo_url ) {
 	}
 </style>
 
-
-
+<div id="pb_backupbuddy_status_wrap">
+	<?php echo pb_backupbuddy::status_box( 'Starting deployment process . . .' ); ?>
+</div>
 <?php
-echo '<div id="pb_backupbuddy_status_wrap">';
-echo pb_backupbuddy::status_box( 'Starting deployment process . . .' );
-echo '</div>';
 global $wp_version;
 pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( 'version' ) . ' using WordPress v' . $wp_version . ' on ' . PHP_OS . '.' );
 ?>
-
 
 <script type="text/javascript">
 	function pb_status_append( status_string ) {
@@ -108,11 +82,9 @@ pb_backupbuddy::status( 'details', 'BackupBuddy v' . pb_backupbuddy::settings( '
 	}
 </script>
 
-
 <div id="message" style="display: none; padding: 9px;" rel="" class="pb_backupbuddy_alert updated fade below-h2">
-	<?php _e( 'If the deployment should fail for any reason you may attempt to undo its changes at any time by visiting the URL', 'it-l10n-backupbuddy' ); ?>:<br>
+	<?php esc_html_e( 'If the deployment should fail for any reason you may attempt to undo its changes at any time by visiting the URL', 'it-l10n-backupbuddy' ); ?>:<br>
 	<a href="" id="pb_backupbuddy_undourl" target="pb_backupbuddy_modal_iframe"></a>
 </div>
 
-
-<iframe id="pb_backupbuddy_modal_iframe" name="pb_backupbuddy_modal_iframe" src="<?php echo pb_backupbuddy::ajax_url( 'deploy' ); ?>&step=init&deployment=<?php echo $deployment_id; ?>" width="100%" height="1800" frameBorder="0" padding="0" margin="0">Error #4584594579. Browser not compatible with iframes.</iframe>
+<iframe id="pb_backupbuddy_modal_iframe" name="pb_backupbuddy_modal_iframe" src="<?php echo pb_backupbuddy::ajax_url( 'deploy' ); ?>&step=init&deployment=<?php echo esc_attr( $deployment_id ); ?>" width="100%" height="1800" frameBorder="0" padding="0" margin="0">Error #4584594579. Browser not compatible with iframes.</iframe>

@@ -1,31 +1,32 @@
 <?php
+/**
+ * Remote Send Retry AJAX Controller
+ *
+ * @package BackupBuddy
+ */
+
 backupbuddy_core::verifyAjaxAccess();
 pb_backupbuddy::$ui->ajax_header();
 
 $send_id = pb_backupbuddy::_GET( 'send_id' );
 $send_id = str_replace( '/\\', '', $send_id );
 
-require_once( pb_backupbuddy::plugin_path() . '/classes/fileoptions.php' );
-$fileoptions_obj = new pb_backupbuddy_fileoptions( backupbuddy_core::getLogDirectory() . 'fileoptions/send-' . $send_id . '.txt', $read_only = true, $ignore_lock = false, $create_file = false );
-if ( true !== ( $result = $fileoptions_obj->is_ok() ) ) {
-	pb_backupbuddy::status( 'error', __('Fatal Error #9034.23443. Unable to access fileoptions data.', 'it-l10n-backupbuddy' ) . ' Error: ' . $result );
+require_once pb_backupbuddy::plugin_path() . '/classes/fileoptions.php';
+$fileoptions_obj = new pb_backupbuddy_fileoptions( backupbuddy_core::getLogDirectory() . 'fileoptions/send-' . $send_id . '.txt', true, false, false );
+$result          = $fileoptions_obj->is_ok();
+if ( true !== $result ) {
+	pb_backupbuddy::status( 'error', __( 'Fatal Error #9034.23443. Unable to access fileoptions data.', 'it-l10n-backupbuddy' ) . ' Error: ' . $result );
 	return false;
 }
 
 // Don't do anything for success, failure, or already-marked as -1 finish time.
-$whyNoSend = '';
+$why_no_send = '';
 if ( 'success' == $fileoptions_obj->options['status'] ) {
-	$whyNoSend = 'This transfer is already marked as sucessfully completing.';
+	$why_no_send = 'This transfer is already marked as sucessfully completing.';
 }
-/* elseif ( 'failure' == $fileoptions_obj->options['status'] ) {
-	$whyNoSend = 'This transfer is marked as officially failed.';
-} elseif ( -1 == $fileoptions_obj->options['finish_time'] ) {
-	$whyNoSend = 'This transfer is marked as cancelled.';
-} */
 
-
-if ( '' != $whyNoSend ) {
-	die( 'Error #8438483:<br><br>This send is not eligable to be resent. ' . $whyNoSend . ' Please re-initiate a send for this file manually with a fresh send.' );
+if ( '' != $why_no_send ) {
+	die( 'Error #8438483:<br><br>This send is not eligable to be resent. ' . $why_no_send . ' Please re-initiate a send for this file manually with a fresh send.' );
 }
 
 echo '<center>';

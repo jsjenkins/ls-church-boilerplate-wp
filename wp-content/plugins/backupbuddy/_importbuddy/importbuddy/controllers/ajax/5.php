@@ -52,6 +52,8 @@ function finalActions( $restore ) {
 	}
 	
 	pb_backupbuddy::status( 'details', 'Finished final actions function.' );
+
+	it_bub_importbuddy_do_action( 'finished_final_actions' );
 	
 } // End finalActions().
 

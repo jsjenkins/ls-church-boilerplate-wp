@@ -260,7 +260,6 @@ class backupbuddy_core {
 	 * @return array  Array of directories to exclude.
 	 */
 	public static function get_directory_exclusions( $profile, $trim_suffix = true, $serial = '' ) {
-
 		$profile = array_merge( pb_backupbuddy::settings( 'profile_defaults' ), $profile );
 
 		// No trailing slash $abspath.
@@ -296,14 +295,20 @@ class backupbuddy_core {
 		$excludes[] = self::getLogDirectory();
 
 		// Media/themes/plugins excluded option.
-		if ( isset( $profile['exclude_media'] ) && ( '1' == $profile['exclude_media'] ) ) {
+		if ( isset( $profile['exclude_media'] ) && '1' == $profile['exclude_media'] ) {
+			pb_backupbuddy::status( 'details', __( 'Excluding media directories.', 'it-l10n-backupbuddy' ) );
 			$excludes[] = backupbuddy_core::get_media_root();
 		}
-		if ( isset( $profile['exclude_themes'] ) && ( '1' == $profile['exclude_themes'] ) ) {
+		if ( isset( $profile['exclude_themes'] ) && '1' == $profile['exclude_themes'] ) {
+			pb_backupbuddy::status( 'details', __( 'Excluding theme directories.', 'it-l10n-backupbuddy' ) );
 			$excludes[] = backupbuddy_core::get_themes_root();
 		}
-		if ( isset( $profile['exclude_plugins'] ) && ( '1' == $profile['exclude_plugins'] ) ) {
+		if ( isset( $profile['exclude_plugins'] ) && '1' == $profile['exclude_plugins'] ) {
+			pb_backupbuddy::status( 'details', __( 'Excluding plugin directories.', 'it-l10n-backupbuddy' ) );
 			$excludes[] = backupbuddy_core::get_plugins_root();
+		} elseif ( isset( $profile['active_plugins_only'] ) && '1' === $profile['active_plugins_only'] ) {
+			pb_backupbuddy::status( 'details', __( 'Excluding inactive plugin directories.', 'it-l10n-backupbuddy' ) );
+			$excludes = array_merge( $excludes, backupbuddy_core::get_inactive_plugins() );
 		}
 
 		// Exclude all temp directories within backupbuddy_temp, except any subdirectories containing the serial specified (if any).
@@ -358,6 +363,9 @@ class backupbuddy_core {
 
 		// Process exclusion variables.
 		foreach ( $excludes as &$absolute_exclude ) {
+			if ( ! $absolute_exclude ) {
+				continue;
+			}
 			$absolute_exclude = str_replace( '{media}', self::get_media_root(), $absolute_exclude );
 			$absolute_exclude = str_replace( '{themes}', self::get_themes_root(), $absolute_exclude );
 			$absolute_exclude = str_replace( '{plugins}', self::get_plugins_root(), $absolute_exclude );
@@ -1037,11 +1045,12 @@ class backupbuddy_core {
 						}
 					} else {
 						if ( isset( $backup_options->options['profile'] ) ) {
+							$profile_title = isset( $backup_options->options['profile']['title'] ) ? htmlentities( $backup_options->options['profile']['title'] ) : '';
 							$detected_type = '
 							<div>
 								<span class="profile_type-' . $backup_integrity['detected_type'] . '" style="float: left;" title="' . backupbuddy_core::pretty_backup_type( $detected_type ) . '"></span>
 								<span style="display: inline-block; float: left; height: 15px; border-right: 1px solid #EBEBEB; margin-left: 6px; margin-right: 6px;"></span>
-								' . htmlentities( $backup_options->options['profile']['title'] ) . '
+								' . $profile_title . '
 							</div>
 							';
 						}
@@ -1148,6 +1157,10 @@ class backupbuddy_core {
 			'wp-content/uploads/temp_' . $serial . '/backupbuddy_dat.php', // Pre 2.0 full backup.
 			'backupbuddy_dat.php', // DB backup.
 		);
+
+		if ( ! isset( pb_backupbuddy::$classes['zipbuddy'] ) ) {
+			pb_backupbuddy::$classes['zipbuddy'] = $zipbuddy;
+		}
 
 		foreach ( $search as $location ) {
 			if ( true === pb_backupbuddy::$classes['zipbuddy']->file_exists( $file, $location ) ) {
@@ -1375,6 +1388,38 @@ class backupbuddy_core {
 		return rtrim( WP_PLUGIN_DIR, '/' ) . '/';
 	} // End get_plugins_root().
 
+	/**
+	 * Returns array of paths to inactive plugins.
+	 *
+	 * @return array  Paths to inactive plugins.
+	 */
+	public static function get_inactive_plugins() {
+		$inactive_plugins = array();
+
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$all_plugins = get_plugins();
+
+		foreach ( $all_plugins as $plugin_path => $plugin ) {
+			if ( ! $plugin_path ) {
+				continue;
+			}
+
+			if ( is_plugin_active( $plugin_path ) === false ) {
+				if ( dirname( self::get_plugins_root() . $plugin_path ) == WP_PLUGIN_DIR ) {
+					// Exclude the full path (like plugins/hello.php).
+					$inactive_plugins[] = self::get_plugins_root() . $plugin_path;
+				} else {
+					// Exclude the parent folder (like plugins/akismet).
+					$inactive_plugins[] = dirname( self::get_plugins_root() . $plugin_path );
+				}
+			}
+		}
+
+		return $inactive_plugins;
+	}
 
 	/**
 	 * Return a nice human string for a specified backup type.
@@ -1529,10 +1574,11 @@ class backupbuddy_core {
 
 		// MULTISITE BETA WARNING.
 		if ( is_multisite() && backupbuddy_core::is_network_activated() && ! defined( 'PB_DEMO_MODE' ) ) { // Multisite installation.
+			$instruction = defined( 'PB_BACKUPBUDDY_MULTISITE_EXPERIMENT' ) && true === PB_BACKUPBUDDY_MULTISITE_EXPERIMENT ? '' : 'To enable experimental BackupBuddy Multisite functionality you must add the following line to your wp-config.php file: <b>define( \'PB_BACKUPBUDDY_MULTISITE_EXPERIMENT\', true );</b>';
 			$tests[] = array(
 				'test'    => 'multisite_beta',
 				'success' => false,
-				'message' => 'WARNING: BackupBuddy Multisite functionality is EXPERIMENTAL and NOT officially supported. Multiple issues are known. Usage of it is at your own risk and should not be relied upon. Standalone WordPress sites are suggested. You may use the "Export" feature to export your subsites into standalone WordPress sites. To enable experimental BackupBuddy Multisite functionality you must add the following line to your wp-config.php file: <b>define( \'PB_BACKUPBUDDY_MULTISITE_EXPERIMENT\', true );</b>',
+				'message' => 'WARNING: BackupBuddy Multisite functionality is EXPERIMENTAL and NOT officially supported. Multiple issues are known. Usage of it is at your own risk and should not be relied upon. Standalone WordPress sites are suggested. You may use the "Export" feature to export your subsites into standalone WordPress sites.' . $instruction,
 			);
 		} // end network-activated multisite.
 
@@ -1905,7 +1951,7 @@ class backupbuddy_core {
 
 				// If we made it here, the script isn't blocked, but the crons aren't being executed.
 				$error  = 'Active wp-cron.php loopback test failure. Your wp-cron.php appears to be reachable by the server but something is preventing it from executing code properly - Coming Soon plugins and Basic Authentication often break this. ';
-				$error .= 'This may be a temporary site/server/hosting issue but if it persists you will need to investigaet further. ';
+				$error .= 'This may be a temporary site/server/hosting issue but if it persists you will need to investigate further. ';
 				$error .= 'Returned: `' . $response['body'] . '` with code `' . $response['response']['code'] . ' ' . $response['response']['message'] . '`.';
 				pb_backupbuddy::status( 'error', $error );
 				$backupbuddy_cronback_details = $error;
@@ -2192,10 +2238,12 @@ class backupbuddy_core {
 			$schedule_result = wp_schedule_event( $time, $period, $tag, array( $method, $args ) );
 		}
 
+		// Confirm event was scheduled successfully.
 		$next_scheduled = wp_next_scheduled( $tag, array( $method, $args ) );
 
-		// If failed, sleep 1 then try again.
+		// If failed, event doesn't exist yet, sleep for 1 second, then try again.
 		if ( false === $next_scheduled ) {
+			pb_backupbuddy::status( 'details', 'Confirming cron scheduled for `' . $method . '`...' );
 			sleep( backupbuddy_constants::SCHEDULE_RETRY_WAIT );
 			$next_scheduled = wp_next_scheduled( $tag, array( $method, $args ) );
 		}
@@ -2220,12 +2268,15 @@ class backupbuddy_core {
 	 * @return bool  True on verified schedule deletion success, else false.
 	 */
 	public static function unschedule_event( $time, $tag, $args ) {
+		// Remove the event.
 		$unschedule_result = wp_unschedule_event( $time, $tag, $args );
-		$next_scheduled    = wp_next_scheduled( $tag, $args );
 		if ( false === $unschedule_result ) {
 			pb_backupbuddy::status( 'warning', 'Warning: Unable to remove schedule for tag `' . $tag . '` as wp_unschedule_event() returned false. A plugin may have prevented it or it is already unscheduled. This may not be a problem.' );
 			return false;
 		}
+
+		// Make sure the event was removed.
+		$next_scheduled = wp_next_scheduled( $tag, $args );
 		if ( false !== $next_scheduled ) {
 			pb_backupbuddy::status( 'error', 'WordPress reported success unscheduling BUT wp_next_scheduled() confirmed schedule existance of tag `' . $tag . '`. The database may have rejected the removal.' );
 			return false;
@@ -3132,7 +3183,7 @@ class backupbuddy_core {
 
 		// Calculate base tables.
 		if ( 'all' === $base_dump_mode ) { // All tables in database to start with.
-			$sql = 'SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()';
+			$sql = 'SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_schema = DATABASE()';
 			pb_backupbuddy::status( 'startAction', 'schemaTables' );
 			$results = $wpdb->get_results( $sql, ARRAY_A );
 			pb_backupbuddy::status( 'finishAction', 'schemaTables' );
@@ -3148,7 +3199,7 @@ class backupbuddy_core {
 
 			pb_backupbuddy::status( 'details', 'Determining database tables with prefix `' . $wpdb->prefix . '`.' );
 			$prefix_sql = str_replace( '_', '\_', $wpdb->prefix );
-			$sql        = "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '{$prefix_sql}%' AND table_schema = DATABASE()";
+			$sql        = "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_name LIKE '{$prefix_sql}%' AND table_schema = DATABASE()";
 			pb_backupbuddy::status( 'startAction', 'schemaTables' );
 			$results = $wpdb->get_results( $sql, ARRAY_A );
 			pb_backupbuddy::status( 'finishAction', 'schemaTables' );

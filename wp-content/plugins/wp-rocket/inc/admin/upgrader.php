@@ -34,11 +34,6 @@ function rocket_upgrader() {
 		}
 
 		update_option( WP_ROCKET_SLUG, $options );
-
-		// Empty OPCache to prevent issue where plugin is updated but still showing as old version in WP admin.
-		if ( function_exists( 'opcache_reset' ) ) {
-			@opcache_reset();
-		}
 	}
 
 	/** This filter is documented in inc/admin-bar.php */
@@ -48,6 +43,81 @@ function rocket_upgrader() {
 	}
 }
 add_action( 'admin_init', 'rocket_upgrader' );
+
+/**
+ * Maybe reset opcache after WP Rocket update.
+ *
+ * @since  3.1
+ * @author Grégory Viguier
+ *
+ * @param object $wp_upgrader Plugin_Upgrader instance.
+ * @param array  $hook_extra  {
+ *     Array of bulk item update data.
+ *
+ *     @type string $action  Type of action. Default 'update'.
+ *     @type string $type    Type of update process. Accepts 'plugin', 'theme', 'translation', or 'core'.
+ *     @type bool   $bulk    Whether the update process is a bulk update. Default true.
+ *     @type array  $plugins Array of the basename paths of the plugins' main files.
+ * }
+ */
+function rocket_maybe_reset_opcache( $wp_upgrader, $hook_extra ) {
+	static $rocket_path;
+
+	if ( ! isset( $hook_extra['action'], $hook_extra['type'], $hook_extra['plugins'] ) ) {
+		return;
+	}
+
+	if ( 'update' !== $hook_extra['action'] || 'plugin' !== $hook_extra['type'] || ! is_array( $hook_extra['plugins'] ) ) {
+		return;
+	}
+
+	$plugins = array_flip( $hook_extra['plugins'] );
+
+	if ( ! isset( $rocket_path ) ) {
+		$rocket_path = plugin_basename( WP_ROCKET_FILE );
+	}
+
+	if ( ! isset( $plugins[ $rocket_path ] ) ) {
+		return;
+	}
+
+	rocket_reset_opcache();
+}
+add_action( 'upgrader_process_complete', 'rocket_maybe_reset_opcache', 20, 2 );
+
+/**
+ * Reset PHP opcache.
+ *
+ * @since  3.1
+ * @author Grégory Viguier
+ */
+function rocket_reset_opcache() {
+	static $can_reset;
+
+	if ( ! isset( $can_reset ) ) {
+		if ( ! function_exists( 'opcache_reset' ) ) {
+			$can_reset = false;
+
+			return;
+		}
+
+		$restrict_api = ini_get( 'opcache.restrict_api' );
+
+		if ( $restrict_api && strpos( __FILE__, $restrict_api ) !== 0 ) {
+			$can_reset = false;
+
+			return;
+		}
+
+		$can_reset = true;
+	}
+
+	if ( ! $can_reset ) {
+		return;
+	}
+
+	opcache_reset();
+}
 
 /**
  * Keeps this function up to date at each version
@@ -129,7 +199,6 @@ function rocket_first_install() {
 				'do_cloudflare'               => 0,
 				'cloudflare_email'            => '',
 				'cloudflare_api_key'          => '',
-				'cloudflare_domain'           => '',
 				'cloudflare_zone_id'          => '',
 				'cloudflare_devmode'          => 0,
 				'cloudflare_protocol_rewrite' => 0,
@@ -138,6 +207,7 @@ function rocket_first_install() {
 				'varnish_auto_purge'          => 0,
 				'do_beta'                     => 0,
 				'analytics_enabled'           => 0,
+				'google_analytics_cache'      => 0,
 			)
 		)
 	);
@@ -198,34 +268,12 @@ function rocket_new_upgrade( $wp_rocket_version, $actual_version ) {
 		$options['do_cloudflare']               = 0;
 		$options['cloudflare_email']            = '';
 		$options['cloudflare_api_key']          = '';
-		$options['cloudflare_domain']           = '';
 		$options['cloudflare_devmode']          = 0;
 		$options['cloudflare_protocol_rewrite'] = 0;
 		$options['cloudflare_auto_settings']    = 0;
 		$options['cloudflare_old_settings']     = '';
 
 		update_option( WP_ROCKET_SLUG, $options );
-	}
-
-	// Add a value to the new CF zone_id field if the CF domain is set.
-	if ( version_compare( $actual_version, '2.8.21', '<' ) ) {
-		$options = get_option( WP_ROCKET_SLUG );
-		if ( 0 < $options['do_cloudflare'] && '' !== $options['cloudflare_domain'] ) {
-			$cf_instance = get_rocket_cloudflare_api_instance();
-			if ( ! is_wp_error( $cf_instance ) ) {
-				try {
-					$zone_instance = new Cloudflare\Zone( $cf_instance );
-					$zone          = $zone_instance->zones( $options['cloudflare_domain'] );
-
-					if ( isset( $zone->result[0]->id ) ) {
-						$options['cloudflare_zone_id'] = $zone->result[0]->id;
-						update_option( WP_ROCKET_SLUG, $options );
-					}
-				} catch ( Exception $e ) {
-					// do nothing.
-				}
-			}
-		}
 	}
 
 	// Disable minification options if they're active in Autoptimize.
@@ -265,6 +313,10 @@ function rocket_new_upgrade( $wp_rocket_version, $actual_version ) {
 			update_rocket_option( 'cache_ssl', 1 );
 		}
 
+		rocket_generate_config_file();
+	}
+
+	if ( version_compare( $actual_version, '3.1.1', '<' ) ) {
 		rocket_generate_config_file();
 	}
 }

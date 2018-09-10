@@ -4291,7 +4291,7 @@ if ( ! file_exists( ABSPATH . '.maintenance' ) ) {
 
 // Find tables matching temp OLD (original live tables) prefix.
 $tempPrefix = 'bbold-' . substr( $serial, 0, 4 ) . '_';
-$sql = "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '" . str_replace( '_', '\_', $tempPrefix ) . "%' AND table_schema = DATABASE()";
+$sql = "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_name LIKE '" . str_replace( '_', '\_', $tempPrefix ) . "%' AND table_schema = DATABASE()";
 echo 'Looking for tables with temp prefix `' . $tempPrefix . '` to rename back to normal.<br>';
 $tempTables = $wpdb->get_results( $sql, ARRAY_A );
 if ( empty( $tempTables ) ) {
@@ -4311,7 +4311,7 @@ foreach( (array)$tempTables as $tempTable ) {
 	$nonTempName = str_replace( $tempPrefix, '', $tempTable['table_name'] );
 	
 	// CHECK if $nonTempName table exists in db. If it does then DROP the table.
-	$sql = "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '" . str_replace( '_', '\_', $nonTempName ) . "%' AND table_schema = DATABASE()";
+	$sql = "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_name LIKE '" . str_replace( '_', '\_', $nonTempName ) . "%' AND table_schema = DATABASE()";
 	$tempTables = $wpdb->get_results( $sql, ARRAY_A );
 	if ( ! empty( $tempTables ) ) { // WordPress EXISTS already. Collision.
 		if ( FALSE === $wpdb->query( "DROP TABLE `" . rollback_dbEscape( $nonTempName ) . "`" ) ) {
@@ -4342,7 +4342,7 @@ foreach( (array)$tempTables as $tempTable ) {
 
 // Drop any remaining temporary just-imported tables.
 $tempPrefix = 'bbnew-'; //. substr( $serial, 0, 4 ) . '_';
-$sql = "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '" . str_replace( '_', '\_', $tempPrefix ) . "%' AND table_schema = DATABASE()";
+$sql = "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_name LIKE '" . str_replace( '_', '\_', $tempPrefix ) . "%' AND table_schema = DATABASE()";
 echo 'Looking for tables with prefix `' . $tempPrefix . '` to delete.<br>';
 $tempTables = $wpdb->get_results( $sql, ARRAY_A );
 if ( empty( $tempTables ) ) {

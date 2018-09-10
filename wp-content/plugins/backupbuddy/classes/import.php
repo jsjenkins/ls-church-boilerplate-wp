@@ -29,7 +29,7 @@ class pb_backupbuddy_import {
 		//$this->connect_database();
 		
 		global $wpdb;
-		$rows = $wpdb->get_results( "SELECT table_name FROM information_schema.tables WHERE table_name LIKE '" . backupbuddy_core::dbEscape( str_replace( '_', '\_', $prefix ) ) . "%' AND table_schema = DATABASE()", ARRAY_A );
+		$rows = $wpdb->get_results( "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_name LIKE '" . backupbuddy_core::dbEscape( str_replace( '_', '\_', $prefix ) ) . "%' AND table_schema = DATABASE()", ARRAY_A );
 		$table_wipe_count = count( $rows );
 		foreach( $rows as $row ) {
 			pb_backupbuddy::status( 'details', 'Dropping table `' . $row['table_name'] . '`.' );
@@ -61,7 +61,7 @@ class pb_backupbuddy_import {
 		//$this->connect_database();
 		
 		global $wpdb;
-		$rows = $wpdb->get_results( "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()", ARRAY_A );
+		$rows = $wpdb->get_results( "SELECT table_name AS `table_name` FROM information_schema.tables WHERE table_schema = DATABASE()", ARRAY_A );
 		$table_wipe_count = count( $rows );
 		foreach( $rows as $row ) {
 			pb_backupbuddy::status( 'details', 'Dropping table `' . $row['table_name'] . '`.' );

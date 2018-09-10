@@ -3,7 +3,7 @@
  * Plugin Name: BackupBuddy
  * Plugin URI: http://ithemes.com/purchase/backupbuddy/
  * Description: The most complete WordPress solution for Backup, Restoration, Migration, and Deployment to the same host or a new domain. Backs up a customizable selection of files, settings, and content for a complete snapshot of your site. Stash Live feature allows for real-time live backups to the cloud.
- * Version: 8.2.6.5
+ * Version: 8.2.8.3
  * Author: iThemes
  * Author URI: http://ithemes.com/
  * iThemes Package: backupbuddy
@@ -184,6 +184,7 @@ $pluginbuddy_settings = array(
 				'exclude_media'                 => '0',
 				'exclude_themes'                => '0',
 				'exclude_plugins'               => '0',
+				'active_plugins_only'           => '0',                   // Only backup active plugins.
 			),
 			1  => array(
 				'type'  => 'db',
@@ -208,8 +209,9 @@ $pluginbuddy_settings = array(
 		'mysqldump_additional_includes' => '-1',           // Additional db tables to backup in addition to those calculated by mysql_dumpmode. Newslines between tables.
 		'mysqldump_additional_excludes' => '-1',           // Additional db tables to EXCLUDE. This is taken into account last, after tables are calculated by mysql_dumpmode AND additional includes calculated.
 		'backup_nonwp_tables'           => '-1',           // Backup tables not prefixed with the WP prefix.
-		// 'compression'                  => '-1',           // Zip compression.
+		// 'compression'                => '-1',           // Zip compression.
 		'excludes'                      => '-1',           // Newline deliminated list of directories to exclude from the backup.
+		'active_plugins_only'           => '-1',           // Skips inactive plugin folders when enabled ('1').
 		'integrity_check'               => '-1',           // Zip file integrity check on the backup listing.
 		'profile_globaltables'          => '1',            // Whether or not custom table inclusions/exclusions enabled for this profile.
 		'profile_globalexcludes'        => '1',            // Whether or not custom file excludes enabled for this profile.
@@ -272,6 +274,9 @@ require dirname( __FILE__ ) . '/pluginbuddy/_pluginbuddy.php';
 
 // Load privacy functions.
 require_once dirname( __FILE__ ) . '/helpers/privacy.php';
+
+// Helper functions to style Filetree icons.
+require_once dirname( __FILE__ ) . '/helpers/file-icons.php';
 
 // Cron looback test.
 function itbub_cron_test() {

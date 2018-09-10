@@ -227,7 +227,8 @@ function cleanup( $restoreData, $restore ) {
 function remove_file( $file, $description, $error_on_missing = false ) {
 	pb_backupbuddy::status( 'message', 'Deleting `' . $description . '`...' );
 
-	@chmod( $file, 0755 ); // High permissions to delete.
+	$mode = apply_filters( 'itbub-default-file-mode', 0755 );
+	@chmod( $file, $mode ); // High permissions to delete.
 	
 	if ( is_dir( $file ) ) { // directory.
 		pb_backupbuddy::$filesystem->unlink_recursive( $file );

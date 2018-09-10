@@ -1,11 +1,17 @@
 <?php
+/**
+ * Run PHP Runtime Test
+ *
+ * @package BackupBuddy
+ */
+
 backupbuddy_core::verifyAjaxAccess();
 
 pb_backupbuddy::load();
 
 // Schedule to run.
-$cronArgs = array( $schedule_results = false, $force_run = true );
-$schedule_result = backupbuddy_core::schedule_single_event( time(), 'php_runtime_test', $cronArgs );
+$cron_args       = array( false, true );
+$schedule_result = backupbuddy_core::schedule_single_event( time(), 'php_runtime_test', $cron_args );
 if ( true === $schedule_result ) {
 	pb_backupbuddy::status( 'details', 'PHP runtime test cron event scheduled.' );
 } else {
@@ -18,4 +24,4 @@ if ( '1' != pb_backupbuddy::$options['skip_spawn_cron_call'] ) {
 	spawn_cron( time() + 150 ); // Adds > 60 seconds to get around once per minute cron running limit.
 }
 
-die( __( 'This may take a few minutes...', 'it-l10n-backupbuddy' ) );
+die( esc_html__( 'This may take a few minutes...', 'it-l10n-backupbuddy' ) );

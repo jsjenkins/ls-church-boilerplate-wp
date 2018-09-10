@@ -958,7 +958,8 @@ class backupbuddy_live_periodic {
 		
 		// Prepare destination snapshot sql files directory.
 		pb_backupbuddy::status( 'details', 'Creating dump directory.' );
-		if ( pb_backupbuddy::$filesystem->mkdir( $directory, $mode = 0755, $recurse = true ) === false ) {
+		$mode = apply_filters( 'itbub-default-file-mode', 0755 );
+		if ( pb_backupbuddy::$filesystem->mkdir( $directory, $mode, $recurse = true ) === false ) {
 			$error = 'Error #387974: BackupBuddy unable to create directory `' . $directory . '`. Please verify write permissions for the parent directory `' . dirname( $directory ) . '` or manually create the specified directory & set permissions.';
 		}
 		
@@ -979,10 +980,10 @@ class backupbuddy_live_periodic {
 				self::$_state['stats']['last_db_snapshot'] = microtime( true ); // Timestamp snapshot completed. Used to delete live sql updates prior to this timestamp.
 				
 				// Get info on tables.
-				$table_details = $wpdb->get_results( "SELECT TABLE_NAME,DATA_LENGTH,INDEX_LENGTH FROM information_schema.tables WHERE table_schema = DATABASE()", ARRAY_A );
+				$table_details = $wpdb->get_results( "SELECT table_name AS `table_name`, data_length AS `data_length`, index_length AS `index_length` FROM information_schema.tables WHERE table_schema = DATABASE()", ARRAY_A );
 				$table_sizes = array();
 				foreach( $table_details as $table_detail ) {
-					$table_sizes[ $table_detail['TABLE_NAME'] ] = $table_detail['DATA_LENGTH'] + $table_detail['INDEX_LENGTH'];
+					$table_sizes[ $table_detail['table_name'] ] = $table_detail['data_length'] + $table_detail['index_length'];
 				}
 				unset( $table_details );
 				

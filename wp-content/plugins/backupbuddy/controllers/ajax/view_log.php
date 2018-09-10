@@ -1,24 +1,28 @@
 <?php
-backupbuddy_core::verifyAjaxAccess();
+/**
+ * View Log AJAX Controller
+ *
+ * @package BackupBuddy
+ */
 
+backupbuddy_core::verifyAjaxAccess();
 
 pb_backupbuddy::$ui->ajax_header();
 
-$serial = pb_backupbuddy::_GET( 'serial' );
-$logFile = backupbuddy_core::getLogDirectory() . 'status-' . $serial . '_sum_' . pb_backupbuddy::$options['log_serial'] . '.txt';
+$serial   = pb_backupbuddy::_GET( 'serial' );
+$log_file = backupbuddy_core::getLogDirectory() . 'status-' . $serial . '_sum_' . pb_backupbuddy::$options['log_serial'] . '.txt';
 
-if ( ! file_exists( $logFile ) ) {
-	die( 'Error #858733: Log file `' . $logFile . '` not found or access denied.' );
+if ( ! file_exists( $log_file ) ) {
+	die( 'Error #858733: Log file `' . $log_file . '` not found or access denied.' );
 }
 
-$lines = file_get_contents( $logFile );
+$lines = file_get_contents( $log_file );
 $lines = explode( "\n", $lines );
 ?>
-
-<textarea readonly="readonly" id="backupbuddy_messages" wrap="off" style="width: 100%; min-height: 400px; height: 500px; height: 80%; background: #FFF;"><?php
-foreach( (array)$lines as $rawline ) {
+<textarea readonly="readonly" id="backupbuddy_messages" wrap="off" style="width: 100%; min-height: 400px; height: 500px; height: 80%; background: #FFF;">
+<?php
+foreach ( (array) $lines as $rawline ) {
 	$line = json_decode( $rawline, true );
-	//print_r( $line );
 	if ( is_array( $line ) ) {
 		$u = '';
 		if ( isset( $line['u'] ) ) { // As off v4.2.15.6. TODO: Remove this in a couple of versions once old logs without this will have cycled out.
@@ -33,14 +37,14 @@ foreach( (array)$lines as $rawline ) {
 		echo $rawline . "\n";
 	}
 }
-?></textarea><br><br>
-<small>Log file: <?php echo $logFile; ?></small>
+?>
+</textarea><br><br>
+<small>Log file: <?php echo $log_file; ?></small>
 <br>
 <?php
-echo '<small>Last modified: ' . pb_backupbuddy::$format->date( filemtime( $logFile ) ) . ' (' . pb_backupbuddy::$format->time_ago( filemtime( $logFile ) ) . ' ago)';
+echo '<small>Last modified: ' . pb_backupbuddy::$format->date( filemtime( $log_file ) ) . ' (' . pb_backupbuddy::$format->time_ago( filemtime( $log_file ) ) . ' ago)';
 ?>
 <br><br>
-
 
 <?php
 pb_backupbuddy::$ui->ajax_footer();

@@ -10,7 +10,7 @@ global $current_site;
 ?>
 
 <?php _e( 'Multisite import allows you to import a site from a BackupBuddy backup archive as a new site within this Multisite network with a new URL.  Please upload your BackupBuddy backup archive into the root of your site before proceeding or select an existing backup.','it-l10n-backupbuddy' ) ?>
- 
+
 <?php _e( 'Only FULL backups may be imported into a Multisite Network.' ); ?>
 <br><br>
 
@@ -40,14 +40,14 @@ global $current_site;
 			_e( 'No BackupBuddy backups found in the root directory of the site.','it-l10n-backupbuddy' );
 			echo '<br>';
 		}
-		
-		
+
+
 		echo '<br>';
 		echo 'Existing backups in this site\'s backup directory:';
 		echo '<br>';
-		
-		
-		
+
+
+
 		$files = glob( backupbuddy_core::getBackupDirectory() . 'backup*.zip' );
 		if ( !is_array( $files ) || empty( $files ) ) {
 			$files = array();
@@ -77,35 +77,35 @@ global $current_site;
 		<?php } else {
 			echo 'http://' . $current_blog->domain . $current_blog->path ?><input name="blog[domain]" class="regular-text" type="text" title="<?php _e( 'Domain','it-l10n-backupbuddy' ) ?>" style="width: 25em;">
 		<?php }
-		
+
 		echo '<p class="description">' . __( 'Only the characters a-z and 0-9 recommended.','it-l10n-backupbuddy' ) . '</p>';
-		?>		
+		?>
 		<p class='description'><?php esc_html_e( 'If the site already exists and is mapped into a different domain, simply use the domain name (e.g., jubyo.com)','it-l10n-backupbuddy' ); ?></p>
-		
+
 		<br>
-		
+
 		<?php // These advanced options will be available via $this->advanced_options from within the msimport class on each page. Passed along in the submitted form per step. ?>
 		<span class="pb_toggle button-secondary" id="advanced">Advanced Configuration Options</span>
 			<div id="pb_toggle-advanced" class="pb_toggled" style="margin-top: 12px; width: 600px;">
 				<b>WARNING:</b> Improper use of Advanced Options could result in data loss.<br><br>
 				<input type="hidden" name="advanced_options[skip_files]" value="false">
 				<input type="checkbox" name="advanced_options[skip_files]" value="true"> Skip zip file extraction. <?php pb_backupbuddy::tip( 'Checking this box will prevent extraction/unzipping of the backup ZIP file.  You will need to manually extract it either on your local computer then upload it or use a server-based tool such as cPanel to extract it. This feature is useful if the extraction step is unable to complete for some reason.' ); ?><br>
-				
+
 				<input type="hidden" name="advanced_options[ignore_sql_errors]" value="false">
 				<input type="checkbox" name="advanced_options[ignore_sql_errors]" value="true" /> Ignore SQL errors & hide them. <br>
-				
+
 				<input type="hidden" name="advanced_options[skip_database_import]" value="false">
 				<input type="checkbox" name="advanced_options[skip_database_import]" value="true" /> Skip import of database. <br>
-				
+
 				<input type="hidden" name="advanced_options[skip_database_migration]" value="false">
 				<input type="checkbox" name="advanced_options[skip_database_migration]" value="true" /> Skip migration of database. <br>
-				
+
 				<input type="hidden" name="advanced_options[force_compatibility_medium]" value="false">
 				<input type="checkbox" name="advanced_options[force_compatibility_medium]" value="true" /> Force medium speed compatibility mode (ZipArchive). <br>
-				
+
 				<input type="hidden" name="advanced_options[force_compatibility_slow]" value="false">
 				<input type="checkbox" name="advanced_options[force_compatibility_slow]" value="true" /> Force slow speed compatibility mode (PCLZip). <br>
-				
+
 				<br>
 				PHP Maximum Execution Time: <input type="text" name="advanced_options[max_execution_time]" value="<?php echo $this->detected_max_execution_time; ?>" size="5"> seconds. <?php pb_backupbuddy::tip( 'The maximum allowed PHP runtime. If your database import step is timing out then lowering this value will instruct the script to limit each `chunk` to allow it to finish within this time period.' ); ?>
 			</div>

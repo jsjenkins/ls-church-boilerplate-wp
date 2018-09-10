@@ -1,28 +1,27 @@
 <?php
+/**
+ * File viewer (view content only) in the file restore page.
+ * View contents of a file (text) that is inside a zip archive.
+ *
+ * @package BackupBuddy
+ */
+
 backupbuddy_core::verifyAjaxAccess();
 
-
-// File viewer (view content only) in the file restore page.
-/* restore_file_view()
-*
-* View contents of a file (text) that is inside a zip archive.
-*
-*/
-
-pb_backupbuddy::$ui->ajax_header( true, false ); // js, no padding
+pb_backupbuddy::$ui->ajax_header( true, false ); // js, no padding.
 
 $archive_file = pb_backupbuddy::_GET( 'archive' ); // archive to extract from.
-$file = pb_backupbuddy::_GET( 'file' ); // file to extract.
-$serial = backupbuddy_core::get_serial_from_file( $archive_file ); // serial of archive.
-$temp_file = uniqid(); // temp filename to extract into.
+$file         = pb_backupbuddy::_GET( 'file' ); // file to extract.
+$serial       = backupbuddy_core::get_serial_from_file( $archive_file ); // serial of archive.
+$temp_file    = uniqid(); // temp filename to extract into.
 
-require_once( pb_backupbuddy::plugin_path() . '/lib/zipbuddy/zipbuddy.php' );
+require_once pb_backupbuddy::plugin_path() . '/lib/zipbuddy/zipbuddy.php';
 $zipbuddy = new pluginbuddy_zipbuddy( backupbuddy_core::getBackupDirectory() );
 
 // Calculate temp directory & lock it down.
-$temp_dir = get_temp_dir();
+$temp_dir    = get_temp_dir();
 $destination = $temp_dir . 'backupbuddy-' . $serial;
-if ( ( ( ! file_exists( $destination ) ) && ( false === mkdir( $destination ) ) ) ) {
+if ( ! file_exists( $destination ) && false === mkdir( $destination ) ) {
 	$error = 'Error #458485945b: Unable to create temporary location.';
 	pb_backupbuddy::status( 'error', $error );
 	die( $error );
@@ -31,7 +30,7 @@ if ( ( ( ! file_exists( $destination ) ) && ( false === mkdir( $destination ) ) 
 // If temp directory is within webroot then lock it down.
 $temp_dir = str_replace( '\\', '/', $temp_dir ); // Normalize for Windows.
 $temp_dir = rtrim( $temp_dir, '/\\' ) . '/'; // Enforce single trailing slash.
-if ( FALSE !== stristr( $temp_dir, ABSPATH ) ) { // Temp dir is within webroot.
+if ( false !== stristr( $temp_dir, ABSPATH ) ) { // Temp dir is within webroot.
 	pb_backupbuddy::anti_directory_browsing( $destination );
 }
 unset( $temp_dir );
@@ -41,8 +40,7 @@ echo '<!-- ';
 pb_backupbuddy::status( 'details', $message );
 echo $message;
 
-
-$extractions = array( $file => $temp_file );
+$extractions    = array( $file => $temp_file );
 $extract_result = $zipbuddy->extract( backupbuddy_core::getBackupDirectory() . $archive_file, $destination, $extractions );
 if ( false === $extract_result ) { // failed.
 	echo ' -->';
@@ -50,12 +48,11 @@ if ( false === $extract_result ) { // failed.
 	pb_backupbuddy::status( 'error', $error );
 	die( $error );
 } else { // success.
-	_e( 'Success.', 'it-l10n-backupbuddy' );
+	esc_html_e( 'Success.', 'it-l10n-backupbuddy' );
 	echo ' -->';
 	?>
 	<textarea readonly="readonly" wrap="off" style="width: 100%; min-height: 175px; height: 100%; margin: 0;"><?php echo file_get_contents( $destination . '/' . $temp_file ); ?></textarea>
 	<?php
-	//unlink( $destination . '/' . $temp_file );
 }
 
 // Try to cleanup.
