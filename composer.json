@@ -43,6 +43,7 @@
     "require": {
           "landslidecreative/advanced-custom-fields-pro" : "5.7.3",
           "landslidecreative/backupbuddy" : "8.2.8.3",
+          "wpackagist-plugin/classic-editor" : "0.4",
           "landslidecreative/gravityforms" : "2.3.3.9",
           "wpackagist-plugin/imagify" : "1.8.1.1",
           "wpackagist-plugin/intuitive-custom-post-order" : "3.1.1",
