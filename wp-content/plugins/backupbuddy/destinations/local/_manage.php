@@ -10,7 +10,7 @@ require_once( pb_backupbuddy::plugin_path() . '/destinations/local/init.php' );
 // Set reference to destination.
 if ( isset( pb_backupbuddy::$options['remote_destinations'][pb_backupbuddy::_GET('destination_id')] ) ) {
 	$destination = &pb_backupbuddy::$options['remote_destinations'][pb_backupbuddy::_GET('destination_id')];
-	
+
 	$destination = pb_backupbuddy_destination_local::_formatSettings( $destination );
 }
 
@@ -32,7 +32,7 @@ if ( pb_backupbuddy::_POST( 'bulk_action' ) == 'delete_backup' ) {
 			$deleted_files[] = $item;
 		}
 	}
-	
+
 	if ( count( $deleted_files ) > 0 ) {
 		pb_backupbuddy::alert( 'Deleted ' . implode( ', ', $deleted_files ) . '.' );
 	}
@@ -49,16 +49,19 @@ if ( !is_array( $backups ) ) {
 
 // Generate array of table rows.
 $backup_list = array();
-foreach( $backups as $backup ) {
-	$backup_list[basename($backup)] = array(
-						basename( $backup ),
-						pb_backupbuddy::$format->date(
-							pb_backupbuddy::$format->localize_time( filemtime( $backup ) )
-						) . '<br /><span class="description">(' .
-						pb_backupbuddy::$format->time_ago( filemtime( $backup ) ) .
-						' ago)</span>',
-						pb_backupbuddy::$format->file_size( filesize( $backup ) ),
-					);
+foreach ( $backups as $backup ) {
+	$backup_type = backupbuddy_core::getBackupTypeFromFile( basename( $backup ) );
+
+	if ( ! $backup_type ) {
+		continue;
+	}
+
+	$backup_list[ basename( $backup ) ] = array(
+		basename( $backup ),
+		pb_backupbuddy::$format->date( pb_backupbuddy::$format->localize_time( filemtime( $backup ) ) ) . '<br /><span class="description">(' . pb_backupbuddy::$format->time_ago( filemtime( $backup ) ) . ' ago)</span>',
+		pb_backupbuddy::$format->file_size( filesize( $backup ) ),
+		$backup_type,
+	);
 }
 
 $urlPrefix = pb_backupbuddy::ajax_url( 'remoteClient' ) . '&destination_id=' . htmlentities( pb_backupbuddy::_GET( 'destination_id' ) );
@@ -67,12 +70,12 @@ $urlPrefix = pb_backupbuddy::ajax_url( 'remoteClient' ) . '&destination_id=' . h
 pb_backupbuddy::$ui->list_table(
 	$backup_list,
 	array(
-		'action'		=>	$urlPrefix,
-		'columns'		=>	array( 'Backup File', 'Last Modified', 'File Size' ),
-		//'hover_actions'	=>	array( 'copy' => 'Copy to Local' ),
-		'hover_action_column_key'	=>	'0',
-		'bulk_actions'	=>	array( 'delete_backup' => 'Delete' ),
-		'css'			=>		'width: 100%;',
+		'action'                  => $urlPrefix,
+		'columns'                 => array( 'Backup File', 'Last Modified', 'File Size', 'Type' ),
+		// 'hover_actions'           => array( 'copy' => 'Copy to Local' ),
+		'hover_action_column_key' => '0',
+		'bulk_actions'            => array( 'delete_backup' => 'Delete' ),
+		'css'                     => 'width: 100%;',
 	)
 );
 

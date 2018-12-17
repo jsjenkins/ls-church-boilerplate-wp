@@ -19,25 +19,25 @@ echo '<center>' . $listAll . '</center>';
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		
+
 		jQuery( '.pb_backupbuddy_hoveraction_copy' ).click( function() {
 			var backup_file = jQuery(this).attr( 'rel' );
 			var backup_url = '<?php echo pb_backupbuddy::page_url(); ?>&custom=remoteclient&destination_id=<?php echo pb_backupbuddy::_GET( 'destination_id' ); ?>&remote_path=<?php echo htmlentities( pb_backupbuddy::_GET( 'remote_path' ) ); ?>&cpy_file=' + backup_file;
-			
+
 			window.location.href = backup_url;
-			
+
 			return false;
 		} );
-		
+
 		jQuery( '.pb_backupbuddy_hoveraction_download_link' ).click( function() {
 			var backup_file = jQuery(this).attr( 'rel' );
 			var backup_url = '<?php echo pb_backupbuddy::page_url(); ?>&custom=remoteclient&destination_id=<?php echo pb_backupbuddy::_GET( 'destination_id' ); ?>&remote_path=<?php echo htmlentities( pb_backupbuddy::_GET( 'remote_path' ) ); ?>&downloadlink_file=' + backup_file;
-			
+
 			window.location.href = backup_url;
-			
+
 			return false;
 		} );
-		
+
 	});
 </script>
 
@@ -66,7 +66,7 @@ if ( pb_backupbuddy::_POST( 'bulk_action' ) == 'delete_backup' ) {
 		$deleteFiles[] = $item;
 	}
 	$response = pb_backupbuddy_destination_s33::deleteFiles( $settings, $deleteFiles );
-	
+
 	if ( true === $response ) {
 		pb_backupbuddy::alert( 'Deleted ' . implode( ', ', $deleteFiles ) . '.' );
 	} else {
@@ -82,7 +82,7 @@ if ( pb_backupbuddy::_GET( 'cpy_file' ) != '' ) {
 	echo '<br>';
 	pb_backupbuddy::status( 'details',  'Scheduling Cron for creating S3 copy.' );
 	backupbuddy_core::schedule_single_event( time(), 'process_remote_copy', array( 's33', pb_backupbuddy::_GET( 'cpy_file' ), $settings ) );
-	
+
 	if ( '1' != pb_backupbuddy::$options['skip_spawn_cron_call'] ) {
 		update_option( '_transient_doing_cron', 0 ); // Prevent cron-blocking for next item.
 		spawn_cron( time() + 150 ); // Adds > 60 seconds to get around once per minute cron running limit.
@@ -123,11 +123,16 @@ foreach( $files as $object ) {
 	if ( ( ! preg_match( pb_backupbuddy_destination_s33::BACKUP_FILENAME_PATTERN, $file ) ) && ( 'importbuddy.php' !== $file ) ) { // Do not display any files that do not appear to be a BackupBuddy backup file (except importbuddy.php).
 		continue;
 	}
-	
+
+	$backup_type = backupbuddy_core::getBackupTypeFromFile( $file );
+
+	if ( ! $backup_type ) {
+		continue;
+	}
+
 	$last_modified = strtotime( $object['LastModified'] );
 	$size = (double) $object['Size'];
-	$backup_type = backupbuddy_core::getBackupTypeFromFile( $file );
-	
+
 	// Generate array of table rows.
 	while( isset( $backup_list_temp[$last_modified] ) ) { // Avoid collisions.
 		$last_modified += 0.1;

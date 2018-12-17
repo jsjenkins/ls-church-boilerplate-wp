@@ -70,6 +70,7 @@ if ( 'add' === $mode ) { // ADD MODE.
 			$pb_hide_test = true;
 			$pb_hide_save = true;
 
+			require_once( pb_backupbuddy::plugin_path() . '/lib/stash/stash-api.php' );
 			require_once dirname( __FILE__ ) . '/class.itx_helper2.php';
 			global $wp_version;
 
@@ -77,11 +78,7 @@ if ( 'add' === $mode ) { // ADD MODE.
 			$password_hash   = iThemes_Credentials::get_password_hash( $itxapi_username, $settings_result['data']['itxapi_password_raw'] );
 			$access_token    = ITXAPI_Helper2::get_access_token( $itxapi_username, $password_hash, site_url(), $wp_version );
 
-			$settings = array(
-				'itxapi_username' => $itxapi_username,
-				'itxapi_password' => $access_token,
-			);
-			$response = pb_backupbuddy_destination_stash3::stashAPI( $settings, 'connect' );
+			$response = BackupBuddy_Stash_API::connect( $itxapi_username, $access_token );
 
 			if ( ! is_array( $response ) ) { // Error message.
 				pb_backupbuddy::alert( 'Error #23333: Unexpected server response. Check your login and try again. Detailed response: `' . print_r( $response, true ) . '`.' );

@@ -295,24 +295,7 @@ function rocket_after_update_array_options( $old_value, $value ) {
  * @return true if a mobile plugin in the list is active, false otherwise.
  **/
 function rocket_is_mobile_plugin_active() {
-	$mobile_plugins = array(
-		'wptouch/wptouch.php',
-		'wiziapp-create-your-own-native-iphone-app/wiziapp.php',
-		'wordpress-mobile-pack/wordpress-mobile-pack.php',
-		'wp-mobilizer/wp-mobilizer.php',
-		'wp-mobile-edition/wp-mobile-edition.php',
-		'device-theme-switcher/dts_controller.php',
-		'wp-mobile-detect/wp-mobile-detect.php',
-		'easy-social-share-buttons3/easy-social-share-buttons3.php',
-	);
-
-	foreach ( $mobile_plugins as $mobile_plugin ) {
-		if ( is_plugin_active( $mobile_plugin ) ) {
-			return true;
-		}
-	}
-
-	return false;
+	return \WP_Rocket\Subscriber\Third_Party\Plugins\Mobile_Subscriber::is_mobile_plugin_active();
 }
 
 /**
@@ -328,6 +311,53 @@ function rocket_allow_json_mime_type( $wp_get_mime_types ) {
 	$wp_get_mime_types['json'] = 'application/json';
 
 	return $wp_get_mime_types;
+}
+
+/**
+ * Forces the correct file type for JSON file if the WP checks is incorrect
+ *
+ * @since 3.2.3.1
+ * @author Gregory Viguier
+ *
+ * @param array  $wp_check_filetype_and_ext File data array containing 'ext', 'type', and
+ *                                         'proper_filename' keys.
+ * @param string $file                     Full path to the file.
+ * @param string $filename                 The name of the file (may differ from $file due to
+ *                                         $file being in a tmp directory).
+ * @param array  $mimes                     Key is the file extension with value as the mime type.
+ * @return array
+ */
+function rocket_check_json_filetype( $wp_check_filetype_and_ext, $file, $filename, $mimes ) {
+	if ( ! empty( $wp_check_filetype_and_ext['ext'] ) && ! empty( $wp_check_filetype_and_ext['type'] ) ) {
+		return $wp_check_filetype_and_ext;
+	}
+
+	$wp_filetype = wp_check_filetype( $filename, $mimes );
+
+	if ( 'json' !== $wp_filetype['ext'] ) {
+		return $wp_check_filetype_and_ext;
+	}
+
+	if ( empty( $wp_filetype['type'] ) ) {
+		// In case some other filter messed it up.
+		$wp_filetype['type'] = 'application/json';
+	}
+
+	if ( ! extension_loaded( 'fileinfo' ) ) {
+		return $wp_check_filetype_and_ext;
+	}
+
+	$finfo     = finfo_open( FILEINFO_MIME_TYPE );
+	$real_mime = finfo_file( $finfo, $file );
+	finfo_close( $finfo );
+
+	if ( 'text/plain' !== $real_mime ) {
+		return $wp_check_filetype_and_ext;
+	}
+
+	$wp_check_filetype_and_ext = array_merge( $wp_check_filetype_and_ext, $wp_filetype );
+
+	return $wp_check_filetype_and_ext;
 }
 
 /**

@@ -178,7 +178,7 @@ class pb_backupbuddy_destination_rackspace { // Change class name end to match d
 		}
 		// Create test file
 		$testbackup = @$container->create_object( 'backupbuddytest.txt' );
-		if ( ! $testbackup->load_from_filename( pb_backupbuddy::plugin_path() . '/readme.txt') ) {
+		if ( ! $testbackup->load_from_filename( pb_backupbuddy::plugin_path() . '/destinations/rackspace/backupbuddy.txt') ) {
 			return __('BackupBuddy was not able to write the test file.', 'it-l10n-backupbuddy' );
 		}
 

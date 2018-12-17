@@ -14,7 +14,7 @@ if ( ! file_exists( backupbuddy_core::getLogDirectory() . 'fileoptions/' . $seri
 	if ( ! isset( pb_backupbuddy::$classes['zipbuddy'] ) ) {
 		pb_backupbuddy::$classes['zipbuddy'] = new pluginbuddy_zipbuddy( backupbuddy_core::getLogDirectory() . 'fileoptions/' );
 	}
-	
+
 	if ( pb_backupbuddy::$classes['zipbuddy']->file_exists( $file, 'wp-content/uploads/backupbuddy_temp/' . $serial . '/backupbuddy_dat.php' ) === true ) { // Post 2.0 full backup
 		$backup_type = 'full';
 		$pass = true;
@@ -27,16 +27,13 @@ if ( ! file_exists( backupbuddy_core::getLogDirectory() . 'fileoptions/' . $seri
 		$backup_type = 'db';
 		$pass = true;
 	}
-	
+
 	$backup_dat = self::getDatArrayFromZip( $file );
-	/*
-	echo 'DAT:<pre>';
-	print_r( $backup_dat );
-	echo '</pre>';
-	*/
-	$options = $backup_dat; //['profile'];
-	
-	
+	$options    = $backup_dat;
+	if ( ! is_array( $options ) ) {
+		$options = array();
+	}
+
 	$createdFileOptions = true;
 }
 
@@ -83,7 +80,7 @@ if ( true === $createdFileOptions ) {
 	if ( isset( $options['force_single_db_file'] ) ) {
 		$backup_options_options['force_single_db_file'] = $options['force_single_db_file'];
 	}
-	
+
 	if ( isset( $options['profile'] ) ) {
 		$options = $options['profile'];
 	} else {
@@ -202,16 +199,16 @@ if ( ! isset( $options['type'] ) || ( isset( $options['type'] ) && ( ( 'db' == $
 
 if ( isset( $options['type'] ) && ( ( 'files' == $options['type'] ) || ( 'media' == $options['type'] ) || ( 'themes' == $options['type'] ) || ( 'plugins' == $options['type'] ) ) ) {
 	$files = pb_backupbuddy::$classes['zipbuddy']->get_file_list( $file );
-	$count = count( $files );
-	if ( is_array( $files ) && ( $count > 0 ) ) {
-		$pass = true;
-	} else {
-		$pass = false;
+	$count = 0;
+	$pass  = false;
+	if ( is_array( $files ) ) {
+		$count = count( $files );
+		$pass  = $count > 0;
 	}
 	$tests[] = array(
-		'test'		=>	'Basic file list scan (' . $count . ' files found inside) - <a target="_top" href="' . admin_url('admin.php') . '?page=pb_backupbuddy_backup&zip_viewer=' . basename( $file ). '&value=' . basename( $file ) . '&bub_rand=' . rand( 100, 999 ) . '">Browse Files</a>', // rand is because some hosts block URLs with a .zip at the end of the url.
-		'pass'		=>	$pass,
-		'fileCount'	=>	$count,
+		'test'      => 'Basic file list scan (' . $count . ' files found inside) - <a target="_top" href="' . admin_url('admin.php') . '?page=pb_backupbuddy_backup&zip_viewer=' . basename( $file ). '&value=' . basename( $file ) . '&bub_rand=' . rand( 100, 999 ) . '">Browse Files</a>', // rand is because some hosts block URLs with a .zip at the end of the url.
+		'pass'      => $pass,
+		'fileCount' => $count,
 	);
 }
 
@@ -223,13 +220,13 @@ if ( isset( $options['type'] ) && ( ( 'files' == $options['type'] ) || ( 'themes
 	$pass = false;
 	$db_test_note = '';
 	pb_backupbuddy::status( 'details', 'Verifying database SQL file in zip archive.' );
-	
-	
-	
+
+
+
 	if ( isset( $backup_options_options['table_sizes'] ) && ( count( $backup_options_options['table_sizes'] ) > 0 ) ) { // BB v5.0+. && ( $backup_options_options['data_version'] >= 1 )
 		// Look for missing SQL files.
 		$pass = true;
-		
+
 		if ( ! isset( $backup_options_options['force_single_db_file'] ) ) {
 			$backup_options_options['force_single_db_file'] = false;
 		} else {
@@ -239,7 +236,7 @@ if ( isset( $options['type'] ) && ( ( 'files' == $options['type'] ) || ( 'themes
 				pb_backupbuddy::status( 'details', 'Forcing to a single db_1.sql file was NOT enabled for this backup.' );
 			}
 		}
-		
+
 		pb_backupbuddy::status( 'details', 'BackupBuddy v5.0+ format database detected.' );
 		if ( 'db' == $backup_type ) { // DB.
 			pb_backupbuddy::status( 'details', 'Database-only type backup.' );
@@ -303,9 +300,9 @@ if ( isset( $options['type'] ) && ( ( 'files' == $options['type'] ) || ( 'themes
 				}
 			}
 		}
-		
+
 		$db_test_note = 's (' . count( $backup_options_options['table_sizes'] ) . ' tables)';
-		
+
 	} elseif ( pb_backupbuddy::$classes['zipbuddy']->file_exists( $file, 'wp-content/uploads/backupbuddy_temp/' . $serial . '/db_1.sql' ) === true ) { // post 2.0 full backup.
 		$backup_type = 'full';
 		$pass = true;
@@ -341,13 +338,13 @@ if ( isset( $options['type'] ) && ( ( 'files' == $options['type'] ) || ( 'themes
 		$backup_type = 'db';
 		$pass = true;
 	}
-	
+
 	 if ( true !== $pass ) {
 		//if ( count( $backup_options_options['table_sizes'] ) > 0 ) {
-			
+
 		//}
 	}
-	
+
 	if ( '1' == $options['skip_database_dump'] ) {
 		if ( false === $pass ) {
 			pb_backupbuddy::status( 'warning', 'WARNING: Database .SQL does NOT exist because database dump was set to be skipped based on settings. Use with caution. The database was NOT backed up.' );

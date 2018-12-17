@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the BackupBuddy package.
 msgid ""
 msgstr ""
-"Project-Id-Version: BackupBuddy 8.2.8.3\n"
+"Project-Id-Version: BackupBuddy 8.3.3.1\n"
 "Report-Msgid-Bugs-To: http://ithemes.com/support/\n"
-"POT-Creation-Date: 2018-08-13 20:06:41+00:00\n"
+"POT-Creation-Date: 2018-12-12 18:16:59+00:00\n"
 "PO-Revision-Date: 2018-MO-DA HO:MI+ZONE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -161,7 +161,7 @@ msgid "<strong>ERROR</strong>: WordPress %1$s requires MySQL %2$s or higher"
 msgstr ""
 
 #: _importbuddy/importbuddy/controllers/pages/server_tools.php:27
-#: controllers/pages/server_tools.php:32 init_admin.php:145 init_admin.php:179
+#: controllers/pages/server_tools.php:32 init_admin.php:142 init_admin.php:176
 msgid "Server Tools"
 msgstr ""
 
@@ -172,8 +172,8 @@ msgstr ""
 
 #: _importbuddy/importbuddy/controllers/pages/server_tools.php:44
 #: controllers/pages/_backup-perform.php:814
-#: controllers/pages/server_tools.php:48 destinations/live/_manage.php:920
-#: views/settings/_advanced.php:562 views/settings/_includeexclude.php:117
+#: controllers/pages/server_tools.php:48 destinations/live/_manage.php:927
+#: views/settings/_advanced.php:576 views/settings/_includeexclude.php:117
 msgid "Database"
 msgstr ""
 
@@ -244,12 +244,12 @@ msgid ""
 "You have not sent any backups to Stash yet (or files are still transferring)."
 msgstr ""
 
-#: classes/_integrityCheck.php:62 classes/integrity_check.php:253
+#: classes/_integrityCheck.php:59 classes/integrity_check.php:253
 msgid "Fatal Error #9034 C. Unable to access fileoptions data."
 msgstr ""
 
-#: classes/_integrityCheck.php:358 classes/_integrityCheck.php:359
-#: classes/integrity_check.php:583 classes/integrity_check.php:584
+#: classes/_integrityCheck.php:355 classes/_integrityCheck.php:356
+#: classes/integrity_check.php:591 classes/integrity_check.php:592
 msgid "Database skipped"
 msgstr ""
 
@@ -343,7 +343,7 @@ msgstr ""
 msgid "Sending scheduled backup start email notification if applicable."
 msgstr ""
 
-#: classes/backup.php:217 classes/backup.php:2539
+#: classes/backup.php:217 classes/backup.php:2545
 msgid "Scheduled backup"
 msgstr ""
 
@@ -598,15 +598,15 @@ msgstr ""
 msgid "Final ZIP file size"
 msgstr ""
 
-#: classes/backup.php:2537
+#: classes/backup.php:2543
 msgid "Sending scheduled backup complete email notification."
 msgstr ""
 
-#: classes/backup.php:2546
+#: classes/backup.php:2552
 msgid "Finished cleaning up."
 msgstr ""
 
-#: classes/backup.php:2553
+#: classes/backup.php:2559
 msgid ""
 "As this backup did not pass the integrity check you should verify it "
 "manually or re-scan. Integrity checks can fail on good backups due to "
@@ -615,15 +615,15 @@ msgid ""
 "notified of potentially bad backups."
 msgstr ""
 
-#: classes/backup.php:2624
+#: classes/backup.php:2630
 msgid "Error. Unable to delete local archive as requested."
 msgstr ""
 
-#: classes/backup.php:2627
+#: classes/backup.php:2633
 msgid "Deleted local archive as requested."
 msgstr ""
 
-#: classes/backup.php:2670
+#: classes/backup.php:2676
 msgid "Fatal Error #9034 E. Unable to access fileoptions data."
 msgstr ""
 
@@ -833,20 +833,20 @@ msgid ""
 "Use importbuddy.php to restore or migrate instead."
 msgstr ""
 
-#: controllers/actions.php:44
+#: controllers/actions.php:51
 msgid "WordPress Updates"
 msgstr ""
 
-#: controllers/actions.php:44
+#: controllers/actions.php:51
 msgid "Remember to back up your site with BackupBuddy before upgrading!"
 msgstr ""
 
-#: controllers/actions.php:123 controllers/ajax/live_setup.php:15
+#: controllers/actions.php:429 controllers/ajax/live_setup.php:15
 #: destinations/live/_manual_snapshot.php:70
 msgid "Database Backup"
 msgstr ""
 
-#: controllers/actions.php:123 controllers/ajax/live_setup.php:16
+#: controllers/actions.php:429 controllers/ajax/live_setup.php:16
 #: destinations/live/_manual_snapshot.php:69
 msgid "Full Backup"
 msgstr ""
@@ -1057,8 +1057,8 @@ msgid "Download Link"
 msgstr ""
 
 #: controllers/ajax/live_last_snapshot_details.php:81
-#: controllers/pages/malware_scan.php:40 init_admin.php:146 init_admin.php:166
-#: init_admin.php:180
+#: controllers/pages/malware_scan.php:40 init_admin.php:143 init_admin.php:163
+#: init_admin.php:177
 msgid "Malware Scan"
 msgstr ""
 
@@ -1102,7 +1102,7 @@ msgid ""
 "you disabled file managementrefresh the page to see the effect."
 msgstr ""
 
-#: controllers/ajax/live_settings.php:67 controllers/pages/live.php:115
+#: controllers/ajax/live_settings.php:67 controllers/pages/live.php:114
 msgid "Disconnect from Stash Live"
 msgstr ""
 
@@ -1125,6 +1125,70 @@ msgstr ""
 
 #: controllers/ajax/migrate_status.php:38
 msgid "Fatal Error #9034.2342348. Unable to access fileoptions data."
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:12
+msgid "Trashed Post"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:13
+msgid "Trashed Posts"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:16
+msgid "Modified Post"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:17
+msgid "Modified Posts"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:20
+msgid "New Post"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:21
+msgid "New Posts"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:24
+msgid "Modified Setting"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:25
+msgid "Modified Settings"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:28
+msgid "Deleted Setting"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:29
+msgid "Deleted Settings"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:32
+msgid "Updated Plugin"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:33
+msgid "Updated Plugins"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:36
+msgid "Activated Plugin"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:37
+msgid "Activated Plugins"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:40
+msgid "Deactivated Plugin"
+msgstr ""
+
+#: controllers/ajax/recent_edits.php:41
+msgid "Deactivated Plugins"
 msgstr ""
 
 #: controllers/ajax/remotesend_abort.php:19
@@ -1211,11 +1275,11 @@ msgstr ""
 msgid "Display Directory Size Listing in Text Format"
 msgstr ""
 
-#: controllers/dashboard.php:84
+#: controllers/dashboard.php:106
 msgid "Stored offsite or deleted"
 msgstr ""
 
-#: controllers/dashboard.php:92 views/_backup_listing.php:143
+#: controllers/dashboard.php:114 views/_backup_listing.php:143
 msgid "Download"
 msgstr ""
 
@@ -1271,7 +1335,7 @@ msgstr ""
 msgid "Documentation"
 msgstr ""
 
-#: controllers/filters.php:136 init_admin.php:222
+#: controllers/filters.php:136 init_admin.php:219
 msgid "Support"
 msgstr ""
 
@@ -1544,13 +1608,13 @@ msgstr ""
 #: controllers/pages/_backup-perform.php:808
 #: controllers/pages/server_info/database.php:52
 #: controllers/pages/server_info/database.php:63
-#: controllers/pages/settings.php:55 init_admin.php:148 init_admin.php:182
+#: controllers/pages/settings.php:55 init_admin.php:145 init_admin.php:179
 #: lib/updater/settings-page.php:290
 msgid "Settings"
 msgstr ""
 
 #: controllers/pages/_backup-perform.php:820 destinations/live/_manage.php:339
-#: destinations/live/_manage.php:964 destinations/live/_manage.php:971
+#: destinations/live/_manage.php:971 destinations/live/_manage.php:978
 msgid "Files"
 msgstr ""
 
@@ -1683,7 +1747,7 @@ msgstr ""
 #: controllers/pages/server_info/_server_tests.php:673
 #: controllers/pages/server_info/site_size.php:77
 #: destinations/gdrive/_manage.php:74 destinations/gdrive/init.php:1195
-#: init_admin.php:250 views/_quicksetup.php:331
+#: init_admin.php:247 views/_quicksetup.php:331
 msgid "Loading..."
 msgstr ""
 
@@ -1918,22 +1982,22 @@ msgid ""
 "and should be available on all hosts."
 msgstr ""
 
-#: controllers/pages/live.php:116
+#: controllers/pages/live.php:115
 msgid ""
 "To disconnect you must verify you have access to this account. Please "
 "authenticate with your iThemes Member Login to validate your access and "
 "disconnect this site from Stash Live."
 msgstr ""
 
-#: controllers/pages/live.php:149 init_admin.php:140 init_admin.php:175
+#: controllers/pages/live.php:148 init_admin.php:137 init_admin.php:172
 msgid "Stash Live"
 msgstr ""
 
-#: controllers/pages/live.php:158
+#: controllers/pages/live.php:157
 msgid "Troubleshooting Scan"
 msgstr ""
 
-#: controllers/pages/live.php:164
+#: controllers/pages/live.php:163
 msgid "Live Settings"
 msgstr ""
 
@@ -2070,8 +2134,8 @@ msgid ""
 "for details."
 msgstr ""
 
-#: controllers/pages/migrate_restore.php:56 init_admin.php:142
-#: init_admin.php:177
+#: controllers/pages/migrate_restore.php:56 init_admin.php:139
+#: init_admin.php:174
 msgid "Restore / Migrate"
 msgstr ""
 
@@ -2127,46 +2191,46 @@ msgstr ""
 msgid "Rollback Complete"
 msgstr ""
 
-#: controllers/pages/scheduling.php:55
+#: controllers/pages/scheduling.php:57
 msgid "Deleted schedule(s):"
 msgstr ""
 
-#: controllers/pages/scheduling.php:57
+#: controllers/pages/scheduling.php:59
 msgid "There were problems deleting the following schedule(s):"
 msgstr ""
 
-#: controllers/pages/scheduling.php:65
+#: controllers/pages/scheduling.php:67
 msgid "Manually running scheduled backup"
 msgstr ""
 
-#: controllers/pages/scheduling.php:67
+#: controllers/pages/scheduling.php:69
 msgid "in the background."
 msgstr ""
 
-#: controllers/pages/scheduling.php:68
+#: controllers/pages/scheduling.php:70
 msgid ""
 "Note: If there is no site activity there may be delays between steps in the "
 "backup. Access the site or use a 3rd party service, such as a free pinging "
 "service, to generate site activity."
 msgstr ""
 
-#: controllers/pages/scheduling.php:94 views/scheduling.php:14
+#: controllers/pages/scheduling.php:96 views/scheduling.php:14
 msgid "Remove remote destination from this schedule."
 msgstr ""
 
-#: controllers/pages/scheduling.php:114
+#: controllers/pages/scheduling.php:116
 msgid "Edit Schedule"
 msgstr ""
 
-#: controllers/pages/scheduling.php:137
+#: controllers/pages/scheduling.php:139
 msgid "Add New Schedule"
 msgstr ""
 
-#: controllers/pages/scheduling.php:156
+#: controllers/pages/scheduling.php:158
 msgid "This is a name for your reference only."
 msgstr ""
 
-#: controllers/pages/scheduling.php:190
+#: controllers/pages/scheduling.php:192
 msgid ""
 "Full backups contain all files (except exclusions) and your database. "
 "Database only backups consist of an export of your mysql database; no "
@@ -2174,178 +2238,178 @@ msgid ""
 "faster to perform and are typically the most quickly changing part of a site."
 msgstr ""
 
-#: controllers/pages/scheduling.php:490
+#: controllers/pages/scheduling.php:492
 msgid ""
 "Error: The expected BackupBuddy defined schedule intervals are not present "
 "in the list provided by WordPress."
 msgstr ""
 
-#: controllers/pages/scheduling.php:491
+#: controllers/pages/scheduling.php:493
 msgid ""
 "This is indicative of another plugin or the theme having a bug that causes "
 "schedule intervals defined "
 msgstr ""
 
-#: controllers/pages/scheduling.php:492
+#: controllers/pages/scheduling.php:494
 msgid ""
 "by other plugin(s) to be handled incorrectly and discarded. The problem "
 "plugin can be identified by "
 msgstr ""
 
-#: controllers/pages/scheduling.php:493
+#: controllers/pages/scheduling.php:495
 msgid ""
 "selectively deactivating suspected plugins until the expected schedule "
 "interval definitions appear (and "
 msgstr ""
 
-#: controllers/pages/scheduling.php:494
+#: controllers/pages/scheduling.php:496
 msgid ""
 "this error message disappears) and the developers of the problem plugin can "
 "be contacted to fix the "
 msgstr ""
 
-#: controllers/pages/scheduling.php:495
+#: controllers/pages/scheduling.php:497
 msgid ""
 "issue. Sometimes the bad functionality can be part of theme functionality "
 "and it may be necessary to "
 msgstr ""
 
-#: controllers/pages/scheduling.php:496
+#: controllers/pages/scheduling.php:498
 msgid ""
 "temporarily switch to a default theme to identify this if that is possible. "
 "Whilst this site issue "
 msgstr ""
 
-#: controllers/pages/scheduling.php:497
+#: controllers/pages/scheduling.php:499
 msgid ""
 "exists the schedule interval selection list will show all available schedule "
 "intervals regardless of "
 msgstr ""
 
-#: controllers/pages/scheduling.php:498
+#: controllers/pages/scheduling.php:500
 msgid ""
 "the configuration setting but will revert to only showing the BackupBuddy "
 "defined schedule intervals "
 msgstr ""
 
-#: controllers/pages/scheduling.php:499
+#: controllers/pages/scheduling.php:501
 msgid "when the issue is fixed (dependent on the configuration setting). "
 msgstr ""
 
-#: controllers/pages/scheduling.php:500
+#: controllers/pages/scheduling.php:502
 msgid "Check the following plugin(s) as possible cause of problem: "
 msgstr ""
 
-#: controllers/pages/scheduling.php:501
+#: controllers/pages/scheduling.php:503
 msgid "Check the following mu-plugin(s) as possible cause of problem: "
 msgstr ""
 
-#: controllers/pages/scheduling.php:502
+#: controllers/pages/scheduling.php:504
 msgid "Check the following theme as possible cause of problem: "
 msgstr ""
 
-#: controllers/pages/scheduling.php:515 destinations/live/_configure.php:230
+#: controllers/pages/scheduling.php:517 destinations/live/_configure.php:230
 #: destinations/live/_configure.php:531
 msgid "Invalid Schedule Interval"
 msgstr ""
 
-#: controllers/pages/scheduling.php:564
+#: controllers/pages/scheduling.php:566
 msgid "No cron intervals are available. Schedule may not work properly."
 msgstr ""
 
-#: controllers/pages/scheduling.php:566
+#: controllers/pages/scheduling.php:568
 msgid ""
 "You may need to disable `Show all defined cron schedules` under Settings > "
 "Advanced Settings/Troubleshooting"
 msgstr ""
 
-#: controllers/pages/scheduling.php:584
+#: controllers/pages/scheduling.php:586
 msgid "Time period between backups."
 msgstr ""
 
-#: controllers/pages/scheduling.php:595
+#: controllers/pages/scheduling.php:597
 msgid ""
 "IMPORTANT: For scheduled events to occur someone (or you) must visit this "
 "site on or after the scheduled time. If no one visits your site for a long "
 "period of time some backup events may not be triggered."
 msgstr ""
 
-#: controllers/pages/scheduling.php:598 destinations/live/_manage.php:895
-#: init_admin.php:271 views/widgets/dashboard.php:19
+#: controllers/pages/scheduling.php:600 destinations/live/_manage.php:902
+#: init_admin.php:268 views/widgets/dashboard.php:19
 msgid "Currently"
 msgstr ""
 
-#: controllers/pages/scheduling.php:598
+#: controllers/pages/scheduling.php:600
 msgid "based on"
 msgstr ""
 
-#: controllers/pages/scheduling.php:598
+#: controllers/pages/scheduling.php:600
 msgid "WordPress settings"
 msgstr ""
 
-#: controllers/pages/scheduling.php:609
+#: controllers/pages/scheduling.php:611
 msgid "Select a Destination"
 msgstr ""
 
-#: controllers/pages/scheduling.php:609
+#: controllers/pages/scheduling.php:611
 msgid "+ Add Remote Destination"
 msgstr ""
 
-#: controllers/pages/scheduling.php:618
+#: controllers/pages/scheduling.php:620
 msgid "Delete local backup file after remote send success"
 msgstr ""
 
-#: controllers/pages/scheduling.php:635
+#: controllers/pages/scheduling.php:637
 msgid "Schedule enabled?"
 msgstr ""
 
-#: controllers/pages/scheduling.php:641
+#: controllers/pages/scheduling.php:643
 msgid ""
 "[Default: enabled] When disabled this schedule will be effectively turned "
 "off. This scheduled backup will not occur when disabled / off. You can re-"
 "enable schedules by editing them."
 msgstr ""
 
-#: controllers/pages/scheduling.php:642
+#: controllers/pages/scheduling.php:644
 msgid "Enable schedule to run"
 msgstr ""
 
-#: controllers/pages/scheduling.php:662 controllers/pages/scheduling.php:701
+#: controllers/pages/scheduling.php:664 controllers/pages/scheduling.php:703
 msgid "Invalid time format. Please use the specified format / example %s"
 msgstr ""
 
-#: controllers/pages/scheduling.php:765
+#: controllers/pages/scheduling.php:767
 msgid ""
 "Invalid schedule interval! Delete and recreate the schedule with a valid "
 "interval for this schedule to work."
 msgstr ""
 
-#: controllers/pages/scheduling.php:765
+#: controllers/pages/scheduling.php:767
 msgid "Invalid interval tag"
 msgstr ""
 
-#: controllers/pages/scheduling.php:767
+#: controllers/pages/scheduling.php:769
 msgid "ERROR"
 msgstr ""
 
-#: controllers/pages/scheduling.php:808
+#: controllers/pages/scheduling.php:810
 msgid "Never"
 msgstr ""
 
-#: controllers/pages/scheduling.php:813
+#: controllers/pages/scheduling.php:815
 #: controllers/pages/server_info/_server_tests.php:1128
 #: controllers/pages/server_info/_server_tests.php:1129
 #: controllers/pages/server_info/_server_tests.php:1130
 #: controllers/pages/server_info/permissions.php:31
 #: controllers/pages/server_info/permissions.php:32
-#: destinations/dropbox2/_manage.php:59 destinations/live/_stats.php:20
+#: destinations/dropbox2/_manage.php:66 destinations/live/_stats.php:20
 #: destinations/live/_stats.php:21 destinations/live/_stats.php:23
 #: destinations/live/_stats.php:26 destinations/live/_stats.php:31
 #: destinations/live/_stats.php:33 destinations/live/_stats.php:54
 #: destinations/live/_stats.php:62 destinations/live/_stats.php:72
 #: destinations/live/_stats.php:74 destinations/live/_stats.php:76
 #: destinations/live/_stats.php:79 destinations/live/live.php:265
-#: destinations/stash3/_configure.php:143
+#: destinations/stash3/_configure.php:140
 msgid "Unknown"
 msgstr ""
 
@@ -2456,11 +2520,11 @@ msgstr ""
 
 #: controllers/pages/server_info/_server_tests.php:310
 #: controllers/pages/server_info/_server_tests.php:449
-#: destinations/ftp/_manage.php:270 destinations/live/_stats.php:145
-#: destinations/live/_stats.php:197 destinations/live/_stats.php:210
-#: destinations/live/_stats.php:219 destinations/live/_troubleshooting.php:321
+#: destinations/live/_stats.php:145 destinations/live/_stats.php:197
+#: destinations/live/_stats.php:210 destinations/live/_stats.php:219
+#: destinations/live/_troubleshooting.php:321
 #: destinations/live/_troubleshooting.php:332
-#: pluginbuddy/classes/format.php:153
+#: pluginbuddy/classes/format.php:153 views/widgets/recent-edits.php:108
 msgid "ago"
 msgstr ""
 
@@ -3175,8 +3239,8 @@ msgstr ""
 #: destinations/rackspace/_configure.php:10 destinations/s3/_configure.php:43
 #: destinations/s32/_configure.php:38 destinations/s33/_configure.php:38
 #: destinations/sftp/_configure.php:10 destinations/site/_configure.php:12
-#: destinations/stash2/_configure.php:178
-#: destinations/stash3/_configure.php:181
+#: destinations/stash2/_configure.php:175
+#: destinations/stash3/_configure.php:178
 msgid "Destination name"
 msgstr ""
 
@@ -3187,32 +3251,32 @@ msgstr ""
 #: destinations/rackspace/_configure.php:11 destinations/s3/_configure.php:44
 #: destinations/s32/_configure.php:39 destinations/s33/_configure.php:39
 #: destinations/sftp/_configure.php:11 destinations/site/_configure.php:13
-#: destinations/stash2/_configure.php:179
-#: destinations/stash3/_configure.php:182
+#: destinations/stash2/_configure.php:176
+#: destinations/stash3/_configure.php:179
 msgid ""
 "Name of the new destination to create. This is for your convenience only."
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:146 destinations/s3/_configure.php:95
+#: destinations/dropbox2/_configure.php:141 destinations/s3/_configure.php:95
 #: destinations/s32/_configure.php:121 destinations/s33/_configure.php:149
 msgid "Directory (optional)"
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:147
+#: destinations/dropbox2/_configure.php:142
 msgid ""
 "[Example: backupbuddy or backupbuddy/mysite/ or myfiles/backups/mysite] - "
 "Directory (or subdirectory) name to place the backups within. NOTE: This "
 "cannot be changed once the destination is created (for security)."
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:153
+#: destinations/dropbox2/_configure.php:148
 #: destinations/ftp/_configure.php:143 destinations/local/_configure.php:53
 #: destinations/rackspace/_configure.php:63
 #: destinations/sftp/_configure.php:82
 msgid "Archive limit"
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:154
+#: destinations/dropbox2/_configure.php:149
 #: destinations/ftp/_configure.php:144 destinations/local/_configure.php:54
 #: destinations/rackspace/_configure.php:64
 #: destinations/sftp/_configure.php:83
@@ -3222,23 +3286,23 @@ msgid ""
 "backups will be deleted."
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:165
+#: destinations/dropbox2/_configure.php:160
 #: destinations/ftp/_configure.php:155 destinations/gdrive/_configure.php:392
 #: destinations/live/_configure.php:359 destinations/local/_configure.php:65
 #: destinations/rackspace/_configure.php:75 destinations/s3/_configure.php:107
 #: destinations/s32/_configure.php:191 destinations/s33/_configure.php:240
 #: destinations/sftp/_configure.php:94 destinations/site/_configure.php:103
-#: destinations/stash2/_configure.php:243
-#: destinations/stash3/_configure.php:259
+#: destinations/stash2/_configure.php:240
+#: destinations/stash3/_configure.php:256
 msgid "Advanced Options"
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:174 destinations/s3/_configure.php:153
+#: destinations/dropbox2/_configure.php:169 destinations/s3/_configure.php:153
 #: destinations/site/_configure.php:112
 msgid "Max chunk size"
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:175
+#: destinations/dropbox2/_configure.php:170
 msgid ""
 "[Example: 5] - Enter 0 for no chunking; minimum of 5 if enabling. This is "
 "the maximum file size to send in one whole piece. Files larger than this "
@@ -3248,24 +3312,24 @@ msgid ""
 "traffic to trigger them."
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:186
+#: destinations/dropbox2/_configure.php:181
 #: destinations/ftp/_configure.php:191 destinations/gdrive/_configure.php:436
 #: destinations/live/_configure.php:613 destinations/local/_configure.php:76
 #: destinations/rackspace/_configure.php:110
 #: destinations/s3/_configure.php:189 destinations/s32/_configure.php:280
 #: destinations/s33/_configure.php:369 destinations/sftp/_configure.php:105
-#: destinations/stash2/_configure.php:307
-#: destinations/stash3/_configure.php:361
+#: destinations/stash2/_configure.php:304
+#: destinations/stash3/_configure.php:358
 msgid "Disable file management"
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:187
+#: destinations/dropbox2/_configure.php:182
 #: destinations/ftp/_configure.php:192 destinations/gdrive/_configure.php:437
 #: destinations/live/_configure.php:614 destinations/local/_configure.php:77
 #: destinations/rackspace/_configure.php:111
 #: destinations/s3/_configure.php:190 destinations/s32/_configure.php:281
 #: destinations/s33/_configure.php:370 destinations/sftp/_configure.php:106
-#: destinations/stash2/_configure.php:308
+#: destinations/stash2/_configure.php:305
 msgid ""
 "[[Default: unchecked] - When checked, selecting this destination disables "
 "browsing or accessing files stored at this destination from within "
@@ -3274,55 +3338,54 @@ msgid ""
 "without deleting and re-creating this destination."
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:190
+#: destinations/dropbox2/_configure.php:185
 #: destinations/ftp/_configure.php:195 destinations/gdrive/_configure.php:440
 #: destinations/live/_configure.php:617 destinations/local/_configure.php:80
 #: destinations/rackspace/_configure.php:114
 #: destinations/s3/_configure.php:193 destinations/s32/_configure.php:284
 #: destinations/s33/_configure.php:373 destinations/sftp/_configure.php:109
-#: destinations/stash2/_configure.php:311
+#: destinations/stash2/_configure.php:308
 msgid "Once disabled you must recreate the destination to re-enable."
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:198
+#: destinations/dropbox2/_configure.php:193
 #: destinations/email/_configure.php:35 destinations/ftp/_configure.php:203
 #: destinations/gdrive/_configure.php:448 destinations/local/_configure.php:88
 #: destinations/rackspace/_configure.php:122
 #: destinations/s3/_configure.php:201 destinations/s32/_configure.php:292
 #: destinations/s33/_configure.php:386 destinations/sftp/_configure.php:117
-#: destinations/site/_configure.php:134 destinations/stash2/_configure.php:319
-#: destinations/stash3/_configure.php:377
+#: destinations/site/_configure.php:134 destinations/stash2/_configure.php:316
+#: destinations/stash3/_configure.php:374
 msgid "Disable destination"
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:199
+#: destinations/dropbox2/_configure.php:194
 #: destinations/email/_configure.php:36 destinations/ftp/_configure.php:204
 #: destinations/gdrive/_configure.php:449 destinations/local/_configure.php:89
 #: destinations/rackspace/_configure.php:123
 #: destinations/s3/_configure.php:202 destinations/s32/_configure.php:293
 #: destinations/s33/_configure.php:387 destinations/sftp/_configure.php:118
-#: destinations/site/_configure.php:135 destinations/stash2/_configure.php:320
-#: destinations/stash3/_configure.php:378
+#: destinations/site/_configure.php:135 destinations/stash2/_configure.php:317
+#: destinations/stash3/_configure.php:375
 msgid ""
 "[Default: unchecked] - When checked, this destination will be disabled and "
 "unusable until re-enabled. Use this if you need to temporary turn a "
 "destination off but don\\t want to delete it."
 msgstr ""
 
-#: destinations/dropbox2/_configure.php:201
+#: destinations/dropbox2/_configure.php:196
 #: destinations/email/_configure.php:38 destinations/ftp/_configure.php:206
 #: destinations/gdrive/_configure.php:451 destinations/local/_configure.php:91
 #: destinations/rackspace/_configure.php:125
 #: destinations/s3/_configure.php:204 destinations/s32/_configure.php:295
 #: destinations/s33/_configure.php:389 destinations/sftp/_configure.php:120
-#: destinations/site/_configure.php:137 destinations/stash2/_configure.php:322
-#: destinations/stash3/_configure.php:380
+#: destinations/site/_configure.php:137 destinations/stash2/_configure.php:319
+#: destinations/stash3/_configure.php:377
 msgid "Check to disable this destination until re-enabled."
 msgstr ""
 
-#: destinations/dropbox2/_manage.php:7 destinations/ftp/_manage.php:5
-#: destinations/gdrive/_manage.php:3 destinations/live/_manage.php:45
-#: destinations/live/_viewfiles.php:14
+#: destinations/dropbox2/_manage.php:7 destinations/gdrive/_manage.php:3
+#: destinations/live/_manage.php:45 destinations/live/_viewfiles.php:14
 #: destinations/live/_viewfiles_tables.php:14 destinations/local/_manage.php:4
 #: destinations/rackspace/_manage.php:3 destinations/s3/_manage.php:6
 #: destinations/s32/_manage.php:5 destinations/s33/_manage.php:5
@@ -3342,7 +3405,7 @@ msgstr ""
 msgid "Unable to delete one or more files. Details: "
 msgstr ""
 
-#: destinations/dropbox2/_manage.php:106
+#: destinations/dropbox2/_manage.php:111
 msgid "You have not completed sending any backups to this destination yet."
 msgstr ""
 
@@ -3352,7 +3415,7 @@ msgstr ""
 #: destinations/rackspace/init.php:62 destinations/s3/init.php:60
 #: destinations/s32/init.php:201 destinations/s33/init.php:196
 #: destinations/sftp/init.php:85 destinations/site/init.php:52
-#: destinations/stash2/init.php:73 destinations/stash3/init.php:73
+#: destinations/stash2/init.php:74 destinations/stash3/init.php:74
 msgid ""
 "Error #48933: This destination is currently disabled. Enable it under this "
 "destination's Advanced Settings."
@@ -3364,12 +3427,12 @@ msgstr ""
 msgid "Fatal Error #9034.84838. Unable to access fileoptions data."
 msgstr ""
 
-#: destinations/dropbox2/init.php:363 destinations/local/init.php:141
+#: destinations/dropbox2/init.php:364 destinations/local/init.php:141
 #: destinations/s3/init.php:147
 msgid "Fatal Error #9034.2344848. Unable to access fileoptions data."
 msgstr ""
 
-#: destinations/dropbox2/init.php:423
+#: destinations/dropbox2/init.php:424
 msgid "Dropbox remote limit could not delete %s backups."
 msgstr ""
 
@@ -3468,44 +3531,50 @@ msgstr ""
 msgid "Not supported by most servers"
 msgstr ""
 
-#: destinations/ftp/_manage.php:99 destinations/sftp/_manage.php:63
+#: destinations/ftp/_manage.php:12
+msgid ""
+"This destination is currently disabled based on its settings. Re-enable it "
+"under its Advanced Settings."
+msgstr ""
+
+#: destinations/ftp/_manage.php:53
+msgid "Unable to connect to FTPS  (check address/FTPS support)."
+msgstr ""
+
+#: destinations/ftp/_manage.php:56
+msgid "Connected to FTPs."
+msgstr ""
+
+#: destinations/ftp/_manage.php:59
+msgid "Your web server doesnt support FTPS in PHP."
+msgstr ""
+
+#: destinations/ftp/_manage.php:66
+msgid "ERROR: Unable to connect to FTP (check address)."
+msgstr ""
+
+#: destinations/ftp/_manage.php:69
+msgid "Connected to FTP."
+msgstr ""
+
+#: destinations/ftp/_manage.php:72
+msgid "Your web server doesnt support FTP in PHP."
+msgstr ""
+
+#: destinations/ftp/_manage.php:109 destinations/sftp/_manage.php:63
 msgid "Deleted %d file."
 msgid_plural "Deleted %d files."
 msgstr[0] ""
 msgstr[1] ""
 
-#: destinations/ftp/_manage.php:101 destinations/sftp/_manage.php:65
+#: destinations/ftp/_manage.php:111 destinations/sftp/_manage.php:65
 msgid "No backups were deleted."
 msgstr ""
 
-#: destinations/ftp/_manage.php:216 destinations/ftp/_manage.php:292
-msgid "Delete from FTP"
-msgstr ""
-
-#: destinations/ftp/_manage.php:224 destinations/ftp/_manage.php:239
-msgid "Backup File"
-msgstr ""
-
-#: destinations/ftp/_manage.php:225 destinations/ftp/_manage.php:240
-#: views/_backup-home.php:443 views/_backup_listing.php:159
-msgid "File Size"
-msgstr ""
-
-#: destinations/ftp/_manage.php:226 destinations/ftp/_manage.php:241
-#: destinations/live/_manage.php:341 destinations/live/_viewtables.php:41
-msgid "Modified"
-msgstr ""
-
-#: destinations/ftp/_manage.php:228 destinations/ftp/_manage.php:243
-msgid "Sorted by modified"
-msgstr ""
-
-#: destinations/ftp/_manage.php:231 destinations/ftp/_manage.php:245
-msgid "Actions"
-msgstr ""
-
-#: destinations/ftp/_manage.php:253
-msgid "This directory does not have any backups."
+#: destinations/ftp/_manage.php:229
+msgid ""
+"You have not completed sending any backups to this FTP destination for this "
+"site yet."
 msgstr ""
 
 #: destinations/ftp/init.php:77
@@ -3555,14 +3624,14 @@ msgid ""
 msgstr ""
 
 #: destinations/gdrive/_configure.php:331 destinations/s32/_configure.php:131
-#: destinations/s33/_configure.php:159 destinations/stash2/_configure.php:186
-#: destinations/stash3/_configure.php:191
+#: destinations/s33/_configure.php:159 destinations/stash2/_configure.php:183
+#: destinations/stash3/_configure.php:188
 msgid "Full backup limit"
 msgstr ""
 
 #: destinations/gdrive/_configure.php:332
-#: destinations/stash2/_configure.php:187
-#: destinations/stash3/_configure.php:192
+#: destinations/stash2/_configure.php:184
+#: destinations/stash3/_configure.php:189
 msgid ""
 "[Example: 5] - Enter 0 for no limit. This is the maximum number of Full "
 "(complete) backup archives to be stored in this specific destination. If "
@@ -3570,14 +3639,14 @@ msgid ""
 msgstr ""
 
 #: destinations/gdrive/_configure.php:340 destinations/s32/_configure.php:140
-#: destinations/s33/_configure.php:170 destinations/stash2/_configure.php:195
-#: destinations/stash3/_configure.php:202
+#: destinations/s33/_configure.php:170 destinations/stash2/_configure.php:192
+#: destinations/stash3/_configure.php:199
 msgid "Database only limit"
 msgstr ""
 
 #: destinations/gdrive/_configure.php:341
-#: destinations/stash2/_configure.php:196
-#: destinations/stash3/_configure.php:203
+#: destinations/stash2/_configure.php:193
+#: destinations/stash3/_configure.php:200
 msgid ""
 "[Example: 5] - Enter 0 for no limit. This is the maximum number of Database "
 "Only backup archives to be stored in this specific destination. If this "
@@ -3585,8 +3654,8 @@ msgid ""
 msgstr ""
 
 #: destinations/gdrive/_configure.php:350 destinations/s32/_configure.php:150
-#: destinations/s33/_configure.php:181 destinations/stash2/_configure.php:205
-#: destinations/stash3/_configure.php:214
+#: destinations/s33/_configure.php:181 destinations/stash2/_configure.php:202
+#: destinations/stash3/_configure.php:211
 msgid "Themes only limit"
 msgstr ""
 
@@ -3597,14 +3666,14 @@ msgstr ""
 #: destinations/s32/_configure.php:160 destinations/s32/_configure.php:169
 #: destinations/s32/_configure.php:178 destinations/s33/_configure.php:182
 #: destinations/s33/_configure.php:193 destinations/s33/_configure.php:204
-#: destinations/s33/_configure.php:215 destinations/stash2/_configure.php:206
-#: destinations/stash2/_configure.php:215
-#: destinations/stash2/_configure.php:224
-#: destinations/stash2/_configure.php:233
-#: destinations/stash3/_configure.php:215
-#: destinations/stash3/_configure.php:226
-#: destinations/stash3/_configure.php:237
-#: destinations/stash3/_configure.php:248
+#: destinations/s33/_configure.php:215 destinations/stash2/_configure.php:203
+#: destinations/stash2/_configure.php:212
+#: destinations/stash2/_configure.php:221
+#: destinations/stash2/_configure.php:230
+#: destinations/stash3/_configure.php:212
+#: destinations/stash3/_configure.php:223
+#: destinations/stash3/_configure.php:234
+#: destinations/stash3/_configure.php:245
 msgid ""
 "[Example: 5] - Enter 0 for no limit. This is the maximum number of this type "
 "of archive to be stored in this specific destination. If this limit is met "
@@ -3612,27 +3681,27 @@ msgid ""
 msgstr ""
 
 #: destinations/gdrive/_configure.php:359 destinations/s32/_configure.php:159
-#: destinations/s33/_configure.php:192 destinations/stash2/_configure.php:214
-#: destinations/stash3/_configure.php:225
+#: destinations/s33/_configure.php:192 destinations/stash2/_configure.php:211
+#: destinations/stash3/_configure.php:222
 msgid "Plugins only limit"
 msgstr ""
 
 #: destinations/gdrive/_configure.php:368 destinations/s32/_configure.php:168
-#: destinations/s33/_configure.php:203 destinations/stash2/_configure.php:223
-#: destinations/stash3/_configure.php:236
+#: destinations/s33/_configure.php:203 destinations/stash2/_configure.php:220
+#: destinations/stash3/_configure.php:233
 msgid "Media only limit"
 msgstr ""
 
 #: destinations/gdrive/_configure.php:377 destinations/s32/_configure.php:177
-#: destinations/s33/_configure.php:214 destinations/stash2/_configure.php:232
-#: destinations/stash3/_configure.php:247
+#: destinations/s33/_configure.php:214 destinations/stash2/_configure.php:229
+#: destinations/stash3/_configure.php:244
 msgid "Files only limit"
 msgstr ""
 
 #: destinations/gdrive/_configure.php:401 destinations/live/_configure.php:393
 #: destinations/s32/_configure.php:198 destinations/s33/_configure.php:263
-#: destinations/stash2/_configure.php:252
-#: destinations/stash3/_configure.php:268
+#: destinations/stash2/_configure.php:249
+#: destinations/stash3/_configure.php:265
 msgid "Send per burst"
 msgstr ""
 
@@ -3646,14 +3715,14 @@ msgid ""
 msgstr ""
 
 #: destinations/gdrive/_configure.php:412 destinations/s32/_configure.php:208
-#: destinations/s33/_configure.php:275 destinations/stash2/_configure.php:262
-#: destinations/stash3/_configure.php:280
+#: destinations/s33/_configure.php:275 destinations/stash2/_configure.php:259
+#: destinations/stash3/_configure.php:277
 msgid "Max time per chunk"
 msgstr ""
 
 #: destinations/gdrive/_configure.php:413 destinations/s32/_configure.php:209
-#: destinations/s33/_configure.php:276 destinations/stash2/_configure.php:263
-#: destinations/stash3/_configure.php:281
+#: destinations/s33/_configure.php:276 destinations/stash2/_configure.php:260
+#: destinations/stash3/_configure.php:278
 msgid ""
 "[Example: 30] - Enter 0 for no limit (aka no chunking; bursts may still "
 "occur based on burst size setting). This is the maximum number of seconds "
@@ -3664,8 +3733,8 @@ msgstr ""
 
 #: destinations/gdrive/_configure.php:416 destinations/live/_configure.php:447
 #: destinations/s32/_configure.php:212 destinations/s33/_configure.php:279
-#: destinations/stash2/_configure.php:266
-#: destinations/stash3/_configure.php:284 views/settings/_advanced.php:275
+#: destinations/stash2/_configure.php:263
+#: destinations/stash3/_configure.php:281 views/settings/_advanced.php:275
 msgid "Blank for detected default:"
 msgstr ""
 
@@ -3683,7 +3752,7 @@ msgstr ""
 msgid "Check to disable gzip compression."
 msgstr ""
 
-#: destinations/gdrive/_manage.php:147
+#: destinations/gdrive/_manage.php:151
 msgid ""
 "You have not completed sending any backups to Google Drive for this site yet."
 msgstr ""
@@ -3861,8 +3930,8 @@ msgid ""
 "use: /someplugin_.+/"
 msgstr ""
 
-#: destinations/live/_configure.php:394 destinations/stash2/_configure.php:253
-#: destinations/stash3/_configure.php:269
+#: destinations/live/_configure.php:394 destinations/stash2/_configure.php:250
+#: destinations/stash3/_configure.php:266
 msgid ""
 "[Example: 10] - This is the amount of data that will be sent per burst "
 "within a single PHP page load/chunk. Bursts happen within a single page "
@@ -3944,14 +4013,14 @@ msgid ""
 msgstr ""
 
 #: destinations/live/_configure.php:464 destinations/s32/_configure.php:230
-#: destinations/s33/_configure.php:307 destinations/stash2/_configure.php:284
-#: destinations/stash3/_configure.php:312
+#: destinations/s33/_configure.php:307 destinations/stash2/_configure.php:281
+#: destinations/stash3/_configure.php:309
 msgid "Use system CA bundle"
 msgstr ""
 
 #: destinations/live/_configure.php:465 destinations/s32/_configure.php:231
-#: destinations/s33/_configure.php:308 destinations/stash2/_configure.php:285
-#: destinations/stash3/_configure.php:313
+#: destinations/s33/_configure.php:308 destinations/stash2/_configure.php:282
+#: destinations/stash3/_configure.php:310
 msgid ""
 "[Default: disabled] - When enabled, BackupBuddy will use your web server's "
 "certificate bundle for connecting to the server instead of BackupBuddy "
@@ -3959,20 +4028,20 @@ msgid ""
 msgstr ""
 
 #: destinations/live/_configure.php:467 destinations/s32/_configure.php:233
-#: destinations/s33/_configure.php:310 destinations/stash2/_configure.php:287
-#: destinations/stash3/_configure.php:315
+#: destinations/s33/_configure.php:310 destinations/stash2/_configure.php:284
+#: destinations/stash3/_configure.php:312
 msgid "Use webserver certificate bundle instead of BackupBuddy's."
 msgstr ""
 
 #: destinations/live/_configure.php:475 destinations/s32/_configure.php:241
-#: destinations/s33/_configure.php:323 destinations/stash2/_configure.php:295
-#: destinations/stash3/_configure.php:328
+#: destinations/s33/_configure.php:323 destinations/stash2/_configure.php:292
+#: destinations/stash3/_configure.php:325
 msgid "Disable SSL Verifications"
 msgstr ""
 
 #: destinations/live/_configure.php:476 destinations/s32/_configure.php:242
-#: destinations/s33/_configure.php:324 destinations/stash2/_configure.php:296
-#: destinations/stash3/_configure.php:329
+#: destinations/s33/_configure.php:324 destinations/stash2/_configure.php:293
+#: destinations/stash3/_configure.php:326
 msgid ""
 "[Default: disabled] - When enabled, the SSL host and peer information will "
 "not be verified. While the connection will still be encrypted SSL's man-in-"
@@ -3981,22 +4050,22 @@ msgid ""
 msgstr ""
 
 #: destinations/live/_configure.php:478 destinations/s32/_configure.php:244
-#: destinations/s33/_configure.php:326 destinations/stash2/_configure.php:298
-#: destinations/stash3/_configure.php:331
+#: destinations/s33/_configure.php:326 destinations/stash2/_configure.php:295
+#: destinations/stash3/_configure.php:328
 msgid "Check only if directed by support. Use with caution."
 msgstr ""
 
 #: destinations/live/_configure.php:486 destinations/s3/_configure.php:164
 #: destinations/s32/_configure.php:219 destinations/s33/_configure.php:291
-#: destinations/stash2/_configure.php:273
-#: destinations/stash3/_configure.php:296
+#: destinations/stash2/_configure.php:270
+#: destinations/stash3/_configure.php:293
 msgid "Encrypt connection"
 msgstr ""
 
 #: destinations/live/_configure.php:487 destinations/s3/_configure.php:165
 #: destinations/s32/_configure.php:220 destinations/s33/_configure.php:292
-#: destinations/stash2/_configure.php:274
-#: destinations/stash3/_configure.php:297
+#: destinations/stash2/_configure.php:271
+#: destinations/stash3/_configure.php:294
 msgid ""
 "[Default: enabled] - When enabled, all transfers will be encrypted with SSL "
 "encryption. Disabling this may aid in connection troubles but results in "
@@ -4007,8 +4076,8 @@ msgstr ""
 
 #: destinations/live/_configure.php:489 destinations/s3/_configure.php:167
 #: destinations/s32/_configure.php:222 destinations/s33/_configure.php:294
-#: destinations/stash2/_configure.php:276
-#: destinations/stash3/_configure.php:299
+#: destinations/stash2/_configure.php:273
+#: destinations/stash3/_configure.php:296
 msgid "Enable connecting over SSL."
 msgstr ""
 
@@ -4252,7 +4321,7 @@ msgid ""
 "Enabled Live Files Backup and Restarted Periodic Process (forced to run now)."
 msgstr ""
 
-#: destinations/live/_manage.php:291 destinations/live/_manage.php:1004
+#: destinations/live/_manage.php:291 destinations/live/_manage.php:1011
 msgid "Pending"
 msgstr ""
 
@@ -4262,6 +4331,10 @@ msgstr ""
 
 #: destinations/live/_manage.php:296 destinations/live/_viewtables.php:17
 msgid "No"
+msgstr ""
+
+#: destinations/live/_manage.php:341 destinations/live/_viewtables.php:41
+msgid "Modified"
 msgstr ""
 
 #: destinations/live/_manage.php:342
@@ -4347,85 +4420,85 @@ msgstr ""
 msgid "pending deletion"
 msgstr ""
 
-#: destinations/live/_manage.php:632
+#: destinations/live/_manage.php:639
 msgid ""
 "Oops, something may have gone wrong (most errors try to fix themselves after "
 "a bit of time)"
 msgstr ""
 
-#: destinations/live/_manage.php:658
+#: destinations/live/_manage.php:665
 msgid "Building Snapshot"
 msgstr ""
 
-#: destinations/live/_manage.php:911 destinations/live/_manage.php:955
+#: destinations/live/_manage.php:918 destinations/live/_manage.php:962
 msgid "Last Activity"
 msgstr ""
 
-#: destinations/live/_manage.php:915 destinations/live/_manage.php:959
+#: destinations/live/_manage.php:922 destinations/live/_manage.php:966
 msgid "Next Full Scan"
 msgstr ""
 
-#: destinations/live/_manage.php:926 destinations/live/_manage.php:970
-#: destinations/live/_manage.php:1009
+#: destinations/live/_manage.php:933 destinations/live/_manage.php:977
+#: destinations/live/_manage.php:1016
 msgid "of"
 msgstr ""
 
-#: destinations/live/_manage.php:927
+#: destinations/live/_manage.php:934
 msgid "Tables"
 msgstr ""
 
-#: destinations/live/_manage.php:943 destinations/live/_manage.php:987
+#: destinations/live/_manage.php:950 destinations/live/_manage.php:994
 msgid "Resume"
 msgstr ""
 
-#: destinations/live/_manage.php:945 destinations/live/_manage.php:989
+#: destinations/live/_manage.php:952 destinations/live/_manage.php:996
 msgid "Pause"
 msgstr ""
 
-#: destinations/live/_manage.php:998
+#: destinations/live/_manage.php:1005
 msgid "Storage"
 msgstr ""
 
-#: destinations/live/_manage.php:1010
+#: destinations/live/_manage.php:1017
 msgid "Used"
 msgstr ""
 
-#: destinations/live/_manage.php:1012
+#: destinations/live/_manage.php:1019
 msgid "Storage Amount %s Currently Unavailable"
 msgstr ""
 
-#: destinations/live/_manage.php:1029
+#: destinations/live/_manage.php:1036
 msgid "Need More Storage?"
 msgstr ""
 
-#: destinations/live/_manage.php:1030
+#: destinations/live/_manage.php:1037
 msgid "Manage Remote Files"
 msgstr ""
 
-#. #-#-#-#-#  backupbuddy.pot (BackupBuddy 8.2.8.3)  #-#-#-#-#
+#. #-#-#-#-#  backupbuddy.pot (BackupBuddy 8.3.3.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: destinations/live/_manage.php:1037 helpers/privacy.php:21
+#: destinations/live/_manage.php:1044 helpers/privacy.php:21
 #: helpers/privacy.php:121 helpers/privacy.php:263
 msgid "BackupBuddy"
 msgstr ""
 
-#: destinations/live/_manage.php:1037
+#: destinations/live/_manage.php:1044
 msgid "requested new Stash Live snapshot files"
 msgstr ""
 
-#: destinations/live/_manage.php:1040
+#: destinations/live/_manage.php:1047
 msgid "View Last Snapshot Details"
 msgstr ""
 
-#: destinations/live/_manage.php:1044
+#: destinations/live/_manage.php:1051
 msgid "Need a more recent snapshot?"
 msgstr ""
 
-#: destinations/live/_manage.php:1045
+#: destinations/live/_manage.php:1052
 msgid "Create Manual Snapshot"
 msgstr ""
 
-#: destinations/live/_manage.php:1079
+#: destinations/live/_manage.php:1086
 msgid "Loading remote Snapshot files list..."
 msgstr ""
 
@@ -4822,7 +4895,7 @@ msgstr ""
 msgid "Use included certificate bundle."
 msgstr ""
 
-#: destinations/s3/_manage.php:189
+#: destinations/s3/_manage.php:194
 msgid ""
 "You have not completed sending any backups to this S3 destination for this "
 "site yet."
@@ -4882,13 +4955,13 @@ msgid ""
 "file listing request from the S3 servers."
 msgstr ""
 
-#: destinations/s32/_manage.php:183 destinations/s33/_manage.php:183
+#: destinations/s32/_manage.php:189 destinations/s33/_manage.php:188
 msgid ""
 "You have not completed sending any backups to this S3 v2 destination (bucket "
 "+ directory)."
 msgstr ""
 
-#: destinations/s32/_manage.php:185 destinations/s33/_manage.php:185
+#: destinations/s32/_manage.php:191 destinations/s33/_manage.php:190
 msgid ""
 "You have not completed sending any backups to this S3 v2 destination (bucket "
 "+ directory) for this site yet."
@@ -4916,19 +4989,19 @@ msgstr ""
 msgid "Additional charges may apply from Amazon."
 msgstr ""
 
-#: destinations/s33/_configure.php:339 destinations/stash3/_configure.php:344
+#: destinations/s33/_configure.php:339 destinations/stash3/_configure.php:341
 msgid "Enable SDK debug mode"
 msgstr ""
 
-#: destinations/s33/_configure.php:340 destinations/stash3/_configure.php:345
+#: destinations/s33/_configure.php:340 destinations/stash3/_configure.php:342
 msgid ""
 "[Default: disabled] - When enabled, additional data will be logged by the "
 "SDK for troubleshooting."
 msgstr ""
 
-#: destinations/s33/_configure.php:342 destinations/stash3/_configure.php:347
-#: views/settings/_advanced.php:445 views/settings/_advanced.php:490
-#: views/settings/_advanced.php:648
+#: destinations/s33/_configure.php:342 destinations/stash3/_configure.php:344
+#: views/settings/_advanced.php:459 views/settings/_advanced.php:504
+#: views/settings/_advanced.php:662
 msgid "Check if directed by support."
 msgstr ""
 
@@ -4939,7 +5012,7 @@ msgid ""
 "key file."
 msgstr ""
 
-#: destinations/sftp/_manage.php:146
+#: destinations/sftp/_manage.php:150
 msgid ""
 "You have not completed sending any backups to this sFTP destination for this "
 "site yet."
@@ -5232,61 +5305,61 @@ msgstr ""
 msgid "Log in with your iThemes.com member account to begin."
 msgstr ""
 
-#: destinations/stash2/_configure.php:148
-#: destinations/stash3/_configure.php:152
+#: destinations/stash2/_configure.php:145
+#: destinations/stash3/_configure.php:149
 msgid "To jump right in using the defaults just hit \"Add Destination\" below."
 msgstr ""
 
-#: destinations/stash2/_manage.php:208 destinations/stash3/_manage.php:208
+#: destinations/stash2/_manage.php:213 destinations/stash3/_manage.php:213
 msgid "Snapshots Stored Remotely on Stash Live Servers"
 msgstr ""
 
-#: destinations/stash2/_manage.php:210 destinations/stash3/_manage.php:210
+#: destinations/stash2/_manage.php:215 destinations/stash3/_manage.php:215
 msgid "Stash Traditional Backup Files"
 msgstr ""
 
-#: destinations/stash2/_manage.php:217 destinations/stash3/_manage.php:217
+#: destinations/stash2/_manage.php:222 destinations/stash3/_manage.php:222
 msgid ""
 "Your remote BackupBuddy Stash storage does not contain any Snapshot zip "
 "files yet. It may take several minutes after a Snapshot for them to display."
 msgstr ""
 
-#: destinations/stash2/_manage.php:219 destinations/stash3/_manage.php:219
+#: destinations/stash2/_manage.php:224 destinations/stash3/_manage.php:224
 msgid ""
 "Your remote BackupBuddy Stash storage does not contain any traditional "
 "backup zip files yet."
 msgstr ""
 
-#: destinations/stash2/_manage.php:228 destinations/stash3/_manage.php:228
+#: destinations/stash2/_manage.php:233 destinations/stash3/_manage.php:233
 #: views/_backup_listing.php:149
 msgid "Delete"
 msgstr ""
 
-#: destinations/stash2/init.php:410 destinations/stash3/init.php:412
+#: destinations/stash2/init.php:340 destinations/stash3/init.php:342
 msgid "Upgrade storage"
 msgstr ""
 
-#: destinations/stash3/_configure.php:132
+#: destinations/stash3/_configure.php:129
 msgid "Welcome to your BackupBuddy Stash"
 msgstr ""
 
-#: destinations/stash3/_configure.php:134
+#: destinations/stash3/_configure.php:131
 msgid "Your account is "
 msgstr ""
 
-#: destinations/stash3/_configure.php:137
+#: destinations/stash3/_configure.php:134
 msgid "LOCKED"
 msgstr ""
 
-#: destinations/stash3/_configure.php:139
+#: destinations/stash3/_configure.php:136
 msgid "EXPIRED"
 msgstr ""
 
-#: destinations/stash3/_configure.php:141
+#: destinations/stash3/_configure.php:138
 msgid "active"
 msgstr ""
 
-#: destinations/stash3/_configure.php:362
+#: destinations/stash3/_configure.php:359
 msgid ""
 "[Default: unchecked] - When checked, selecting this destination disables "
 "browsing or accessing files stored at this destination from within "
@@ -5378,51 +5451,51 @@ msgstr ""
 msgid "Rackspace Cloud"
 msgstr ""
 
-#: init_admin.php:138 init_admin.php:173 views/_backup-home.php:49
+#: init_admin.php:135 init_admin.php:170 views/_backup-home.php:49
 msgid "Backup"
 msgstr ""
 
-#: init_admin.php:143 init_admin.php:178
+#: init_admin.php:140 init_admin.php:175
 msgid "Remote Destinations"
 msgstr ""
 
-#: init_admin.php:144
+#: init_admin.php:141
 msgid "MS Import (beta)"
 msgstr ""
 
-#: init_admin.php:147 init_admin.php:181 views/scheduling.php:43
+#: init_admin.php:144 init_admin.php:178 views/scheduling.php:43
 msgid "Schedules"
 msgstr ""
 
-#: init_admin.php:158
+#: init_admin.php:155
 msgid "MS Export (experimental)"
 msgstr ""
 
-#: init_admin.php:161
+#: init_admin.php:158
 msgid "MS Export SA (experimental)"
 msgstr ""
 
-#: init_admin.php:216
+#: init_admin.php:213
 msgid "Tutorials & Support"
 msgstr ""
 
-#: init_admin.php:218
+#: init_admin.php:215
 msgid "Getting Started eBook"
 msgstr ""
 
-#: init_admin.php:220
+#: init_admin.php:217
 msgid "Knowledge Base & Tutorials"
 msgstr ""
 
-#: init_global.php:134
+#: init_global.php:151
 msgid "You have not completed your first BackupBuddy backup."
 msgstr ""
 
-#: init_global.php:141
+#: init_global.php:158
 msgid "It has been over a month since your last BackupBuddy backup completed."
 msgstr ""
 
-#: init_global.php:157
+#: init_global.php:174
 msgid "You do not currently have any backup schedules in BackupBuddy."
 msgstr ""
 
@@ -7508,7 +7581,7 @@ msgstr ""
 msgid "year"
 msgstr ""
 
-#: pluginbuddy/classes/settings.php:292
+#: pluginbuddy/classes/settings.php:294
 msgid "Settings saved."
 msgstr ""
 
@@ -7545,6 +7618,10 @@ msgstr ""
 
 #: views/_backup-home.php:442
 msgid "Type | Profile"
+msgstr ""
+
+#: views/_backup-home.php:443 views/_backup_listing.php:159
+msgid "File Size"
 msgstr ""
 
 #: views/_backup-home.php:490
@@ -8064,7 +8141,7 @@ msgid ""
 "size limits."
 msgstr ""
 
-#: views/settings/_advanced.php:272 views/settings/_advanced.php:726
+#: views/settings/_advanced.php:272 views/settings/_advanced.php:740
 msgid "Maximum time per chunk"
 msgstr ""
 
@@ -8114,8 +8191,8 @@ msgstr ""
 msgid "Everything (troubleshooting mode)"
 msgstr ""
 
-#: views/settings/_advanced.php:315 views/settings/_advanced.php:350
-#: views/settings/_advanced.php:362
+#: views/settings/_advanced.php:315 views/settings/_advanced.php:364
+#: views/settings/_advanced.php:376
 msgid ""
 "[Default: Errors Only] - This option controls how much activity is logged "
 "for records or troubleshooting. Logs may be viewed from the Logs / Other tab "
@@ -8124,11 +8201,31 @@ msgid ""
 "file: %s"
 msgstr ""
 
-#: views/settings/_advanced.php:327
+#: views/settings/_advanced.php:324
+msgid "Recent Edits Tracking Mode"
+msgstr ""
+
+#: views/settings/_advanced.php:326 views/widgets/dashboard.php:37
+msgid "Basic"
+msgstr ""
+
+#: views/settings/_advanced.php:327 views/settings/_profiles-advanced.php:26
+#: views/widgets/dashboard.php:39
+msgid "Advanced"
+msgstr ""
+
+#: views/settings/_advanced.php:329
+msgid ""
+"[Default: Basic] - Adjusts levels of recent edits tracking. Basic tracks "
+"posts, pages, media, and plugin changes. Advanced adds tracking for settings/"
+"options along with a more detailed dashboard widget."
+msgstr ""
+
+#: views/settings/_advanced.php:341
 msgid "Temporarily save full backup status logs"
 msgstr ""
 
-#: views/settings/_advanced.php:328
+#: views/settings/_advanced.php:342
 msgid ""
 "[Default: Checked] When checked BackupBuddy will temporarily (~10 days) save "
 "the complete full backup status log, regardless of the Logging Level "
@@ -8136,135 +8233,135 @@ msgid ""
 "hovering a backup on the Backups page and clicking \"View Log\"."
 msgstr ""
 
-#: views/settings/_advanced.php:330
+#: views/settings/_advanced.php:344
 msgid "Temporarily save full backup status logs."
 msgstr ""
 
-#: views/settings/_advanced.php:338
+#: views/settings/_advanced.php:352
 msgid "Maximum main log file size"
 msgstr ""
 
-#: views/settings/_advanced.php:339
+#: views/settings/_advanced.php:353
 msgid ""
 "[Default: 10 MB] - If the log file exceeds this size then it will be cleared "
 "to prevent it from using too much space."
 msgstr ""
 
-#: views/settings/_advanced.php:349
+#: views/settings/_advanced.php:363
 msgid "Recent remote send stats max age"
 msgstr ""
 
-#: views/settings/_advanced.php:351
+#: views/settings/_advanced.php:365
 msgid ""
 "[Default: 7 days] - Number of days to store recently sent file statistics & "
 "logs. Valid options are 1 to 90 days."
 msgstr ""
 
-#: views/settings/_advanced.php:361
+#: views/settings/_advanced.php:375
 msgid "Recent remote send stats max number"
 msgstr ""
 
-#: views/settings/_advanced.php:363
+#: views/settings/_advanced.php:377
 msgid ""
 "[Default: 7 days] - Maximum number of recently sent file statistics & logs "
 "to store. Valid options are 1 to 25 sends."
 msgstr ""
 
-#: views/settings/_advanced.php:373
+#: views/settings/_advanced.php:387
 msgid "Maximum days to keep recent activity"
 msgstr ""
 
-#: views/settings/_advanced.php:374
+#: views/settings/_advanced.php:388
 msgid ""
 "[Default: 21 days] - Number of days to store recent activity notifications / "
 "audits."
 msgstr ""
 
-#: views/settings/_advanced.php:385
+#: views/settings/_advanced.php:399
 msgid "Technical & Server Compatibility"
 msgstr ""
 
-#: views/settings/_advanced.php:393
+#: views/settings/_advanced.php:407
 msgid "Default global backup mode"
 msgstr ""
 
-#: views/settings/_advanced.php:395 views/settings/_profiles-advanced.php:80
+#: views/settings/_advanced.php:409 views/settings/_profiles-advanced.php:80
 msgid "Classic (v1.x) - Entire backup in single PHP page load"
 msgstr ""
 
-#: views/settings/_advanced.php:396 views/settings/_profiles-advanced.php:81
+#: views/settings/_advanced.php:410 views/settings/_profiles-advanced.php:81
 msgid "Modern (v2.x+) - Split across page loads via WP cron"
 msgstr ""
 
-#: views/settings/_advanced.php:398 views/settings/_profiles-advanced.php:83
+#: views/settings/_advanced.php:412 views/settings/_profiles-advanced.php:83
 msgid ""
 "[Default: Modern] - If you are encountering difficulty backing up due to "
 "WordPress cron, HTTP Loopbacks, or other features specific to version 2.x "
 "you can try classic mode which runs like BackupBuddy v1.x did."
 msgstr ""
 
-#: views/settings/_advanced.php:410
+#: views/settings/_advanced.php:424
 msgid "Delete all backup archives prior to backups"
 msgstr ""
 
-#: views/settings/_advanced.php:411
+#: views/settings/_advanced.php:425
 msgid ""
 "[Default: disabled] - When enabled all local backup archives will be deleted "
 "prior to each backup. This is useful if in compatibilty mode to prevent "
 "backing up existing files."
 msgstr ""
 
-#: views/settings/_advanced.php:413
+#: views/settings/_advanced.php:427
 msgid "Use if exclusions are malfunctioning or for special purposes."
 msgstr ""
 
-#: views/settings/_advanced.php:426
+#: views/settings/_advanced.php:440
 msgid "Disable local SSL certificate verification"
 msgstr ""
 
-#: views/settings/_advanced.php:427
+#: views/settings/_advanced.php:441
 msgid ""
 "[Default: Disabled] When checked, WordPress will skip local https SSL "
 "verification."
 msgstr ""
 
-#: views/settings/_advanced.php:429
+#: views/settings/_advanced.php:443
 msgid ""
 "Workaround if local SSL verification fails (ie. for loopback & local CA cert "
 "issues)."
 msgstr ""
 
-#: views/settings/_advanced.php:442
+#: views/settings/_advanced.php:456
 msgid "Prevent Flushing"
 msgstr ""
 
-#: views/settings/_advanced.php:443
+#: views/settings/_advanced.php:457
 msgid ""
 "[Default: not prevented (unchecked)] - Rarely some servers die unexpectedly "
 "when flush() or ob_flush() are called multiple times during the same PHP "
 "process. Checking this prevents these from ever being called during backups."
 msgstr ""
 
-#: views/settings/_advanced.php:457
+#: views/settings/_advanced.php:471
 msgid "Save meta data in comment"
 msgstr ""
 
-#: views/settings/_advanced.php:458
+#: views/settings/_advanced.php:472
 msgid ""
 "[Default: Enabled] When enabled, BackupBuddy will store general backup "
 "information in the ZIP comment header such as Site URL, backup type & time, "
 "serial, etc. during backup creation."
 msgstr ""
 
-#: views/settings/_advanced.php:460
+#: views/settings/_advanced.php:474
 msgid "If backups hang when saving meta data disabling skips this process."
 msgstr ""
 
-#: views/settings/_advanced.php:472 views/settings/_profiles-advanced.php:65
+#: views/settings/_advanced.php:486 views/settings/_profiles-advanced.php:65
 msgid "Perform integrity check on backup files"
 msgstr ""
 
-#: views/settings/_advanced.php:473 views/settings/_profiles-advanced.php:66
+#: views/settings/_advanced.php:487 views/settings/_profiles-advanced.php:66
 msgid ""
 "[Default: enabled] - WARNING: USE WITH CAUTION! By default each backup file "
 "is checked for integrity and completion the first time it is viewed on the "
@@ -8273,15 +8370,15 @@ msgid ""
 "the backup page will not load."
 msgstr ""
 
-#: views/settings/_advanced.php:475
+#: views/settings/_advanced.php:489
 msgid "Uncheck if directed by support."
 msgstr ""
 
-#: views/settings/_advanced.php:487
+#: views/settings/_advanced.php:501
 msgid "Reschedule missing crons in manual backups"
 msgstr ""
 
-#: views/settings/_advanced.php:488
+#: views/settings/_advanced.php:502
 msgid ""
 "[Default: disabled] - To proceed to subsequent steps during backups "
 "BackupBuddy schedules the next step with the WordPress cron system.  If this "
@@ -8289,11 +8386,11 @@ msgid ""
 "BackupBuddy to attempt to re-schedule this cron as it occurs."
 msgstr ""
 
-#: views/settings/_advanced.php:502
+#: views/settings/_advanced.php:516
 msgid "Skip chained spawn of cron"
 msgstr ""
 
-#: views/settings/_advanced.php:503
+#: views/settings/_advanced.php:517
 msgid ""
 "[Default: disabled] - When skipping is enabled BackupBuddy will not call "
 "spawn_cron() in an attempt to force a single chaining of the cron process "
@@ -8303,26 +8400,26 @@ msgid ""
 "potential infinite chaining loops."
 msgstr ""
 
-#: views/settings/_advanced.php:505
+#: views/settings/_advanced.php:519
 msgid "Check to skip chaining from web-based page loads (as applicable)."
 msgstr ""
 
-#: views/settings/_advanced.php:517
+#: views/settings/_advanced.php:531
 msgid "Deployment: Verify SSL Cert"
 msgstr ""
 
-#: views/settings/_advanced.php:518
+#: views/settings/_advanced.php:532
 msgid ""
 "[Default: enabled] - When disabled BackupBuddy will not verify the SSL "
 "certificate authenticity of the remote end (outgoing connections). The "
 "connection will still be encrypted."
 msgstr ""
 
-#: views/settings/_advanced.php:527
+#: views/settings/_advanced.php:541
 msgid "Force cron if behind by X seconds"
 msgstr ""
 
-#: views/settings/_advanced.php:528
+#: views/settings/_advanced.php:542
 msgid ""
 "[Default: blank] - When in the default modern mode BackupBuddy schedules "
 "each backup step with the WordPress simulated cron. If cron steps are not "
@@ -8331,15 +8428,15 @@ msgid ""
 "the cron step now. Manual backups only; not scheduled."
 msgstr ""
 
-#: views/settings/_advanced.php:530
+#: views/settings/_advanced.php:544
 msgid "Leave blank for default of no forcing."
 msgstr ""
 
-#: views/settings/_advanced.php:538
+#: views/settings/_advanced.php:552
 msgid "PHP runtime test interval"
 msgstr ""
 
-#: views/settings/_advanced.php:539
+#: views/settings/_advanced.php:553
 msgid ""
 "[Default: 604800 (weekly)] - By default BackupBuddy will regularly perform "
 "an actual test of your PHP maximum execution time limit. Many hosts "
@@ -8348,15 +8445,15 @@ msgid ""
 "0 (zero) to disable this test."
 msgstr ""
 
-#: views/settings/_advanced.php:541 views/settings/_advanced.php:552
+#: views/settings/_advanced.php:555 views/settings/_advanced.php:566
 msgid "Set to zero (0) to disable."
 msgstr ""
 
-#: views/settings/_advanced.php:549
+#: views/settings/_advanced.php:563
 msgid "PHP memory test interval"
 msgstr ""
 
-#: views/settings/_advanced.php:550
+#: views/settings/_advanced.php:564
 msgid ""
 "[Default: 604800 (weekly)] - By default BackupBuddy will regularly perform "
 "an actual test of your PHP maximum memory limit. Many hosts misreport this "
@@ -8364,23 +8461,23 @@ msgid ""
 "to confirm. Set to 0 (zero) to disable this test."
 msgstr ""
 
-#: views/settings/_advanced.php:570
+#: views/settings/_advanced.php:584
 msgid "Database method strategy"
 msgstr ""
 
-#: views/settings/_advanced.php:572
+#: views/settings/_advanced.php:586
 msgid "PHP-based: Supports automated chunked resuming - default"
 msgstr ""
 
-#: views/settings/_advanced.php:573
+#: views/settings/_advanced.php:587
 msgid "Commandline: Fast but does not support resuming"
 msgstr ""
 
-#: views/settings/_advanced.php:574
+#: views/settings/_advanced.php:588
 msgid "All Available: ( PHP [chunking] > Commandline via exec()  )"
 msgstr ""
 
-#: views/settings/_advanced.php:576
+#: views/settings/_advanced.php:590
 msgid ""
 "[Default: PHP-based] - Normally use PHP-based which supports chunking (as of "
 "BackupBuddy v5) to support larger databases. Commandline-based database "
@@ -8389,27 +8486,27 @@ msgid ""
 "larger servers."
 msgstr ""
 
-#: views/settings/_advanced.php:588 views/settings/_profiles-advanced.php:47
+#: views/settings/_advanced.php:602 views/settings/_profiles-advanced.php:47
 msgid "Skip database dump on backup"
 msgstr ""
 
-#: views/settings/_advanced.php:589 views/settings/_profiles-advanced.php:48
+#: views/settings/_advanced.php:603 views/settings/_profiles-advanced.php:48
 msgid ""
 "[Default: disabled] - (WARNING: This prevents BackupBuddy from backing up "
 "the database during any kind of backup. This is for troubleshooting / "
 "advanced usage only to work around being unable to backup the database."
 msgstr ""
 
-#: views/settings/_advanced.php:591
+#: views/settings/_advanced.php:605
 msgid ""
 "Completely bypass backing up database for all database types. Use caution."
 msgstr ""
 
-#: views/settings/_advanced.php:604
+#: views/settings/_advanced.php:618
 msgid "Break out big table dumps into steps"
 msgstr ""
 
-#: views/settings/_advanced.php:605
+#: views/settings/_advanced.php:619
 msgid ""
 "[Default: enabled] When enabled, BackupBuddy will dump some of the commonly "
 "larger tables in separate steps. Note this only applies to command-line "
@@ -8417,15 +8514,15 @@ msgid ""
 "table and/or row as needed."
 msgstr ""
 
-#: views/settings/_advanced.php:607
+#: views/settings/_advanced.php:621
 msgid "Commandline method: Break up dumping of big tables (chunking)"
 msgstr ""
 
-#: views/settings/_advanced.php:619
+#: views/settings/_advanced.php:633
 msgid "Use separate files per table (when possible)"
 msgstr ""
 
-#: views/settings/_advanced.php:620
+#: views/settings/_advanced.php:634
 msgid ""
 "[Default: enabled] When enabled, BackupBuddy will dump individual tables to "
 "their own database file (eg wp_options.sql, wp_posts.sql, etc) when possible "
@@ -8433,15 +8530,15 @@ msgid ""
 "tables is enabled."
 msgstr ""
 
-#: views/settings/_advanced.php:622
+#: views/settings/_advanced.php:636
 msgid "Uncheck to force dumping all tables into a single db_1.sql file."
 msgstr ""
 
-#: views/settings/_advanced.php:630
+#: views/settings/_advanced.php:644
 msgid "Compatibility mode max rows per select"
 msgstr ""
 
-#: views/settings/_advanced.php:631
+#: views/settings/_advanced.php:645
 msgid ""
 "[Default: *blank*] - When BackupBuddy is using compatibility mode mysql "
 "dumping (via PHP), BackupBuddy selects data from the database. Reducing this "
@@ -8449,15 +8546,15 @@ msgid ""
 "Leave blank to use built in default (around 2000 rows per select)."
 msgstr ""
 
-#: views/settings/_advanced.php:633
+#: views/settings/_advanced.php:647
 msgid "Blank for default."
 msgstr ""
 
-#: views/settings/_advanced.php:645
+#: views/settings/_advanced.php:659
 msgid "Skip max command line length check "
 msgstr ""
 
-#: views/settings/_advanced.php:646
+#: views/settings/_advanced.php:660
 msgid ""
 "[Default: disabled] - WARNING: BackupBuddy attempts to determine your "
 "system's maximum command line length to insure that database operation "
@@ -8468,78 +8565,78 @@ msgid ""
 "command line length check."
 msgstr ""
 
-#: views/settings/_advanced.php:657
+#: views/settings/_advanced.php:671
 msgid "Zip"
 msgstr ""
 
-#: views/settings/_advanced.php:668
+#: views/settings/_advanced.php:682
 msgid "Enable zip compression"
 msgstr ""
 
-#: views/settings/_advanced.php:669
+#: views/settings/_advanced.php:683
 msgid ""
 "[Default: enabled] - ZIP compression decreases file sizes of stored backups. "
 "If you are encountering timeouts due to the script running too long, "
 "disabling compression may allow the process to complete faster."
 msgstr ""
 
-#: views/settings/_advanced.php:671
+#: views/settings/_advanced.php:685
 msgid ""
 "Unchecking typically DOUBLES the amount of data which may be zipped up "
 "before timeouts."
 msgstr ""
 
-#: views/settings/_advanced.php:679
+#: views/settings/_advanced.php:693
 msgid "Zip method strategy"
 msgstr ""
 
-#: views/settings/_advanced.php:681
+#: views/settings/_advanced.php:695
 msgid "Best Available"
 msgstr ""
 
-#: views/settings/_advanced.php:682
+#: views/settings/_advanced.php:696
 msgid "All Available"
 msgstr ""
 
-#: views/settings/_advanced.php:683
+#: views/settings/_advanced.php:697
 msgid "Force Compatibility"
 msgstr ""
 
-#: views/settings/_advanced.php:685
+#: views/settings/_advanced.php:699
 msgid ""
 "[Default: Best Only] - Normally use Best Available but if the server is "
 "unreliable in this mode can try All Available or Force Compatibility"
 msgstr ""
 
-#: views/settings/_advanced.php:686
+#: views/settings/_advanced.php:700
 msgid "Select Force Compatibility if absolutely necessary."
 msgstr ""
 
-#: views/settings/_advanced.php:698
+#: views/settings/_advanced.php:712
 msgid "Alternative zip system (BETA)"
 msgstr ""
 
-#: views/settings/_advanced.php:699
+#: views/settings/_advanced.php:713
 msgid "[Default: Disabled] Use if directed by support."
 msgstr ""
 
-#: views/settings/_advanced.php:710
+#: views/settings/_advanced.php:724
 msgid "Zip build strategy"
 msgstr ""
 
-#: views/settings/_advanced.php:712
+#: views/settings/_advanced.php:726
 msgid "Single-Burst/Single-Step"
 msgstr ""
 
-#: views/settings/_advanced.php:713
+#: views/settings/_advanced.php:727
 msgid "Multi-Burst/Single-Step"
 msgstr ""
 
-#: views/settings/_advanced.php:714
+#: views/settings/_advanced.php:728
 msgid "Multi-Burst/Multi-Step"
 msgstr ""
 
-#: views/settings/_advanced.php:716
+#: views/settings/_advanced.php:730
 msgid ""
 "[Default: Multi-Burst/Single-Step] - Most backups can complete the zip build "
 "with the multi-burst/single-step strategy. Single-Burst/Single-Step can give "
@@ -8547,11 +8644,11 @@ msgid ""
 "servers that timeout during the zip build."
 msgstr ""
 
-#: views/settings/_advanced.php:717
+#: views/settings/_advanced.php:731
 msgid "Select Multi-Burst/Multi-Step if server timing out during zip build"
 msgstr ""
 
-#: views/settings/_advanced.php:727
+#: views/settings/_advanced.php:741
 msgid ""
 "[Default: *blank* - 30s] - The maximum amount of time BackupBuddy should "
 "allow a zip archive build to run before pausing and scheduling a "
@@ -8564,15 +8661,15 @@ msgid ""
 "constraints will help your backup progress."
 msgstr ""
 
-#: views/settings/_advanced.php:729
+#: views/settings/_advanced.php:743
 msgid "Blank for default (30s), 0 for infinite"
 msgstr ""
 
-#: views/settings/_advanced.php:738
+#: views/settings/_advanced.php:752
 msgid "Gap between zip build bursts"
 msgstr ""
 
-#: views/settings/_advanced.php:739
+#: views/settings/_advanced.php:753
 msgid ""
 "[Default: *blank* - 2s] - The time gap BackupBuddy will apply between each "
 "zip archive build burst. Some servers/hosting may benefit from having a "
@@ -8582,15 +8679,15 @@ msgid ""
 "too high some servers may prematurely timeout without notice."
 msgstr ""
 
-#: views/settings/_advanced.php:741
+#: views/settings/_advanced.php:755
 msgid "Blank for default (2s)"
 msgstr ""
 
-#: views/settings/_advanced.php:750
+#: views/settings/_advanced.php:764
 msgid "Minimum content size for a single burst (MB)"
 msgstr ""
 
-#: views/settings/_advanced.php:751
+#: views/settings/_advanced.php:765
 msgid ""
 "[Default: 10] - The minimum content size that BackupBuddy will try for in a "
 "zip build burst. If a zip build requires multiple bursts then the actual "
@@ -8598,15 +8695,15 @@ msgid ""
 "imposd by the maximum burst content size setting."
 msgstr ""
 
-#: views/settings/_advanced.php:753
+#: views/settings/_advanced.php:767
 msgid "Blank for default (10MB), 0 for no minimum"
 msgstr ""
 
-#: views/settings/_advanced.php:762
+#: views/settings/_advanced.php:776
 msgid "Maximum content size for a single burst (MB)"
 msgstr ""
 
-#: views/settings/_advanced.php:763
+#: views/settings/_advanced.php:777
 msgid ""
 "[Default: 100] - The maximum content size that BackupBuddy will try for in a "
 "zip build burst. If a zip build requires multiple bursts then the actual "
@@ -8614,15 +8711,15 @@ msgid ""
 "imposd by the maximum burst content size setting."
 msgstr ""
 
-#: views/settings/_advanced.php:765
+#: views/settings/_advanced.php:779
 msgid "Blank for default (100MB), 0 for no maximum"
 msgstr ""
 
-#: views/settings/_advanced.php:778
+#: views/settings/_advanced.php:792
 msgid "Disable zip method caching"
 msgstr ""
 
-#: views/settings/_advanced.php:779
+#: views/settings/_advanced.php:793
 msgid ""
 "[Default: Disabled] Use if directed by support. Bypasses caching available "
 "zip methods so they are always displayed in logs. When unchecked BackupBuddy "
@@ -8631,22 +8728,22 @@ msgid ""
 "results unless you disable caching."
 msgstr ""
 
-#: views/settings/_advanced.php:793
+#: views/settings/_advanced.php:807
 msgid "Ignore zip archive warnings"
 msgstr ""
 
-#: views/settings/_advanced.php:794
+#: views/settings/_advanced.php:808
 msgid ""
 "[Default: Enabled] When enabled BackupBuddy will ignore non-fatal warnings "
 "encountered during the backup process such as inability to read or access a "
 "file, symlink problems, etc. These non-fatal warnings will still be logged."
 msgstr ""
 
-#: views/settings/_advanced.php:808
+#: views/settings/_advanced.php:822
 msgid "Ignore/do-not-follow symbolic links"
 msgstr ""
 
-#: views/settings/_advanced.php:809
+#: views/settings/_advanced.php:823
 msgid ""
 "[Default: Enabled] When enabled BackupBuddy will ignore/not-follow symbolic "
 "links encountered during the backup process"
@@ -9149,10 +9246,6 @@ msgstr ""
 msgid "Remote API Log (incoming calls)"
 msgstr ""
 
-#: views/settings/_profiles-advanced.php:26
-msgid "Advanced"
-msgstr ""
-
 #: views/settings/_profiles-advanced.php:62
 msgid "Disable if directed by support"
 msgstr ""
@@ -9181,8 +9274,16 @@ msgstr ""
 msgid "Manage Stash Live"
 msgstr ""
 
-#: views/widgets/dashboard.php:70
+#: views/widgets/dashboard.php:141
 msgid "Backup Now"
+msgstr ""
+
+#: views/widgets/recent-edits.php:14
+msgid "Recent Edits Summary"
+msgstr ""
+
+#: views/widgets/recent-edits.php:57
+msgid "Last Updated"
 msgstr ""
 
 #. Plugin URI of the plugin/theme

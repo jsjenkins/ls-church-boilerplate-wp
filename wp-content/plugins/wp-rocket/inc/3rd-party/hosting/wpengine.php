@@ -19,6 +19,8 @@ if ( class_exists( 'WpeCommon' ) && function_exists( 'wpe_param' ) ) {
 	add_filter( 'rocket_varnish_field_settings', 'rocket_wpengine_varnish_field' );
 
 	add_filter( 'rocket_display_input_varnish_auto_purge', '__return_false' );
+	// Prevent mandatory cookies on hosting with server cache.
+	add_filter( 'rocket_cache_mandatory_cookies', '__return_empty_array', PHP_INT_MAX );
 
 	/**
 	 * Always keep WP_CACHE constant to true
@@ -47,7 +49,8 @@ if ( class_exists( 'WpeCommon' ) && function_exists( 'wpe_param' ) ) {
 	function rocket_run_rocket_bot_after_wpengine() {
 		if ( wpe_param( 'purge-all' ) && defined( 'PWP_NAME' ) && check_admin_referer( PWP_NAME . '-config' ) ) {
 			// Preload cache.
-			run_rocket_preload_cache( 'cache-preload' );
+			run_rocket_bot();
+			run_rocket_sitemap_preload();
 		}
 	}
 	add_action( 'admin_init', 'rocket_run_rocket_bot_after_wpengine' );

@@ -203,9 +203,9 @@ class Client
 	   $header = "Dropbox-API-Arg: " . json_encode( array(
         	"path" => $path,
         ) );
-        
+
         $curl->addHeader( $header );
-        
+
         $curl->set(CURLOPT_CUSTOMREQUEST, "POST");
         $curl->addHeader("Content-Type: application/octet-stream");
 
@@ -526,20 +526,20 @@ class Client
             //$writeMode->getExtraParams());
 
         $curl = $this->mkCurl($url);
-        
-        
+
+
         $header = "Dropbox-API-Arg: " . json_encode( array(
         	"path" => $path,
 	    "mode" => "add",
 	    "autorename" => true,
 	    "mute" => false)
         );
-        
+
         $curl->addHeader( $header );
-        
+
         $curl->set(CURLOPT_CUSTOMREQUEST, "POST");
         $curl->addHeader("Content-Type: application/octet-stream");
-        
+
         $curlConfigClosure($curl);
 
         $curl->set(CURLOPT_RETURNTRANSFER, true);
@@ -571,7 +571,7 @@ class Client
 
         $response = $this->_chunkedUpload(array(), $data);
         \pb_backupbuddy::status( 'details', 'chunkedUploadStart response: `' . print_r( $response, true ) . '`.' );
-        
+
         if ($response->statusCode === 404) {
             throw new Exception_BadResponse("Got a 404, but we didn't send up an 'session_id'");
         }
@@ -622,8 +622,8 @@ class Client
         Checker::argStringNonEmpty("uploadId", $uploadId);
         Checker::argNat("byteOffset", $byteOffset);
         Checker::argString("data", $data);
-        
-        
+
+
         $response = $this->_chunkedUploadContinue(
             array("session_id" => $uploadId, "offset" => $byteOffset),
             $data
@@ -635,11 +635,11 @@ class Client
             return false;
         }
 
-       
+
         if ($response->statusCode !== 200) throw RequestUtil::unexpectedStatus($response);
 
         $nextByteOffset = $byteOffset + strlen($data);
-        
+
         \pb_backupbuddy::status( 'details', 'Next byte offset calculated by client lib: `' . $nextByteOffset . '`.' );
 
         return true;
@@ -703,15 +703,15 @@ class Client
      */
 	function chunkedUploadFinish($uploadId, $path, $writeMode,$byteOffset) {
 		\pb_backupbuddy::status( 'details', 'chunkedUploadFinish start.' );
-		
+
 		Checker::argStringNonEmpty("uploadId", $uploadId);
 		Path::checkArgNonRoot("path", $path);
 		WriteMode::checkArg("writeMode", $writeMode);
-		
+
 		\pb_backupbuddy::status( 'details', 'Prepping params for chunk finish. Session: `' . $uploadId . '`. Offset: `' . $byteOffset . '`.' );
-		
+
 		$params = $writeMode->getExtraParams();
-		
+
 		$header = "Dropbox-API-Arg: " .
 			json_encode(
 				array(
@@ -727,19 +727,19 @@ class Client
 					)
 				)
 			);
-		
+
 		if ( \pb_backupbuddy::$options['log_level'] == '3' ) { // Full logging enabled.
 			\pb_backupbuddy::status( 'details', 'Dropbox header: `' . $header . '`.' );
 		}
-		
+
 		$response = $this->doPost( $this->contentHost, "2/files/upload_session/finish", null, $header, 'application/octet-stream' );
-		
+
 		if ($response->statusCode === 404) return null;
 		if ($response->statusCode !== 200) {
 			\pb_backupbuddy::status( 'error', 'Error #38494834434: `' . print_r( $response, true ) . '`.' );
 			throw RequestUtil::unexpectedStatus($response);
 		}
-		
+
 		return RequestUtil::parseResponseJson($response->body);
 	}
 
@@ -751,14 +751,14 @@ class Client
     protected function _chunkedUpload($params, $data)
         // Marked 'protected' so I can override it in testing.
     {
-    	
+
     		\pb_backupbuddy::status( 'details', '_chunkedUpload start.' );
-    		
+
         $url = $this->buildUrlForGetOrPut(
             $this->contentHost, "2/files/upload_session/start" ); //, $params);
 
         $curl = $this->mkCurl($url);
-        
+
 
         // We can't use CURLOPT_PUT because it wants a stream, but we already have $data in memory.
         //$curl->set(CURLOPT_CUSTOMREQUEST, "PUT");
@@ -771,18 +771,18 @@ class Client
         \pb_backupbuddy::status( 'details', 'About to exec in _chunkedUpload.' );
         return $curl->exec( 'application/octet-stream' );
     }
-    
+
     protected function _chunkedUploadContinue($params, $data)
         // Marked 'protected' so I can override it in testing.
     {
-    	
+
     		\pb_backupbuddy::status( 'details', '_chunkedUpload continue.' );
-    		
+
         $url = $this->buildUrlForGetOrPut(
             $this->contentHost, "2/files/upload_session/append_v2" ); //, $params);
 
         $curl = $this->mkCurl($url);
-        
+
         $header = "Dropbox-API-Arg: " . json_encode( array( 'cursor' => array(
 				"session_id" => $params['session_id'],
 				"offset" => $params['offset'],
@@ -853,6 +853,10 @@ class Client
     {
         Path::checkArg("path", $path);
 
+        if ( '/' === $path ) {
+        	$path = '';
+        }
+
         return $this->_getMetadata($path, array("list" => "true", "file_limit" => "25000"));
     }
 
@@ -863,10 +867,9 @@ class Client
      */
     private function _getMetadata($path, $params)
     {
-    	
-    	
+
     	$params = array( 'path' => $path );
-    	
+
         $response = $this->doPost(
             $this->apiHost,
             "2/files/list_folder",

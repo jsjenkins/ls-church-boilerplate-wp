@@ -10,32 +10,45 @@ defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
  * @return  string  $buffer The content of avanced-cache.php file
  */
 function get_rocket_advanced_cache_file() {
-	$buffer  = '<?php' . "\n";
-	$buffer .= 'defined( \'ABSPATH\' ) or die( \'Cheatin\\\' uh?\' );' . "\n\n";
+	$buffer  = "<?php\n";
+	$buffer .= "defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );\n\n";
 
 	// Add a constant to be sure this is our file.
-	$buffer .= 'define( \'WP_ROCKET_ADVANCED_CACHE\', true );' . "\n";
+	$buffer .= "define( 'WP_ROCKET_ADVANCED_CACHE', true );\n";
 
 	// Get cache path.
-	$buffer .= '$rocket_cache_path = \'' . WP_ROCKET_CACHE_PATH . '\';' . "\n";
+	$buffer .= '$rocket_cache_path  = \'' . WP_ROCKET_CACHE_PATH . "';\n";
 
 	// Get config path.
-	$buffer .= '$rocket_config_path = \'' . WP_ROCKET_CONFIG_PATH . '\';' . "\n\n";
+	$buffer .= '$rocket_config_path = \'' . WP_ROCKET_CONFIG_PATH . "';\n\n";
 
 	// Include the Mobile Detect class if we have to create a different caching file for mobile.
 	if ( is_rocket_generate_caching_mobile_files() ) {
-		$buffer .= 'if ( file_exists( \'' . WP_ROCKET_VENDORS_PATH . 'classes/class-rocket-mobile-detect.php' . '\' ) && ! class_exists( \'Rocket_Mobile_Detect\' ) ) {' . "\n";
-		$buffer .= "\t" . 'include_once \'' . WP_ROCKET_VENDORS_PATH . 'classes/class-rocket-mobile-detect.php' . '\';' . "\n";
-		$buffer .= '}' . "\n";
+		$buffer .= "if ( file_exists( '" . WP_ROCKET_VENDORS_PATH . "classes/class-rocket-mobile-detect.php' ) && ! class_exists( 'Rocket_Mobile_Detect' ) ) {\n";
+		$buffer .= "\tinclude_once '" . WP_ROCKET_VENDORS_PATH . "classes/class-rocket-mobile-detect.php';\n";
+		$buffer .= "}\n\n";
+	}
+
+	// Register a class autoloader and include the process file.
+	$buffer .= "if ( file_exists( '" . WP_ROCKET_FRONT_PATH . "process.php' ) && version_compare( phpversion(), '" . WP_ROCKET_PHP_VERSION . "' ) >= 0 ) {\n\n";
+
+	// Class autoloader.
+	$autoloader = rocket_direct_filesystem()->get_contents( WP_ROCKET_INC_PATH . 'process-autoloader.php' );
+
+	if ( $autoloader ) {
+		$autoloader = preg_replace( '@^<\?php\s*@', '', $autoloader );
+		$autoloader = str_replace( [ "\n", "\n\t\n" ], [ "\n\t", "\n\n" ], trim( $autoloader ) );
+		$autoloader = str_replace( 'WP_ROCKET_PATH', "'" . WP_ROCKET_PATH . "'", $autoloader );
+
+		$buffer .= "\t$autoloader\n\n";
 	}
 
 	// Include the process file in buffer.
-	$buffer .= 'if ( file_exists( \'' . WP_ROCKET_FRONT_PATH . 'process.php' . '\' ) ) {' . "\n";
-	$buffer .= "\t" . 'include \'' . WP_ROCKET_FRONT_PATH . 'process.php' . '\';' . "\n";
-	$buffer .= '} else {' . "\n";
+	$buffer .= "\tinclude '" . WP_ROCKET_FRONT_PATH . "process.php';\n";
+	$buffer .= "} else {\n";
 	// Add a constant to provent include issue.
-	$buffer .= "\t" . 'define( \'WP_ROCKET_ADVANCED_CACHE_PROBLEM\', true );' . "\n";
-	$buffer .= '}';
+	$buffer .= "\tdefine( 'WP_ROCKET_ADVANCED_CACHE_PROBLEM', true );\n";
+	$buffer .= "}\n";
 
 	/**
 	 * Filter the content of advanced-cache.php file
@@ -50,13 +63,20 @@ function get_rocket_advanced_cache_file() {
 }
 
 /**
- * Create advanced-cache.php file
+ * Create advanced-cache.php file.
  *
  * @since 2.0
  *
  * @return void
  */
 function rocket_generate_advanced_cache_file() {
+	static $done = false;
+
+	if ( $done ) {
+		return;
+	}
+	$done = true;
+
 	rocket_put_content( WP_CONTENT_DIR . '/advanced-cache.php', get_rocket_advanced_cache_file() );
 }
 
@@ -90,6 +110,17 @@ function get_rocket_config_file() {
 	if ( apply_filters( 'rocket_common_cache_logged_users', false ) ) {
 		$buffer .= '$rocket_common_cache_logged_users = 1;' . "\n";
 	}
+
+	/**
+	 * Filters the use of the mobile cache version for tablets
+	 * 'desktop' will serve desktop to tablets, 'mobile' will serve mobile to tablets
+	 *
+	 * @since 3.2
+	 * @author Remy Perona
+	 *
+	 * @param string $tablet_version valid values are 'mobile' or 'desktop'
+	 */
+	$buffer .= '$rocket_cache_mobile_files_tablet = \'' . apply_filters( 'rocket_cache_mobile_files_tablet', 'desktop' ) . '\';' . "\n";
 
 	foreach ( $options as $option => $value ) {
 		if ( 'cache_ssl' === $option || 'cache_mobile' === $option || 'do_caching_mobile_files' === $option || 'secret_cache_key' === $option ) {
@@ -472,32 +503,45 @@ function rocket_clean_cache_busting( $extensions = array( 'js', 'css' ) ) {
 
 
 /**
- * Delete one or several cache files
+ * Delete one or several cache files.
  *
- * @since 2.0   Delete cache files for all users
- * @since 1.1.0 Add filter rocket_clean_files
+ * @since 2.0   Delete cache files for all users.
+ * @since 1.1.0 Add filter rocket_clean_files.
  * @since 1.0
  *
- * @param string|array $urls URLs of cache files to be deleted.
+ * @param  string|array $urls URLs of cache files to be deleted.
  * @return void
  */
 function rocket_clean_files( $urls ) {
-	if ( is_string( $urls ) ) {
-		$urls = (array) $urls;
-	}
+	$urls = (array) $urls;
 
 	/**
-	 * Filter URLs that the cache file to be deleted
+	 * Filter URLs that the cache file to be deleted.
 	 *
 	 * @since 1.1.0
+	 *
 	 * @param array URLs that will be returned.
 	*/
 	$urls = apply_filters( 'rocket_clean_files', $urls );
-	$urls = array_filter( $urls );
+	$urls = array_filter( (array) $urls );
+
+	if ( ! $urls ) {
+		return;
+	}
+
+	/**
+	 * Fires before all cache files are deleted.
+	 *
+	 * @since  3.2.2
+	 * @author Grégory Viguier
+	 *
+	 * @param array $urls The URLs corresponding to the deleted cache files.
+	*/
+	do_action( 'before_rocket_clean_files', $urls );
 
 	foreach ( $urls as $url ) {
 		/**
-		 * Fires before the cache file is deleted
+		 * Fires before the cache file is deleted.
 		 *
 		 * @since 1.0
 		 *
@@ -511,6 +555,7 @@ function rocket_clean_files( $urls ) {
 		}
 
 		$dirs = glob( WP_ROCKET_CACHE_PATH . rocket_remove_url_protocol( $url ), GLOB_NOSORT );
+
 		if ( $dirs ) {
 			foreach ( $dirs as $dir ) {
 				rocket_rrmdir( $dir );
@@ -518,7 +563,7 @@ function rocket_clean_files( $urls ) {
 		}
 
 		/**
-		 * Fires after the cache file is deleted
+		 * Fires after the cache file is deleted.
 		 *
 		 * @since 1.0
 		 *
@@ -526,6 +571,16 @@ function rocket_clean_files( $urls ) {
 		*/
 		do_action( 'after_rocket_clean_file', $url );
 	}
+
+	/**
+	 * Fires after all cache files are deleted.
+	 *
+	 * @since  3.2.2
+	 * @author Grégory Viguier
+	 *
+	 * @param array $urls The URLs corresponding to the deleted cache files.
+	*/
+	do_action( 'after_rocket_clean_files', $urls );
 }
 
 /**
@@ -712,30 +767,31 @@ function rocket_clean_domain( $lang = '' ) {
 }
 
 /**
- * Delete the caching files of a specific term
+ * Delete the caching files of a specific term.
  *
  * $since 2.6.8
  *
- * @param int    $term_id       The term ID.
- * @param string $taxonomy_slug The taxonomy slug.
+ * @param  int    $term_id       The term ID.
+ * @param  string $taxonomy_slug The taxonomy slug.
  * @return void
  */
 function rocket_clean_term( $term_id, $taxonomy_slug ) {
-	$purge_urls = array();
+	$purge_urls = [];
 
 	// Get all term infos.
 	$term = get_term_by( 'id', $term_id, $taxonomy_slug );
 
 	// Get the term language.
-	$lang = false;
+	$i18n_plugin = rocket_has_i18n();
 
-	// WPML.
-	if ( rocket_is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' ) && ! rocket_is_plugin_active( 'woocommerce-multilingual/wpml-woocommerce.php' ) ) {
+	if ( 'wpml' === $i18n_plugin && ! rocket_is_plugin_active( 'woocommerce-multilingual/wpml-woocommerce.php' ) ) {
+		// WPML.
 		$lang = $GLOBALS['sitepress']->get_language_for_element( $term_id, 'tax_' . $taxonomy_slug );
-
+	} elseif ( 'polylang' === $i18n_plugin ) {
 		// Polylang.
-	} elseif ( rocket_is_plugin_active( 'polylang/polylang.php' ) || rocket_is_plugin_active( 'polylang-pro/polylang.php' ) ) {
 		$lang = pll_get_term_language( $term_id );
+	} else {
+		$lang = false;
 	}
 
 	// Get permalink.

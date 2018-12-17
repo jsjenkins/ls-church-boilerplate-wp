@@ -66,14 +66,13 @@ if ( 'disconnect' == pb_backupbuddy::_GET( 'live_action' ) && false !== $live_de
 		if ( empty( $stash_active ) ) {
 			// Pass itxapi_password to disconnect.
 			global $wp_version;
+
+			require_once pb_backupbuddy::plugin_path() . '/lib/stash/stash-api.php';
+
 			$password_hash = iThemes_Credentials::get_password_hash( $destination_settings['itxapi_username'], pb_backupbuddy::_POST( 'password' ) );
 			$access_token  = ITXAPI_Helper2::get_access_token( $destination_settings['itxapi_username'], $password_hash, site_url(), $wp_version );
-			$settings      = array(
-				'itxapi_username' => $destination_settings['itxapi_username'],
-				'itxapi_password' => $access_token,
-				'itxapi_token'    => $destination_settings['itxapi_token'],
-			);
-			$response      = pb_backupbuddy_destination_live::stashAPI( $settings, 'disconnect' );
+
+			$response = BackupBuddy_Stash_API::disconnect( $destination_settings['itxapi_username'], $destination_settings['itxapi_token'], $access_token );
 
 			if ( ! is_array( $response ) ) {
 				pb_backupbuddy::alert( 'Error Disconnecting: ' . $response );

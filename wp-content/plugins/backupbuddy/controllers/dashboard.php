@@ -34,10 +34,32 @@ class pb_backupbuddy_dashboard extends pb_backupbuddy_dashboardcore {
 		$stashlive_url .= '?page=pb_backupbuddy_live';
 
 		// Red-Green status for editsSinceLastBackup.
-		if ( 0 == $get_overview['editsSinceLastBackup'] ) {
-			$status = 'green';
+		$total_edits = is_array( $get_overview['editsSinceLastBackup'] ) ? $get_overview['editsSinceLastBackup']['all'] : $get_overview['editsSinceLastBackup'];
+		if ( 0 == $total_edits ) {
+			$basic_status = 'green';
+			$status_all   = 'green';
 		} else {
-			$status = 'red';
+			$basic_status = 'red';
+			$status_all   = 'red';
+		}
+
+		// Red-Green status for other stats.
+		if ( 'advanced' === $get_overview['editsTrackingMode'] && is_array( $get_overview['advancedEditsSinceLastBackup'] ) ) {
+			if ( 0 == $get_overview['advancedEditsSinceLastBackup']['post_edits'] ) {
+				$status_posts = 'green';
+			} else {
+				$status_posts = 'red';
+			}
+			if ( 0 == $get_overview['advancedEditsSinceLastBackup']['plugin_edits'] ) {
+				$status_plugins = 'green';
+			} else {
+				$status_plugins = 'red';
+			}
+			if ( 0 == $get_overview['advancedEditsSinceLastBackup']['option_edits'] ) {
+				$status_options = 'green';
+			} else {
+				$status_options = 'red';
+			}
 		}
 
 		// Format file archiveSize to readable format.
@@ -91,6 +113,17 @@ class pb_backupbuddy_dashboard extends pb_backupbuddy_dashboardcore {
 			$last_backup_title .= '">';
 			$last_backup_title .= esc_html__( 'Download', 'it-l10n-backupbuddy' );
 			$last_backup_title .= '</a>';
+		}
+
+		$edits_widget_mode    = 'basic';
+		$edits_number_caption = 'Edits Since<br>Last Backup';
+
+		if ( 'advanced' === $get_overview['editsTrackingMode'] ) {
+			$edits_number_caption = 'File &amp; Database Changes<br>Since Last Backup';
+			$user_selected_mode   = get_user_meta( get_current_user_id(), 'backupbuddy_dashboard_widget_mode', true );
+			if ( $user_selected_mode ) {
+				$edits_widget_mode = $user_selected_mode;
+			}
 		}
 
 		// Build widget markup.

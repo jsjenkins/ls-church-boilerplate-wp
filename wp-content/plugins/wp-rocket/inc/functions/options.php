@@ -1,6 +1,7 @@
 <?php
 use WP_Rocket\Admin\Options;
 use WP_Rocket\Admin\Options_Data;
+use WP_Rocket\Logger\Logger;
 
 defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 
@@ -337,11 +338,11 @@ function get_rocket_cache_reject_ua() {
 }
 
 /**
- * Get all files we don't allow to get in CDN
+ * Get all files we don't allow to get in CDN.
  *
  * @since 2.5
  *
- * @return array List of rejected files
+ * @return string A pipe-separated list of rejected files.
  */
 function get_rocket_cdn_reject_files() {
 	$files = get_rocket_option( 'cdn_reject_files', array() );
@@ -355,28 +356,31 @@ function get_rocket_cdn_reject_files() {
 	*/
 	$files = apply_filters( 'rocket_cdn_reject_files', $files );
 
-	$files = implode( '|', array_filter( $files ) );
-
-	return $files;
+	return implode( '|', array_filter( $files ) );
 }
 
 /**
- * Get all CNAMES
+ * Get all CNAMES.
  *
- * @since 3.0 Don't check for WP Rocket CDN option activated to be able to use the function on Hosting with CDN auto-enabled
  * @since 2.1
+ * @since 3.0 Don't check for WP Rocket CDN option activated to be able to use the function on Hosting with CDN auto-enabled.
  *
- * @param string $zone (default: 'all') List of zones.
- * @return array List of CNAMES
+ * @param  string $zone List of zones. Default is 'all'.
+ * @return array        List of CNAMES
  */
 function get_rocket_cdn_cnames( $zone = 'all' ) {
-	$hosts       = array();
-	$cnames      = get_rocket_option( 'cdn_cnames', array() );
-	$cnames_zone = get_rocket_option( 'cdn_zone', array() );
-	$zone        = is_array( $zone ) ? $zone : (array) $zone;
+	$hosts  = [];
+	$cnames = get_rocket_option( 'cdn_cnames', [] );
 
-	foreach ( $cnames as $k => $_urls ) {
-		if ( in_array( $cnames_zone[ $k ], $zone, true ) ) {
+	if ( $cnames ) {
+		$cnames_zone = get_rocket_option( 'cdn_zone', [] );
+		$zone        = (array) $zone;
+
+		foreach ( $cnames as $k => $_urls ) {
+			if ( ! in_array( $cnames_zone[ $k ], $zone, true ) ) {
+				continue;
+			}
+
 			$_urls = explode( ',', $_urls );
 			$_urls = array_map( 'trim', $_urls );
 
@@ -392,7 +396,7 @@ function get_rocket_cdn_cnames( $zone = 'all' ) {
 	 * @since 2.7
 	 *
 	 * @param array $hosts List of CNAMES.
-	*/
+	 */
 	$hosts = apply_filters( 'rocket_cdn_cnames', $hosts );
 	$hosts = array_filter( $hosts );
 
@@ -432,7 +436,11 @@ function get_rocket_cache_query_string() {
 function get_rocket_exclude_defer_js() {
 	global $wp_scripts;
 
-	$exclude_defer_js = array();
+	$exclude_defer_js = [
+		'gist.github.com',
+		'content.jwplatform.com',
+		'js.hsforms.net',
+	];
 
 	if ( get_rocket_option( 'defer_all_js', 0 ) && get_rocket_option( 'defer_all_js_safe', 0 ) ) {
 		$jquery = site_url( $wp_scripts->registered['jquery-core']->src );
@@ -449,6 +457,10 @@ function get_rocket_exclude_defer_js() {
 	 * @param array $exclude_defer_js An array of URLs for the JS files to be excluded.
 	 */
 	$exclude_defer_js = apply_filters( 'rocket_exclude_defer_js', $exclude_defer_js );
+
+	foreach ( $exclude_defer_js as $i => $exclude ) {
+		$exclude_defer_js[ $i ] = str_replace( '#', '\#', $exclude );
+	}
 
 	return $exclude_defer_js;
 }
@@ -504,13 +516,16 @@ function rocket_check_key() {
 	$return = rocket_valid_key();
 
 	if ( ! rocket_valid_key() ) {
+		Logger::info( 'LICENSE VALIDATION PROCESS STARTED.', [ 'license validation process' ] );
+
 		$response = wp_remote_get(
 			WP_ROCKET_WEB_VALID, array(
 				'timeout' => 30,
 			)
 		);
 
-		$json           = ! is_wp_error( $response ) ? json_decode( $response['body'] ) : false;
+		$body           = wp_remote_retrieve_body( $response );
+		$json           = json_decode( $body );
 		$rocket_options = array();
 
 		if ( $json ) {
@@ -523,6 +538,8 @@ function rocket_check_key() {
 				if ( ! get_rocket_option( 'license' ) ) {
 					$rocket_options['license'] = '1';
 				}
+
+				Logger::info( 'License validation succeeded.', [ 'license validation process' ] );
 			} else {
 				$messages = array(
 					'BAD_LICENSE' => __( 'Your license is not valid.', 'rocket' ),
@@ -534,10 +551,27 @@ function rocket_check_key() {
 				$rocket_options['secret_key'] = '';
 
 				add_settings_error( 'general', 'settings_updated', $messages[ $json->data->reason ], 'error' );
+
+				Logger::error( 'License validation failed.', [
+					'license validation process',
+					'response_error' => $json->data->reason,
+				] );
 			}
 
 			set_transient( WP_ROCKET_SLUG, $rocket_options );
 			$return = (array) $rocket_options;
+		} elseif ( is_wp_error( $response ) ) {
+			Logger::error( 'License validation failed.', [
+				'license validation process',
+				'request_error' => $response->get_error_messages(),
+			] );
+		} elseif ( '' !== $body ) {
+			Logger::error( 'License validation failed.', [
+				'license validation process',
+				'response_body' => $body,
+			] );
+		} else {
+			Logger::error( 'License validation failed. No body available in response.', [ 'license validation process' ] );
 		}
 	}
 

@@ -316,6 +316,20 @@ $settings_form->add_setting(
 		'rules'   => 'required',
 	)
 );
+
+$settings_form->add_setting(
+	array(
+		'type'    => 'select',
+		'name'    => 'edits_tracking_mode',
+		'title'   => __( 'Recent Edits Tracking Mode', 'it-l10n-backupbuddy' ),
+		'options' => array(
+			'basic'    => __( 'Basic', 'it-l10n-backupbuddy' ),
+			'advanced' => __( 'Advanced', 'it-l10n-backupbuddy' ),
+		),
+		'tip'     => __( '[Default: Basic] - Adjusts levels of recent edits tracking. Basic tracks posts, pages, media, and plugin changes. Advanced adds tracking for settings/options along with a more detailed dashboard widget.', 'it-l10n-backupbuddy' ),
+	)
+);
+
 $settings_form->add_setting(
 	array(
 		'type'    => 'checkbox',

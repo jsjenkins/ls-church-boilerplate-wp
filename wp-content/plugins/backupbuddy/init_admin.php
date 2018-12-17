@@ -86,10 +86,6 @@ backupbuddy_core::verifyLiveCron();
 /********** ACTIONS (admin) */
 
 
-
-// Iterating edits since last updates widget
-pb_backupbuddy::add_action( array( 'save_post', 'iterate_edits_since_last' ), 10, 3 );
-
 // Set up reminders if enabled.
 if ( pb_backupbuddy::$options['backup_reminders'] == '1' ) {
 	pb_backupbuddy::add_action( array( 'load-update-core.php', 'wp_update_backup_reminder' ) );
@@ -102,6 +98,7 @@ if ( is_multisite() && ! backupbuddy_core::is_network_activated() ) {
 }
 
 
+pb_backupbuddy::add_action( array( 'itbub_save_setting', 'enable_advanced_dashboard_widget' ), 10, 3 );
 
 /********** AJAX (admin) */
 

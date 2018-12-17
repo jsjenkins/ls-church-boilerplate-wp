@@ -8,7 +8,7 @@
  */
 
 class pb_backupbuddy_destination_live {
-	
+
 	const TIME_WIGGLE_ROOM = 5;												// Number of seconds to fudge up the time elapsed to give a little wiggle room so we don't accidently hit the edge and time out.
 	const LIVE_ACTION_TRANSIENT_NAME = 'backupbuddy_live_action_response';	// Transient name where live action response is cached.
 	const LIVE_ACTION_TRANSIENT_EXPIRE_WIGGLE = '5400';						// Caches for the reported expire time minus this amount to prevent issues with servers being off GMT for some reason.
@@ -18,22 +18,22 @@ class pb_backupbuddy_destination_live {
 		'description'	=>		'Simply synchronize your site into the cloud without hassle.',
 		'category'		=>		'best', // best, normal, legacy
 	);
-	
+
 	// Default settings. Should be public static for auto-merging.
 	public static $default_settings = array(
 		'type'			=>		'live',							// MUST MATCH your destination slug.
 		'title'			=>		'',								// Required destination field.
-		
+
 		'itxapi_username'			=>		'',					// Username to connect to iThemes API.
 		'itxapi_token'				=>		'',					// Site token for iThemes API.
 
 																// Note: Neither or the periods below are associated with actual
 																// cron tasks - the hourly live periodic cron task just uses the
 																// interval period to decide when action(s) shuld be taken based
-																// on when they were last taken. 
+																// on when they were last taken.
 		'periodic_process_period'	=> 'itbub-twicedaily',		// How often to run periodic process.
 		'remote_snapshot_period'	=> 'itbub-daily',			// How often to trigger a remote snapshot. NOTE: This does not happen until all periodic process steps are complete.
-		
+
 		'enabled'				=>	'1',							// Enabled (1) or not (0).
 		'disable_logging'		=>	'0',							// 1 to skip log redirection.
 		'max_send_details_limit'=>	'5',							// Maximum number of remote send filesoptions and logs to keep. Keeps most recent.
@@ -49,35 +49,35 @@ class pb_backupbuddy_destination_live {
 		'max_filelist_keys'			=>		'250',		// Maximum number of files to list from server via listObjects calls.
 		'send_snapshot_notification'=>		'1',		// Whether or not to send a snapshot notification for snapshot completions. Note: First email is always sent.
 		'show_admin_bar'			=>		'0',		// Whether or not to show stats in admin bar.
-		'no_new_snapshots_error_days' =>	'10',		// Sends error emails if no Snapshots 
+		'no_new_snapshots_error_days' =>	'10',		// Sends error emails if no Snapshots
 		'max_wait_on_transfers_time' =>		'5',		// Maximum minutes to wait for pending transfers to complete before falling back to Snapshotting.
 		'email'						=>		'',			// Email to send snapshot notifications to. If blank it will use iThemes Member Account email.
 		'max_delete_burst'			=>		'100',		// Max number of files per delete per burst. Eg number of files to pass into deleteFiles() function.
 		'disable_file_management'	=>		'0',
 		'destination_version'		=>		'2', // Which Stash remote destination version to use. Launched with 2 (v2).
-		
+
 		/***** BEGIN ARCHIVE LIMITS *****/
 		'limit_db_daily'			=>		'5',
 		'limit_db_weekly'			=>		'2',
 		'limit_db_monthly'			=>		'1',
 		'limit_db_yearly'			=>		'0',
-		
+
 		'limit_full_daily'			=>		'1',
 		'limit_full_weekly'			=>		'1',
 		'limit_full_monthly'		=>		'1',
 		'limit_full_yearly'			=>		'0',
-		
+
 		'limit_plugins_daily'		=>		'0',
 		'limit_plugins_weekly'		=>		'0',
 		'limit_plugins_monthly'		=>		'0',
 		'limit_plugins_yearly'		=>		'0',
-		
+
 		'limit_themes_daily'		=>		'0',
 		'limit_themes_weekly'		=>		'0',
 		'limit_themes_monthly'		=>		'0',
 		'limit_themes_yearly'		=>		'0',
 		/***** END ARCHIVE LIMITS *****/
-		
+
 		// S32/s33 settings
 		'ssl'						=>		'1',		// Whether or not to use SSL encryption for connecting.
 		'server_encryption'			=>		'AES256',	// Encryption (if any) to have the destination enact. Empty string for none.
@@ -87,17 +87,17 @@ class pb_backupbuddy_destination_live {
 		'use_server_cert'			=>		'0',		// When 1, use the packaged cacert.pem file included with the AWS SDK.
 		'disable_hostpeer_verficiation' =>	'0',		// Disables SSL host/peer verification.
 		'storage'					=>		'STANDARD',	// Whether to use standard or reduced redundancy storage. Allowed values: STANDARD, REDUCED_REDUNDANCY
-		
+
 		'_database_table'			=>		'',			// Table name if sending a database file.
 	);
-	
+
 	private static $_timeStart = 0;
-	
-	
+
+
 	/*	send()
-	 *	
+	 *
 	 *	Send one or more files.
-	 *	
+	 *
 	 *	@param		array 			$settings		Destination settings.
 	 *	@param		array			$file			Array of one or more files to send.
 	 *	@return		boolean							True on success, else false.
@@ -110,19 +110,19 @@ class pb_backupbuddy_destination_live {
 			$pb_backupbuddy_destination_errors[] = __( 'Error #48933: This destination is currently disabled. Enable it under this destination\'s Advanced Settings.', 'it-l10n-backupbuddy' );
 			return false;
 		}
-		
+
 		// Get credentials for working with Live files.
 		$response = self::_get_live_action_response( $settings );
 		if ( false === $response ) {
 			return false;
 		}
-		
+
 		$settings['stash_mode'] = '0';
 		$settings['live_mode'] = '1'; // Live is calling the s32/s33 destination.
 		$settings['bucket'] = $response['bucket'];
 		$settings['credentials'] = $response['credentials'];
 		$settings['directory'] = $response['prefix'];
-		
+
 		if ( '' != $settings['_database_table'] ) { // Database file.
 			$settings['directory'] .= '/wp-content/uploads/backupbuddy_temp/SERIAL/';
 		} else { // Normal file.
@@ -132,10 +132,10 @@ class pb_backupbuddy_destination_live {
 			$file_subdir = substr( $file_subdir, 0, strlen( $file_subdir ) - strlen( basename( $file_subdir ) ) ); // Remove filename, leaving us with fileless path relative to ABSPATH.
 			$settings['directory'] .= '/' . $file_subdir;
 		}
-		
+
 		// Send file.
 		$result = call_user_func_array( array( 'pb_backupbuddy_destination_s3' . $settings['destination_version'], 'send' ), array( $settings, $file, $send_id, $delete_after ) );
-		
+
 		if ( true === $result ) {
 			require_once( pb_backupbuddy::plugin_path() . '/destinations/live/live_periodic.php' );
 			if ( '' == $settings['_database_table'] ) { // Normal file.
@@ -146,13 +146,13 @@ class pb_backupbuddy_destination_live {
 				backupbuddy_live_periodic::set_file_backed_up( $file, $settings['_database_table'] );
 			}
 		}
-		
+
 		// Success AFTER multipart send so kick Live along. For single-pass sends we continue on in live_periodic.php.
 		if ( ( true === $result ) && ( isset( $settings['_multipart_status'] ) ) && ( '' != $settings['_multipart_status'] ) ) {
-			
+
 			pb_backupbuddy::status( 'details', 'Live mode. Preparing to schedule next preferred step (if applicable).' );
 			if ( isset( $settings['_live_next_step'] ) && ( 2 == count( $settings['_live_next_step'] ) ) ) { // Next step is defined and has proper arg count.
-				
+
 				$cronArgs = array(
 					$settings['_live_next_step'][0],
 					$settings['_live_next_step'][1],
@@ -163,43 +163,43 @@ class pb_backupbuddy_destination_live {
 				} else {
 					pb_backupbuddy::status( 'error', 'Next Live Periodic preferred step cron event FAILED to be scheduled.' );
 				}
-				
+
 				if ( '1' != pb_backupbuddy::$options['skip_spawn_cron_call'] ) {
 					pb_backupbuddy::status( 'details', 'Spawning cron now.' );
 					update_option( '_transient_doing_cron', 0 ); // Prevent cron-blocking for next item.
 					spawn_cron( time() + 150 ); // Adds > 60 seconds to get around once per minute cron running limit.
 				}
-				
+
 			}
 		}
-		
+
 		return $result;
 	} // End send().
-	
-	
-	
+
+
+
 	/*	test()
-	 *	
+	 *
 	 *	function description
-	 *	
+	 *
 	 *	@param		array			$settings	Destination settings.
 	 *	@return		bool|string					True on success, string error message on failure.
 	 */
 	public static function test( $settings ) {
-		
+
 		/*
 		if ( ( $settings['address'] == '' ) || ( $settings['username'] == '' ) || ( $settings['password'] == '' ) ) {
 			return __('Missing required input.', 'it-l10n-backupbuddy' );
 		}
 		*/
-		
+
 		// Try sending a file.
 		return pb_backupbuddy_destinations::send( $settings, dirname( dirname( __FILE__ ) ) . '/remote-send-test.php', $send_id = 'TEST-' . pb_backupbuddy::random_string( 12 ) ); // 3rd param true forces clearing of any current uploads.
-		
+
 	} // End test().
-	
-	
-	
+
+
+
 	/* deleteFile()
 	 *
 	 * Alias to deleteFiles().
@@ -211,9 +211,9 @@ class pb_backupbuddy_destination_live {
 		}
 		return self::deleteFiles( $settings, $file );
 	} // End deleteFile().
-	
-	
-	
+
+
+
 	/* deleteFiles()
 	 *
 	 * Delete files.
@@ -222,31 +222,31 @@ class pb_backupbuddy_destination_live {
 	 */
 	public static function deleteFiles( $settings, $files = array() ) {
 		$settings = self::_init( $settings );
-		
+
 		if ( ! is_array( $files ) ) {
 			$file = array( $files );
 		}
-		
+
 		// Get credentials for working with Live files.
 		$response = self::_get_live_action_response( $settings );
 		if ( false === $response ) {
 			return false;
 		}
-		
+
 		$settings['bucket'] = $response['bucket'];
 		$settings['credentials'] = $response['credentials'];
-		
+
 		$directory = '';
 		if ( isset( $settings['directory'] ) && ( '' != $settings['directory'] ) ) {
 			$directory = $settings['directory'];
 		}
 		$settings['directory'] = $response['prefix'] . '/' . $directory;
 		return call_user_func_array( array( 'pb_backupbuddy_destination_s3' . $settings['destination_version'], 'deleteFiles' ), array( $settings, $files ) );
-		
+
 	} // End deleteFiles().
-	
-	
-	
+
+
+
 	/* listFiles()
 	 *
 	 * Get list of files with optional prefix. Returns stashAPI response.
@@ -254,40 +254,40 @@ class pb_backupbuddy_destination_live {
 	 */
 	public static function listFiles( $settings, $prefix = '', $marker = '' ) {
 		$settings = self::_init( $settings );
-		
+
 		// Get credentials for working with Live files.
 		$response = self::_get_live_action_response( $settings );
 		if ( false === $response ) {
 			return false;
 		}
-		
+
 		$settings['stash_mode'] = '1'; // Stash is calling the s32/s33 destination.
 		$settings['bucket'] = $response['bucket'];
 		$settings['credentials'] = $response['credentials'];
 		$prefix = $response['prefix'] . '/' . $prefix;
-		
+
 		if ( '' != $marker ) {
 			$marker = $prefix . $marker;
 		}
-		
+
 		$files = call_user_func_array( array( 'pb_backupbuddy_destination_s3' . $settings['destination_version'], 'listFiles' ), array( $settings, $prefix, $marker ) );
 		if ( ! is_array( $files ) ) {
 			pb_backupbuddy::status( 'error', 'Erorr #43894394734: listFiles() did not return array. Details: `' . print_r( $files ) . '`.' );
 			return array();
 		}
-		
+
 		// Strip prefix from keys.
 		$prefixLen = strlen( $prefix );
 		foreach( $files as &$file ) {
 			$file['Key'] = substr( $file['Key'], $prefixLen );
 		}
-		
+
 		return $files;
-		
+
 	} // End listFiles().
-	
-	
-	
+
+
+
 	/* getFileURL()
 	 *
 	 * Get download URL for a file.
@@ -295,41 +295,43 @@ class pb_backupbuddy_destination_live {
 	 * @param	array 	$settings		Destination settings.
 	 * @param	string	$remoteFile		Filename of remote file. Does NOT contain path as it is calculated from $settings.
 	 * @param	int		$expires		Timestamp to expire. Defaults to 1 hour.
-	 * @return	
+	 * @return
 	 *
 	 */
 	public static function getFileURL( $settings, $remoteFile, $expires = 0 ) {
 		$settings = self::_init( $settings );
-		
+
 		// Get credentials for working with Live files.
 		$response = self::_get_live_action_response( $settings );
 		if ( false === $response ) {
 			return false;
 		}
-		
+
 		$settings['bucket'] = $response['bucket'];
 		$settings['credentials'] = $response['credentials'];
-		
+
 		$directory = '';
 		if ( isset( $settings['directory'] ) && ( '' != $settings['directory'] ) ) {
 			$directory = $settings['directory'];
 		}
 		$settings['directory'] = $response['prefix'] . '/' . $directory;
-		
+
 		return call_user_func_array( array( 'pb_backupbuddy_destination_s3' . $settings['destination_version'], 'getFileURL' ), array( $settings, $remoteFile, $expires ) );
-		
+
 	} // End getFileURL().
-	
-	
-	
-	public static function stashAPI( $settings, $action, $additionalParams = array(), $blocking = true, $passthru_errors = false, $timeout = 15 ) {
+
+
+
+	public static function stashAPI( $settings, $action, $additionalParams = array(), $blocking = true, $passthru_errors = false, $timeout = 60 ) {
+		require_once( pb_backupbuddy::plugin_path() . '/lib/stash/stash-api.php' );
+
 		$settings = self::_formatSettings( $settings );
-		require_once( pb_backupbuddy::plugin_path() . '/destinations/stash' . $settings['destination_version'] . '/init.php' ); // For StashAPI.
-		return call_user_func_array( array( 'pb_backupbuddy_destination_stash' . $settings['destination_version'], 'stashAPI' ), array( $settings, $action, $additionalParams, $blocking, $passthru_errors ) );
+
+		return BackupBuddy_Stash_API::request( $action, $settings, $additionalParams, $blocking, $passthru_errors, $timeout );
 	} // End stashAPI().
-	
-	
-	
+
+
+
 	/* _get_live_action_response()
 	 *
 	 * Retrieves response from calling the 'live' Stash API action. Caches response for a period of time unless forced to bust.
@@ -339,7 +341,7 @@ class pb_backupbuddy_destination_live {
 		if ( true === $bust_cache ) {
 			delete_transient( self::LIVE_ACTION_TRANSIENT_NAME );
 		}
-		
+
 		// Get credentials via LIVE action and cache them for future calls.
 		if ( false === ( $response = get_transient( self::LIVE_ACTION_TRANSIENT_NAME ) ) ) {
 			$stashAction = 'live';
@@ -354,7 +356,7 @@ class pb_backupbuddy_destination_live {
 			if ( pb_backupbuddy::$options['log_level'] == '3' ) { // Full logging enabled.
 				pb_backupbuddy::status( 'details', 'Live API live action response due to logging level: `' . print_r( $response, true ) . '`. Call params: `' . print_r( $additionalParams, true ) . ' `.' );
 			}
-			
+
 			// Calculate credential expiration for caching minus 1.5 hour for wiggle around DST and such issues.
 			//$cache_time = ( $response['expires'] - self::LIVE_ACTION_TRANSIENT_EXPIRE_WIGGLE );
 			$cache_time = self::LIVE_ACTION_TRANSIENT_CACHE_TIME; // Cache 6 hours.
@@ -363,13 +365,13 @@ class pb_backupbuddy_destination_live {
 		} else {
 			//pb_backupbuddy::status( 'details', 'Using cached Live credentials.' );
 		}
-		
+
 		return $response;
-		
+
 	} // End _get_live_action_response().
-	
-	
-	
+
+
+
 	/* _init()
 	 *
 	 * description
@@ -377,28 +379,28 @@ class pb_backupbuddy_destination_live {
 	 */
 	public static function _init( $settings ) {
 		$settings = self::_formatSettings( $settings );
-		
+
 		require_once( pb_backupbuddy::plugin_path() . '/destinations/s3' . $settings['destination_version'] . '/init.php' );
-		
+
 		return $settings;
-	
+
 	} // End _init().
-	
-	
-	
+
+
+
 	/* _formatSettings()
 	 *
 	 * Called by _formatSettings().
 	 *
 	 */
 	public static function _formatSettings( $settings ) {
-		
+
 		// Apply defaults.
 		$settings = array_merge( self::$default_settings, $settings );
 		return $settings;
-		
+
 	} // End _formatSettings().
-	
+
 } // End class.
 
 

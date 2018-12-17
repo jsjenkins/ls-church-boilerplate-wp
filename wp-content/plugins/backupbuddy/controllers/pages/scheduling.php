@@ -7,7 +7,7 @@
 
 pb_backupbuddy::load_script( 'jquery-ui-datepicker', true ); // WP core script.
 pb_backupbuddy::load_script( 'jquery-ui-slider', true ); // WP core script.
-pb_backupbuddy::load_script( 'timepicker.js' );
+pb_backupbuddy::load_script( 'jquery-ui-timepicker-addon.min.js' );
 
 pb_backupbuddy::load_style( 'admin.css', false ); // Plugin-specific file.
 pb_backupbuddy::load_style( 'jquery_smoothness.css', false ); // Plugin-specific file.
@@ -19,7 +19,9 @@ jQuery(function(){
 	// WP 3.2.1 does not like the datepicker and breaks other JS so we omit it if it failed to load properly.
 	if ( jQuery.isFunction( jQuery.fn.datepicker ) ) {
 		jQuery( '#pb_backupbuddy_first_run' ).datetimepicker({
-			ampm: true
+			amNames: ['am', 'a'],
+			pmNames: ['pm', 'p'],
+			timeFormat: "hh:mm tt"
 		});
 
 		// Force datepicker date format. Some themes change the format on BB's page unfortunately.

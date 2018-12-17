@@ -18,7 +18,7 @@ if ( '' != pb_backupbuddy::_GET( 'cpy' ) ) {
 	echo '<br>';
 	pb_backupbuddy::status( 'details',  'Scheduling Cron for creating Dropbox copy.' );
 	backupbuddy_core::schedule_single_event( time(), 'process_destination_copy', array( $destination, pb_backupbuddy::_GET( 'cpy' ) ) );
-	
+
 	if ( '1' != pb_backupbuddy::$options['skip_spawn_cron_call'] ) {
 		update_option( '_transient_doing_cron', 0 ); // Prevent cron-blocking for next item.
 		spawn_cron( time() + 150 ); // Adds > 60 seconds to get around once per minute cron running limit.
@@ -31,7 +31,7 @@ if ( '' != pb_backupbuddy::_GET( 'cpy' ) ) {
 if ( 'delete_backup' == pb_backupbuddy::_POST( 'bulk_action' ) ) {
 	pb_backupbuddy::verify_nonce();
 	if ( is_array( pb_backupbuddy::_POST( 'items' ) ) ) {
-		
+
 		if ( true === ( $result = pb_backupbuddy_destinations::delete( $destination, pb_backupbuddy::_POST( 'items' ) ) ) ) {
 			pb_backupbuddy::alert( __( 'Selected file(s) deleted.', 'it-l10n-backupbuddy' ) );
 		} else {
@@ -50,19 +50,24 @@ foreach( $files_result['entries'] as $file ) { // Loop through files looking for
 	if ( $file['.tag'] == 'folder' ) { // Do NOT display subdirectories.
 		continue;
 	}
-	
+
 	$filename = $file['name']; //str_ireplace( $destination['path'] . '/', '', $file['path_lower'] ); // Remove path from filename.
+
+	$backup_type = backupbuddy_core::getBackupTypeFromFile( $filename );
+
+	if ( ! $backup_type ) {
+		continue;
+	}
+
 	if ( isset( $file['client_modified'] ) ) {
 		$last_modified = strtotime( $file['client_modified'] );
 		//$last_modified = pb_backupbuddy::$format->date( pb_backupbuddy::$format->localize_time( $last_modified ) ) . '<br /><span class="description">(' . pb_backupbuddy::$format->time_ago( $last_modified ) . ' ago)</span>';
 	} else {
 		$last_modified = '<i>' . __( 'Unknown', 'it-l10n-backupbuddy' ) . '</i>';
 	}
-	
+
 	$size = $file['size'];
-	
-	$backup_type = backupbuddy_core::getBackupTypeFromFile( $filename );
-	
+
 	// Generate array of table rows.
 	$backup_files[$filename] = array(
 		$filename,
@@ -71,7 +76,7 @@ foreach( $files_result['entries'] as $file ) { // Loop through files looking for
 		$backup_type,
 		'file_timestamp' => $last_modified,
 	);
-	
+
 }
 
 

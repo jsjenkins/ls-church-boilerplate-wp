@@ -117,15 +117,10 @@ if ( count( $ftp_list ) > 2 ) {
 		}
 		if ( 'directory' == $file['type'] ) { // Directory.
 			echo '<li class="directory collapsed">';
-			$return  = '';
-			$return .= '<div class="pb_backupbuddy_treeselect_control">';
+			$return  = '<div class="pb_backupbuddy_treeselect_control">';
 			$return .= '<img src="' . pb_backupbuddy::plugin_url() . '/images/greenplus.png" style="vertical-align: -3px;" title="Select this path..." class="pb_backupbuddy_filetree_select">';
 			$return .= '</div>';
-			echo '<a href="#" rel="' . esc_attr( $ftp_root . $file_name ) . '/" title="Toggle expand...">' . esc_html( $file_name . $return ) . '</a>';
-			echo '</li>';
-		} else { // File.
-			echo '<li class="file collapsed">';
-			echo '<a href="#" rel="' . esc_attr( $ftp_root . $file_name ) . '">' . esc_attr( $file_name ) . '</a>';
+			echo '<a href="#" rel="' . esc_attr( $ftp_root . $file_name ) . '/" title="Toggle expand...">' . esc_html( $file_name ) . $return . '</a>';
 			echo '</li>';
 		}
 	}

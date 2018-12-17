@@ -1140,11 +1140,11 @@ class backupbuddy_core {
 
 
 	/**
-	 * 1128
+	 * Get Dat Array from Zip
 	 *
 	 * @param string $file  Path to file.
 	 *
-	 * @return array Dat array from zip.
+	 * @return array|false  Dat array from zip or false if failed.
 	 */
 	public static function getDatArrayFromZip( $file ) {
 		require_once pb_backupbuddy::plugin_path() . '/lib/zipbuddy/zipbuddy.php';
@@ -1194,14 +1194,14 @@ class backupbuddy_core {
 		$extractions    = array( $find => $dest_filename );
 		$extract_result = $zipbuddy->extract( $file, $destination, $extractions );
 		if ( false === $extract_result ) { // failed.
-			return array();
+			return false;
 		} else {
 			$dat_array = self::get_dat_file_array( rtrim( $destination, '\\/' ) . '/temp_dat_read-' . $serial . '.php' );
 			@unlink( $temp_dir . $dest_filename );
 			if ( is_array( $dat_array ) ) {
 				return $dat_array;
 			} else {
-				return array();
+				return false;
 			}
 		}
 

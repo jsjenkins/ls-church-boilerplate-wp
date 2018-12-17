@@ -13,6 +13,13 @@
 class pb_backupbuddy_actions extends pb_backupbuddy_actionscore {
 
 	/**
+	 * Track actions only once per request.
+	 *
+	 * @var array
+	 */
+	private $action_tracked = array();
+
+	/**
 	 * Run anything in the admin that may output a notice / error. Runs at proper time to not gunk up HTML.
 	 */
 	public function admin_notices() {
@@ -54,26 +61,325 @@ class pb_backupbuddy_actions extends pb_backupbuddy_actionscore {
 	}
 
 	/**
-	 * Increments BackupBuddy option `edits_since_last` by 1 on saves.
+	 * Retrieves the Recent Edits Tracking Mode Option
+	 *
+	 * @return string  Recent Edits Tracking Mode.
+	 */
+	public function get_edits_tracking_mode() {
+		$mode = 'basic'; // Default to basic.
+		if ( ! empty( pb_backupbuddy::$options['edits_tracking_mode'] ) ) {
+			$mode = pb_backupbuddy::$options['edits_tracking_mode'];
+		}
+
+		return $mode;
+	}
+
+	/**
+	 * Check to see if we should track this post.
+	 *
+	 * @param int    $post_id  The post ID.
+	 * @param object $post     The post object.
+	 *
+	 * @return bool  Whether or not to track it this time.
+	 */
+	public function should_track_post( $post_id, $post ) {
+		if ( in_array( $post_id, $this->action_tracked, true ) ) {
+			return false;
+		}
+
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return false;
+		}
+
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) { // Ignore revisions and autosaves.
+			return false;
+		}
+
+		$ignored_post_types = apply_filters( 'itbub_edits_ignore_post_types', array(
+			'revision',
+		) );
+
+		if ( ! is_a( $post, 'WP_Post' ) ) {
+			$post = get_post( $post );
+		}
+
+		if ( is_a( $post, 'WP_Post' ) ) {
+			if ( in_array( $post->post_type, $ignored_post_types, true ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Increments BackupBuddy option `edits_since_last` by 1 on save_post.
 	 *
 	 * @param int    $post_id  The Post ID.
 	 * @param object $post     The Post Object.
-	 * @param string $updated  Updated text.
+	 * @param bool   $updated  If updated.
 	 */
-	public function iterate_edits_since_last( $post_id, $post, $updated = '' ) {
-		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) { // Ignore revisions and autosaves.
+	public function save_post_iterate_edits_since_last( $post_id, $post, $updated = false ) {
+		if ( false === $this->should_track_post( $post_id, $post ) ) {
 			return;
 		}
 
-		$ignored_post_types = array(
-			'revision',
-			'attachment',
-			'nav_menu_item',
+		$action = 'save_post';
+		if ( false === $updated ) {
+			$action = 'insert_post';
+		}
+		if ( is_a( $post, 'WP_Post' ) ) {
+			if ( 'trash' === $post->post_status ) {
+				$action = 'trash_post';
+			}
+		}
+
+		$this->action_tracked[] = $post_id;
+		pb_backupbuddy::track_edit( $action, $post );
+	}
+
+	/**
+	 * Increments BackupBuddy option `edits_since_last` by 1 on post_updated.
+	 *
+	 * @param int    $post_id      The Post ID.
+	 * @param object $post_after   The Post Object.
+	 * @param object $post_before  If updated.
+	 */
+	public function post_updated_iterate_edits_since_last( $post_id, $post_after, $post_before ) {
+		$post = get_post( $post_id );
+		if ( false === $this->should_track_post( $post_id, $post ) ) {
+			return;
+		}
+
+		$action = 'post_updated';
+
+		if ( is_a( $post, 'WP_Post' ) ) {
+			if ( 'trash' === $post->post_status ) {
+				$action = 'trash_post';
+			}
+		}
+
+		$this->action_tracked[] = $post_id;
+		pb_backupbuddy::track_edit( $action, $post );
+	}
+
+	/**
+	 * Increments BackupBuddy option `edits_since_last` by 1 on wp_insert_post.
+	 *
+	 * @param int    $post_id  The Post ID.
+	 * @param object $post     The Post Object.
+	 * @param bool   $updated  If updated.
+	 */
+	public function insert_post_iterate_edits_since_last( $post_id, $post, $updated = false ) {
+		if ( false === $this->should_track_post( $post_id, $post ) ) {
+			return;
+		}
+
+		$this->action_tracked[] = $post_id;
+		pb_backupbuddy::track_edit( 'insert_post', $post );
+	}
+
+	/**
+	 * Increments BackupBuddy option `edits_since_last` by 1 on wp_trash_post.
+	 *
+	 * @param int $post_id  The Post ID.
+	 */
+	public function trash_post_iterate_edits_since_last( $post_id ) {
+		$post = get_post( $post_id );
+		if ( false === $this->should_track_post( $post_id, $post ) ) {
+			return;
+		}
+
+		if ( ! is_a( $post, 'WP_Post' ) ) {
+			$post = $post_id;
+		}
+
+		$this->action_tracked[] = $post_id;
+		pb_backupbuddy::track_edit( 'trash_post', $post );
+	}
+
+	/**
+	 * Track changes to plugins when updated.
+	 *
+	 * @param object $upgrader_object  WP_Upgrader object.
+	 * @param array  $options          Upgrader options array.
+	 */
+	public function update_plugin_iterate_edits_since_last( $upgrader_object, $options ) {
+		if ( 'update' === $options['action'] && 'plugin' === $options['type'] ) {
+			if ( ! isset( $options['plugins'] ) || ! is_array( $options['plugins'] ) ) {
+				return;
+			}
+			foreach ( $options['plugins'] as $plugin ) {
+				if ( 'backupbuddy/backupbuddy.php' === $plugin ) { // TODO: Set to constant from `uninstall-cleanup` branch.
+					continue;
+				}
+				$track = array(
+					'plugin' => $plugin,
+				);
+				pb_backupbuddy::track_edit( 'update_plugin', $track );
+			}
+		}
+	}
+
+	/**
+	 * Track plugin activations.
+	 *
+	 * @param string $plugin        Plugin slug.
+	 * @param bool   $network_wide  Activation occurred network-wide.
+	 */
+	public function activate_plugin_iterate_edits_since_last( $plugin, $network_wide ) {
+		if ( 'backupbuddy/backupbuddy.php' === $plugin ) { // TODO: Set to constant from `uninstall-cleanup` branch.
+			return;
+		}
+		$track = array(
+			'plugin' => $plugin,
+		);
+		pb_backupbuddy::track_edit( 'activate_plugin', $track );
+	}
+
+	/**
+	 * Track plugin deactivations.
+	 *
+	 * @param string $plugin        Plugin slug.
+	 * @param bool   $network_wide  Activation occurred network-wide.
+	 */
+	public function deactivate_plugin_iterate_edits_since_last( $plugin, $network_wide ) {
+		if ( 'backupbuddy/backupbuddy.php' === $plugin ) { // TODO: Set to constant from `uninstall-cleanup` branch.
+			return;
+		}
+		$track = array(
+			'plugin' => $plugin,
+		);
+		pb_backupbuddy::track_edit( 'deactivate_plugin', $track );
+	}
+
+	/**
+	 * Check to see if we should track this option.
+	 *
+	 * @param string $option  The option key.
+	 *
+	 * @return bool  Whether or not to track it this time.
+	 */
+	public function should_track_option( $option ) {
+		if ( $this->get_edits_tracking_mode() !== 'advanced' ) {
+			return false;
+		}
+
+		if ( in_array( 'option_' . $option, $this->action_tracked, true ) ) {
+			return false;
+		}
+
+		if ( false !== strpos( $option, 'transient' ) ) { // disregard transient changes.
+			return false;
+		}
+
+		$ignored_options = apply_filters( 'itbub_edits_ignore_options', array(
+			// Misc/WordPress.
+			'cron',
+			'rewrite_rules',
+			'auto_updater.lock',
+			'stats_cache',
+
+			// BUB & iThemes.
+			'pb_backupbuddy',
+			'pb_backupbuddy_notifications',
+			'ithemes-updater-cache',
+			'itsec-storage',
+			'itsec_cron',
+
+			// Jetpack.
+			'jetpack_next_sync_time_full-sync-enqueue',
+			'jetpack_updates_sync_checksum',
+			'jetpack_log',
+			'jetpack-sitemap-state',
+
+			// Ninja Forms.
+			'ninja_forms_mailchimp_interests',
+
+			// Stop Spammers.
+			'ss_stop_sp_reg_stats',
+
+			// W3 Total Cache.
+			'w3tc_extensions_hooks',
+			'w3tc_stats_hotspot_start',
+			'w3tc_stats_history',
+
+			// WooCommerce.
+			'wc_connect_services_last_update',
+			'wc_connect_last_heartbeat',
+
+			// WordFence.
+			'wordfence_syncingAttackData',
+			'wordfence_syncAttackDataAttempts',
+			'wordfence_lastSyncAttackData',
+
+			// Yoast.
+			'wpseo_sitemap_1_cache_validator',
+			'wpseo_sitemap_jp_sitemap_cache_validator',
+			'wpseo_sitemap_jp_sitemap_master_cache_validator',
+		) );
+
+		if ( in_array( $option, $ignored_options, true ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Increments BackupBuddy option `edits_since_last` by 1 on update_option.
+	 *
+	 * @param string $option     Option name.
+	 * @param mixed  $old_value  Old option value.
+	 * @param mixed  $new_value  New option value.
+	 */
+	public function update_option_iterate_edits_since_last( $option, $old_value, $new_value ) {
+		if ( false === $this->should_track_option( $option ) ) {
+			return;
+		}
+
+		// Return array of various details.
+		$option_array = array(
+			'option' => $option,
 		);
 
-		if ( ! in_array( $post->post_type, $ignored_post_types, true ) ) {
-			pb_backupbuddy::$options['edits_since_last']++;
-			pb_backupbuddy::save();
+		$this->action_tracked[] = 'option_' . $option;
+		pb_backupbuddy::track_edit( 'update_option', $option_array );
+	}
+
+	/**
+	 * Increments BackupBuddy option `edits_since_last` by 1 on delete_option.
+	 *
+	 * @param string $option     Option name.
+	 */
+	public function delete_option_iterate_edits_since_last( $option ) {
+		if ( false === $this->should_track_option( $option ) ) {
+			return;
+		}
+
+		// Return array of various details.
+		$option_array = array(
+			'option' => $option,
+		);
+
+		$this->action_tracked[] = 'option_' . $option;
+		pb_backupbuddy::track_edit( 'delete_option', $option_array );
+	}
+
+	/**
+	 * Enable Advanced Dashboard user for current user when setting changes to Advanced.
+	 *
+	 * @param string       $option_name       Name of option.
+	 * @param string|array $option_value      New Value of option.
+	 * @param string|array $option_old_value  Old Value of option.
+	 */
+	public function enable_advanced_dashboard_widget( $option_name, $option_value, $option_old_value ) {
+		if ( 'edits_tracking_mode' !== $option_name ) {
+			return;
+		}
+		if ( ( empty( $option_old_value ) || 'basic' === $option_old_value ) && 'advanced' === $option_value ) {
+			$user = get_current_user_id();
+			update_user_meta( $user, 'backupbuddy_dashboard_widget_mode', 'advanced' );
 		}
 	}
 

@@ -39,7 +39,7 @@ if ( true !== $result ) {
 	require_once pb_backupbuddy::plugin_path() . '/lib/zipbuddy/zipbuddy.php';
 	pb_backupbuddy::$classes['zipbuddy'] = new pluginbuddy_zipbuddy( ABSPATH, array(), 'unzip' );
 	$files                               = pb_backupbuddy::$classes['zipbuddy']->get_file_list( backupbuddy_core::getBackupDirectory() . str_replace( '\\/', '', pb_backupbuddy::_GET( 'zip_viewer' ) ) );
-	$fileoptions->options                = $files;
+	$fileoptions->options                = ! is_array( $files ) ? array() : $files;
 	$fileoptions->save();
 } else {
 	$files = &$fileoptions->options;

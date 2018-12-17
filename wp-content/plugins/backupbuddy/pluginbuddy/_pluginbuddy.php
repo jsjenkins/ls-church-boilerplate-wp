@@ -1473,6 +1473,28 @@ class pb_backupbuddy {
 	} // End add_action().
 
 	/**
+	 * Deregisters a WordPress action. Action of the name $tag will call the method in /controllers/actions.php with the matching name.
+	 *
+	 * @param string/array $tag       Tag / slug for the action. If an array the first item is the tag, the second is an optional custom callback method name.
+	 * @param int          $priority  Integer priority number for the action.
+	 */
+	public static function remove_action( $tag, $priority = 10 ) {
+		if ( ! is_object( self::$_actions ) ) {
+			self::_init_core_controller( 'actions' );
+		}
+		if ( is_array( $tag ) ) { // If array then first param is tag, second param is custom callback method name.
+			$callback_method = $tag[1];
+			$tag             = $tag[0];
+		} else { // No custom method name so tag and callback method name are the same.
+			$callback_method = $tag;
+			if ( strpos( $tag, '.' ) !== false ) {
+				echo '{Warning: Your tag contains disallowed characters. Tag names are equal to the PHP method that is called back so they must conform to PHP method name standards. For custom callback method names use an array for the tag parameter in the form: array( \'tag\', \'callback_name\' ).}';
+			}
+		}
+		remove_action( $tag, array( &self::$_actions, $callback_method ), $priority );
+	} // End add_action().
+
+	/**
 	 * Registers a WordPress ajax action. Ajax action of the name $tag will call the method in /controllers/ajax.php with the matching name.
 	 *
 	 * @param string/array $tag  Tag / slug for the action. If an array the first item is the tag, the second is an optional custom callback method name.
@@ -1873,6 +1895,163 @@ class pb_backupbuddy {
 			return;
 		}
 		error_log( 'Called @ ' . xdebug_call_file() . ':' . xdebug_call_line() . ' from ' . xdebug_call_function() );
+	}
+
+	/**
+	 * Track Recent Edits
+	 *
+	 * @param string $action    Action how it was tracked.
+	 * @param mixed  $relevant  Relevant content or object.
+	 */
+	public static function track_edit( $action, $relevant ) {
+		$increment_counter = false;
+		$edit_template     = array(
+			'type'      => 'unknown',
+			'action'    => $action,
+			'timestamp' => current_time( 'mysql' ),
+			'modified'  => 1,
+			'deletion'  => false,
+		);
+
+		// Remove the post_content value to reduce size of the stored object.
+		if ( is_a( $relevant, 'WP_Post' ) && isset( $relevant->post_content ) ) {
+			$relevant->post_content = '';
+		}
+
+		if ( 'save_post' === $action || 'post_updated' === $action ) {
+			if ( ! is_object( $relevant ) || ! isset( $relevant->ID ) ) {
+				return;
+			}
+
+			$post_id = $relevant->ID;
+
+			if ( isset( pb_backupbuddy::$options['recent_edits'][ $post_id ] ) ) {
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['modified']++;
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['post']      = $relevant;
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['timestamp'] = current_time( 'mysql' );
+			} else {
+				$increment_counter = 'post'; // Trigger a counter increment.
+				$save_post         = array_merge( $edit_template, array(
+					'type'    => 'post',
+					'post_id' => $post_id,
+					'post'    => $relevant,
+				) );
+
+				pb_backupbuddy::$options['recent_edits'][ $post_id ] = $save_post;
+			}
+		} elseif ( 'insert_post' === $action ) {
+			if ( ! is_object( $relevant ) || ! isset( $relevant->ID ) ) {
+				return;
+			}
+
+			$post_id = $relevant->ID;
+
+			if ( isset( pb_backupbuddy::$options['recent_edits'][ $post_id ] ) ) {
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['modified']++;
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['post']      = $relevant;
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['timestamp'] = current_time( 'mysql' );
+			} else {
+				$increment_counter = 'post'; // Trigger a counter increment.
+				$insert_post       = array_merge( $edit_template, array(
+					'type'    => 'post',
+					'post_id' => $post_id,
+					'post'    => $relevant,
+				) );
+
+				pb_backupbuddy::$options['recent_edits'][ $post_id ] = $insert_post;
+			}
+		} elseif ( 'trash_post' === $action ) {
+			if ( is_int( $relevant ) ) {
+				$post_id = $relevant;
+			} elseif ( ! is_object( $relevant ) || ! isset( $relevant->ID ) ) {
+				return;
+			} else {
+				$post_id = $relevant->ID;
+			}
+
+			if ( isset( pb_backupbuddy::$options['recent_edits'][ $post_id ] ) ) {
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['modified']++;
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['deletion']  = true;
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['post']      = $relevant;
+				pb_backupbuddy::$options['recent_edits'][ $post_id ]['timestamp'] = current_time( 'mysql' );
+			} else {
+				$increment_counter = 'post'; // Trigger a counter increment.
+				$delete_post       = array_merge( $edit_template, array(
+					'type'     => 'post',
+					'post_id'  => $post_id,
+					'post'     => is_object( $relevant ) ? $relevant : false,
+					'deletion' => true,
+				) );
+
+				pb_backupbuddy::$options['recent_edits'][ $post_id ] = $delete_post;
+			}
+		} elseif ( 'update_option' === $action ) {
+			if ( isset( pb_backupbuddy::$options['recent_edits'][ 'option-' . $relevant['option'] ] ) ) {
+				pb_backupbuddy::$options['recent_edits'][ 'option-' . $relevant['option'] ]['modified']++;
+				pb_backupbuddy::$options['recent_edits'][ 'option-' . $relevant['option'] ]['timestamp'] = current_time( 'mysql' );
+			} else {
+				$increment_counter = 'option'; // Trigger a counter increment.
+				$update_option     = array_merge( $edit_template, array(
+					'type'   => 'option',
+					'option' => $relevant['option'],
+				) );
+				pb_backupbuddy::$options['recent_edits'][ 'option-' . $relevant['option'] ] = $update_option;
+			}
+		} elseif ( 'delete_option' === $action ) {
+			if ( isset( pb_backupbuddy::$options['recent_edits'][ 'option-' . $relevant['option'] ] ) ) {
+				pb_backupbuddy::$options['recent_edits'][ 'option-' . $relevant['option'] ]['modified']++;
+				pb_backupbuddy::$options['recent_edits'][ 'option-' . $relevant['option'] ]['deletion']  = true;
+				pb_backupbuddy::$options['recent_edits'][ 'option-' . $relevant['option'] ]['timestamp'] = current_time( 'mysql' );
+			} else {
+				$increment_counter = 'option'; // Trigger a counter increment.
+				$delete_option     = array_merge( $edit_template, array(
+					'type'     => 'option',
+					'option'   => $relevant['option'],
+					'deletion' => true,
+				) );
+				pb_backupbuddy::$options['recent_edits'][ 'option-' . $relevant['option'] ] = $delete_option;
+			}
+		} elseif ( 'activate_plugin' === $action || 'deactivate_plugin' === $action || 'update_plugin' === $action ) {
+			if ( isset( pb_backupbuddy::$options['recent_edits'][ 'plugin-' . $relevant['plugin'] ] ) ) {
+				pb_backupbuddy::$options['recent_edits'][ 'plugin-' . $relevant['plugin'] ]['modified']++;
+				pb_backupbuddy::$options['recent_edits'][ 'plugin-' . $relevant['plugin'] ]['timestamp'] = current_time( 'mysql' );
+				pb_backupbuddy::$options['recent_edits'][ 'plugin-' . $relevant['plugin'] ]['action']    = $action;
+			} else {
+				$increment_counter = 'plugin'; // Trigger a counter increment.
+				$plugin_data       = array();
+				if ( file_exists( WP_PLUGIN_DIR . '/' . $relevant['plugin'] ) ) {
+					$full_plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $relevant['plugin'], false );
+					// Only store what we need.
+					if ( isset( $full_plugin_data['Name'] ) ) {
+						$plugin_data['Name'] = $full_plugin_data['Name'];
+					}
+					if ( isset( $full_plugin_data['PluginURI'] ) ) {
+						$plugin_data['PluginURI'] = $full_plugin_data['PluginURI'];
+					}
+				}
+				$plugin_detail = array_merge( $edit_template, array(
+					'type'        => 'plugin',
+					'plugin'      => $relevant['plugin'],
+					'plugin_data' => $plugin_data,
+				) );
+				pb_backupbuddy::$options['recent_edits'][ 'plugin-' . $relevant['plugin'] ] = $plugin_detail;
+			}
+		}
+
+		if ( false !== $increment_counter ) {
+			if ( ! is_array( pb_backupbuddy::$options['edits_since_last'] ) ) {
+				pb_backupbuddy::$options['edits_since_last'] = array(
+					'all'    => pb_backupbuddy::$options['edits_since_last'],
+					'post'   => 0,
+					'plugin' => 0,
+					'option' => 0,
+				);
+			}
+
+			pb_backupbuddy::$options['edits_since_last']['all']++;
+			pb_backupbuddy::$options['edits_since_last'][ $increment_counter ]++;
+			pb_backupbuddy::save();
+		}
 	}
 
 } // End class pluginbuddy.

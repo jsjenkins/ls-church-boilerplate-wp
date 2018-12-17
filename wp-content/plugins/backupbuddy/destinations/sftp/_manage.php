@@ -16,9 +16,9 @@ pb_backupbuddy_destination_sftp::_init();
 // Delete sftp backups
 if ( pb_backupbuddy::_POST( 'bulk_action' ) == 'delete_backup' ) {
 	pb_backupbuddy::verify_nonce();
-	
+
 	$delete_count = 0;
-		
+
 	// Connect to server.
 	$server = $destination['address'];
 	$port = '22'; // Default sFTP port.
@@ -27,9 +27,9 @@ if ( pb_backupbuddy::_POST( 'bulk_action' ) == 'delete_backup' ) {
 		$server = $server_params[0];
 		$port = $server_params[1];
 	}
-	
+
 	$pass_or_key = pb_backupbuddy_destination_sftp::get_pass_or_key( $destination );
-	
+
 	pb_backupbuddy::status( 'details', 'Connecting to sFTP server...' );
 	$sftp = new Net_SFTP( $server, $port );
 	if ( ! $sftp->login( $destination['username'], $pass_or_key ) ) {
@@ -46,8 +46,8 @@ if ( pb_backupbuddy::_POST( 'bulk_action' ) == 'delete_backup' ) {
 		pb_backupbuddy::status( 'error', 'Unable to change into specified path. Verify the path is correct with valid permissions.' );
 		return false;
 	}
-	
-	
+
+
 	// loop through and delete ftp backup files
 	foreach( (array)pb_backupbuddy::_POST( 'items' ) as $backup ) {
 		// try to delete backup
@@ -57,8 +57,8 @@ if ( pb_backupbuddy::_POST( 'bulk_action' ) == 'delete_backup' ) {
 			pb_backupbuddy::alert( 'Unable to delete file `' . $destination['path'] . '/' . $backup . '`.' );
 		}
 	}
-	
-	
+
+
 	if ( $delete_count > 0 ) {
 		pb_backupbuddy::alert( sprintf( _n( 'Deleted %d file.', 'Deleted %d files.', $delete_count, 'it-l10n-backupbuddy' ), $delete_count ) );
 	} else {
@@ -106,11 +106,15 @@ foreach( $files as $filename => $file ) {
 	if ( false === stristr( $filename, 'backup' ) ) { // only show backup files
 		continue;
 	}
-	
+
 	$backup_type = backupbuddy_core::getBackupTypeFromFile( $filename );
-	
+
+	if ( ! $backup_type ) {
+		continue;
+	}
+
 	$last_modified = $file['mtime'];
-	
+
 	while( isset( $backup_list_temp[$last_modified] ) ) { // Avoid collisions.
 		$last_modified += 0.1;
 	}
@@ -135,7 +139,7 @@ foreach( $backup_list_temp as $backup_item ) {
 }
 unset( $backup_list_temp );
 
-
+$urlPrefix = pb_backupbuddy::ajax_url( 'remoteClient' ) . '&destination_id=' . htmlentities( pb_backupbuddy::_GET( 'destination_id' ) );
 
 //echo '<h3>', __('Viewing', 'it-l10n-backupbuddy' ), ' `' . $destination['title'] . '` (' . $destination['type'] . ')</h3>';
 
@@ -158,6 +162,3 @@ if ( count( $backup_list ) == 0 ) {
 		)
 	);
 }
-
-
-?>

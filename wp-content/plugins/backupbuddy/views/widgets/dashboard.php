@@ -30,13 +30,84 @@
 	</script>
 <?php endif; ?>
 
-<div class="traditional-backup-wrapper hidden">
-	<div class="edits-since-wrapper">
-		<p class="edits-since <?php echo esc_attr( $status ); ?>">
+<div class="traditional-backup-wrapper hidden mode-<?php echo esc_attr( $edits_widget_mode ); ?>">
+	<?php if ( 'advanced' === $get_overview['editsTrackingMode'] && is_array( $get_overview['advancedEditsSinceLastBackup'] ) ) : ?>
+		<div class="recent-edits-dashboard-toggle">
+			<input type="radio" name="recent-edit-dashboard-widget" value="basic" id="recent-edit-dashboard-widget-basic" <?php checked( 'basic', $edits_widget_mode ); ?>>
+			<label for="recent-edit-dashboard-widget-basic"><?php esc_html_e( 'Basic', 'it-l10n-backupbuddy' ); ?></label>
+			<input type="radio" name="recent-edit-dashboard-widget" value="advanced" id="recent-edit-dashboard-widget-advanced" <?php checked( 'advanced', $edits_widget_mode ); ?>>
+			<label for="recent-edit-dashboard-widget-advanced"><?php esc_html_e( 'Advanced', 'it-l10n-backupbuddy' ); ?></label>
+			<span class="toggle-outside"><span class="toggle-inside"></span></span>
+		</div>
+	<?php endif; ?>
+
+	<div class="edits-since-wrapper basic-mode">
+		<p class="edits-since <?php echo esc_attr( $basic_status ); ?>">
 			<?php echo esc_html( $get_overview['editsSinceLastBackup'] ); ?>
 		</p>
-		<h4 class="number-heading">Edits since<br>last Backup</h4>
+
+		<h4 class="number-heading">
+			<?php if ( 0 == $get_overview['editsSinceLastBackup'] ) : ?>
+				<?php echo $edits_number_caption; ?>
+			<?php else : ?>
+				<a href="#backupbuddy-recent-edits"><?php echo $edits_number_caption; ?></a>
+			<?php endif; ?>
+		</h4>
 	</div>
+
+	<?php if ( 'advanced' === $get_overview['editsTrackingMode'] && is_array( $get_overview['advancedEditsSinceLastBackup'] ) ) : ?>
+		<div class="edits-since-wrapper advanced-mode">
+			<div class="advanced-edits-total all-edits">
+				<p class="total-edits-since <?php echo esc_attr( $status_all ); ?>">
+					<?php echo esc_html( $get_overview['advancedEditsSinceLastBackup']['all_edits'] ); ?>
+				</p>
+				<h5 class="number-heading">
+					<?php if ( 0 == $get_overview['advancedEditsSinceLastBackup']['all_edits'] ) : ?>
+						Total File/Database Changes<br>Since Last Backup
+					<?php else : ?>
+						<a href="#backupbuddy-recent-edits">Total File/Database Changes<br>Since Last Backup</a>
+					<?php endif; ?>
+				</h5>
+			</div>
+			<div class="advanced-edits-total post-changes">
+				<p class="total-edits-since <?php echo esc_attr( $status_posts ); ?>">
+					<?php echo esc_html( $get_overview['advancedEditsSinceLastBackup']['post_edits'] ); ?>
+				</p>
+				<h5 class="number-heading">
+					<?php if ( 0 == $get_overview['advancedEditsSinceLastBackup']['post_edits'] ) : ?>
+						Post Changes<br>Since Last Backup
+					<?php else : ?>
+						<a href="#backupbuddy-recent-edits" rel="post">Post Changes<br>Since Last Backup</a>
+					<?php endif; ?>
+				</h5>
+			</div>
+			<div class="advanced-edits-total plugin-changes">
+				<p class="total-edits-since <?php echo esc_attr( $status_plugins ); ?>">
+					<?php echo esc_html( $get_overview['advancedEditsSinceLastBackup']['plugin_edits'] ); ?>
+				</p>
+				<h5 class="number-heading">
+					<?php if ( 0 == $get_overview['advancedEditsSinceLastBackup']['plugin_edits'] ) : ?>
+						Plugin Changes<br>Since Last Backup
+					<?php else : ?>
+						<a href="#backupbuddy-recent-edits" rel="plugin">Plugin Changes<br>Since Last Backup</a>
+					<?php endif; ?>
+				</h5>
+			</div>
+			<div class="advanced-edits-total option-changes">
+				<p class="total-edits-since <?php echo esc_attr( $status_options ); ?>">
+					<?php echo esc_html( $get_overview['advancedEditsSinceLastBackup']['option_edits'] ); ?>
+				</p>
+				<h5 class="number-heading">
+					<?php if ( 0 == $get_overview['advancedEditsSinceLastBackup']['option_edits'] ) : ?>
+						Options/Settings Changes<br>Since Last Backup
+					<?php else : ?>
+						<a href="#backupbuddy-recent-edits" rel="option">Options/Settings Changes<br>Since Last Backup</a>
+					<?php endif; ?>
+				</h5>
+			</div>
+		</div>
+	<?php endif; ?>
+
 	<?php if ( isset( $get_overview['lastBackupStats']['finish'] ) ) { // only show if a last backup exists. ?>
 		<div class="info-group">
 			<h3>Latest Backup</h3>
@@ -102,6 +173,28 @@
 				jQuery(this).addClass('selected').siblings().removeClass('selected');
 				jQuery( '#pb_backupbuddy_stats .traditional-backup-wrapper').removeClass('hidden');
 				jQuery( '#pb_backupbuddy_stats .stash-live-wrapper').addClass('hidden');
+			}
+		});
+
+		// Click edit count to see recent edits.
+		jQuery( 'a[href$="#backupbuddy-recent-edits"]' ).on( 'click', function(e) {
+			e.preventDefault();
+			var rel = jQuery( this ).attr( 'rel' ) ? '&rel=' + jQuery( this ).attr( 'rel' ) : '';
+			tb_show( 'BackupBuddy', '<?php echo pb_backupbuddy::ajax_url( 'recent_edits' ); ?>' + rel + '&TB_iframe=1&width=640&height=455', null );
+			return false;
+		});
+
+		jQuery( '.recent-edits-dashboard-toggle' ).on( 'click', function(){
+			var val = jQuery('input[name="recent-edit-dashboard-widget"]:checked').val();
+			jQuery.ajax({
+				url: '<?php echo pb_backupbuddy::ajax_url( 'update_user_dashboard_widget' ); ?>',
+				method: 'post',
+				data: { mode: val }
+			});
+			if ( 'advanced' === val ) {
+				jQuery( '.traditional-backup-wrapper' ).removeClass( 'mode-basic' ).addClass( 'mode-advanced' );
+			} else {
+				jQuery( '.traditional-backup-wrapper' ).removeClass( 'mode-advanced' ).addClass( 'mode-basic' );
 			}
 		});
 

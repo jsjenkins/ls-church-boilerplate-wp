@@ -4,9 +4,9 @@ jQuery(document).ready(function() {
 			return false;
 		}
 	});
-	
-	
-	
+
+
+
 	jQuery('.pb_debug_show').click(function(e) {
 		jQuery(this).hide();
 		jQuery(this).parent().children( '.pb_debug_hide').show();
@@ -21,7 +21,7 @@ jQuery(document).ready(function() {
 		jQuery(this).parent().css( 'width', '40px' );
 		jQuery(this).parent().children( 'div').hide();
 	});
-	
+
 	jQuery( '.advanced-toggle-title' ).click(function(){
 		containerWrap = jQuery(this).closest( 'form' );
 		titleToggle = containerWrap.find( '.advanced-toggle-title' );
@@ -33,11 +33,11 @@ jQuery(document).ready(function() {
 		}
 		containerWrap.find( '.advanced-toggle' ).toggle();
 	});
-	
-	
+
+
 	jQuery('.pluginbuddy_tip').tooltip(); // Now using jQuery UI tooltip.
-	
-	
+
+
 	if (typeof jQuery.tableDnD !== 'undefined') { // If tableDnD function loaded.
 		jQuery('.pb_reorder').tableDnD({
 			onDrop: function(tbody, row) {
@@ -52,10 +52,15 @@ jQuery(document).ready(function() {
 			dragHandle: "pb_draghandle"
 		});
 	}
-	
+
 	jQuery('.pb_toggle').click(function(e) {
 		jQuery( '#pb_toggle-' + jQuery(this).attr('id') ).slideToggle();
 	});
-	
-	
+
+	jQuery( '.itbub-edits-summary .itbub-summary-item' ).on( 'click', function() {
+		var $el = jQuery( this );
+
+		$el.toggleClass( 'itbub-active' );
+		jQuery( '#' + $el.attr( 'rel' ) ).toggleClass( 'itbub-active' );
+	});
 });

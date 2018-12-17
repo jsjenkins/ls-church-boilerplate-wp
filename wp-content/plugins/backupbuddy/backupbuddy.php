@@ -3,7 +3,7 @@
  * Plugin Name: BackupBuddy
  * Plugin URI: http://ithemes.com/purchase/backupbuddy/
  * Description: The most complete WordPress solution for Backup, Restoration, Migration, and Deployment to the same host or a new domain. Backs up a customizable selection of files, settings, and content for a complete snapshot of your site. Stash Live feature allows for real-time live backups to the cloud.
- * Version: 8.2.8.3
+ * Version: 8.3.3.1
  * Author: iThemes
  * Author URI: http://ithemes.com/
  * iThemes Package: backupbuddy
@@ -41,7 +41,14 @@ $pluginbuddy_settings = array(
 		'importbuddy_pass_hash'                   => '',       // ImportBuddy password hash.
 		'importbuddy_pass_length'                 => 0,        // Length of the ImportBuddy password before it was hashed.
 		'backup_reminders'                        => 1,        // Remind to backup after post, pre-upgrade, etc.
-		'edits_since_last'                        => 0,        // Number of post/page edits since the last backup began.
+		'edits_since_last'                        => array(    // Number of recent edits since the last backup began.
+			'all'    => 0, // All recent edits total.
+			'post'   => 0, // Post edits total.
+			'plugin' => 0, // Plugin edits total.
+			'option' => 0, // Option edits total.
+		),
+		'recent_edits'                            => array(),  // Track recent edits.
+		'edits_tracking_mode'                     => 'basic',   // Mode for tracking recent edits (basic/advanced).
 		'last_backup_start'                       => 0,        // Timestamp of when last backup started.
 		'last_backup_finish'                      => 0,        // Timestamp of when the last backup finished.
 		'last_backup_serial'                      => '',       // Serial of last backup zip.

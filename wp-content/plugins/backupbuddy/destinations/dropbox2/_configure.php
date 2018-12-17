@@ -20,13 +20,13 @@ $pb_hide_save = true;
 $show_config_form = false;
 
 if ( 'add' == $mode ) { // ADD mode.
-	
+
 	$webAuth = new \Dropbox\WebAuthNoRedirect( pb_backupbuddy_destination_dropbox2::$appInfo, 'BackupBuddy v' . pb_backupbuddy::settings( 'version' ), 'en' );
-	
+
 	$bad_auth_code = false;
 	if ( '' != pb_backupbuddy::_POST( 'dropbox_authorization_code' ) ) { // Authorization code entered. Try it out before showing form or not.
-		
-		
+
+
 		$pb_hide_save = false;
 		$authCode = trim( pb_backupbuddy::_POST( 'dropbox_authorization_code' ) );
 		try {
@@ -36,25 +36,25 @@ if ( 'add' == $mode ) { // ADD mode.
 			$bad_auth_code = true;
 			$pb_hide_save = true;
 		}
-		
+
 		if ( false === $bad_auth_code ) {
 			$dropboxClient = new \Dropbox\Client( $accessToken, 'BackupBuddy v' . pb_backupbuddy::settings( 'version' ) );
 			$accountInfo = $dropboxClient->getAccountInfo();
 			$show_config_form = true;
 		}
-		
+
 	}
-	
-	
+
+
 	if ( '' == pb_backupbuddy::_POST( 'dropbox_authorization_code' ) || ( true === $bad_auth_code ) ) { // No authorization code entered yet so user needs to authorize.
-		
+
 		try {
 			$authorizeUrl = $webAuth->start();
 		} catch( Exception $e ) {
 			pb_backupbuddy::alert( 'Error #8778656: Dropbox error. Details: `' . $e->getMessage() . '`.', true );
 			return false;
 		}
-		
+
 		echo '<form method="post" action="' . pb_backupbuddy::ajax_url( 'destination_picker' ) . '&add=dropbox2&callback_data=' . pb_backupbuddy::_GET( 'callback_data' ) . '">';
 		echo '&nbsp;<a href="https://db.tt/ar3MNMZo" target="_top">Don\'t have a Dropbox account? Click here!</a><br><br>';
 		echo '<br><b>Setup Instructions</b><ol>';
@@ -64,11 +64,11 @@ if ( 'add' == $mode ) { // ADD mode.
 		echo '<li><input type="submit" class="button-primary" value="' . __( "Yes, I've Authorized BackupBuddy with Dropbox & Entered the Code above", 'it-l10n-backupbuddy' ) . '"></li>';
 		echo '</ol>';
 		echo '</form>';
-		
+
 	} // end authorication code submitted.
-	
+
 } elseif ( 'edit' == $mode ) { // EDIT mode.
-	
+
 	$accessToken = $destination_settings['access_token'];
 	try {
 		$dropboxClient = new \Dropbox\Client( $accessToken, 'BackupBuddy v' . pb_backupbuddy::settings( 'version' ) );
@@ -82,23 +82,23 @@ if ( 'add' == $mode ) { // ADD mode.
 		pb_backupbuddy::alert( 'Dropbox Error #132852: ' . $e->getMessage() . '<br><br>' . pb_backupbuddy::$ui->button( pb_backupbuddy::page_url(), '&larr; go back & retry' ), true );
 		return false;
 	}
-	
+
 	$show_config_form = true; // Enable showing configuration form below.
-	
+
 } elseif ( 'save' == $mode ) {
-	
+
 	$show_config_form = true;
-	
+
 } else { // UNKNOWN mode.
-	
+
 	die( 'Error #3283489434: Unknown destination form mode.' );
-		
+
 } // End checking mode.
 
 
 // Display configuration form.
 if ( true === $show_config_form ) {
-	
+
 	if ( 'save' != $mode ) {
 		// Account info.
 		$settings_form->add_setting( array(
@@ -114,7 +114,7 @@ if ( true === $show_config_form ) {
 			'default'	=>		$accountInfo['email'],
 		) );
 	}
-	
+
 	$default_name = NULL;
 	// Settings.
 	if ( 'add' == $mode ) {
@@ -135,13 +135,8 @@ if ( true === $show_config_form ) {
 		'rules'		=>		'required|string[1-45]',
 		'default'	=>		$default_name,
 	) );
-	if ( $mode !== 'edit' ) {
-		$dropbox_directory_type = 'text';
-	} else {
-		$dropbox_directory_type = 'plaintext';
-	}
 	$settings_form->add_setting( array(
-		'type'		=>		$dropbox_directory_type,
+		'type'		=>		'text',
 		'name'		=>		'directory',
 		'title'		=>		__( 'Directory (optional)', 'it-l10n-backupbuddy' ),
 		'tip'		=>		__( '[Example: backupbuddy or backupbuddy/mysite/ or myfiles/backups/mysite] - Directory (or subdirectory) name to place the backups within. NOTE: This cannot be changed once the destination is created (for security).', 'it-l10n-backupbuddy' ),
@@ -156,18 +151,18 @@ if ( true === $show_config_form ) {
 		'css'		=>		'width: 50px;',
 		'after'		=>		' backups',
 	) );
-	
-	
-	
+
+
+
 	$settings_form->add_setting( array(
 		'type'		=>		'title',
 		'name'		=>		'advanced_begin',
 		'title'		=>		'<span class="dashicons dashicons-arrow-right"></span> ' . __( 'Advanced Options', 'it-l10n-backupbuddy' ),
 		'row_class'	=>		'advanced-toggle-title',
 	) );
-	
-	
-	
+
+
+
 	$settings_form->add_setting( array(
 		'type'		=>		'text',
 		'name'		=>		'max_chunk_size',
@@ -202,7 +197,7 @@ if ( true === $show_config_form ) {
 		'rules'		=>		'',
 		'row_class'	=>		'advanced-toggle',
 	) );
-	
+
 } // End showing config form.
 
 

@@ -1910,3 +1910,53 @@
 8.2.8.3 - 2018-08-13 - Brian DiChiara, Joshua Benham
 	Bug Fix: Resolved issues with invalid schedules.
 	Bug Fix: Added schedule cleanup to Housekeeping to resolve some issues with bad schedules.
+8.2.9.0 - 2018-09-19 - Brian DiChiara
+	Enhancement: Added more detail about recent edits in WordPress Dashboard widget as well as track more events more accurately, such as changes to posts and plugin activations/deletions
+	Enhancement: Added ability to change Dropbox remote destination directory.
+	Enhancement: Filtered files in all remote destinations to only show backups.
+	Enhancement: Made remote destination file list tables more consistent.
+	Bug Fix:     Fixed issue for Dropbox when using root directory.
+	Bug Fix:     Resolved an issue with Rackspace remote destination.
+	Bug Fix:     Fixed an escaped HTML issue in FTP Browse interface.
+	Bug Fix:     Fixed a typo in importbuddy.
+	Bug Fix:     Made a message about crons a little clearer.
+	Bug Fix:     Resolved a few issues where PHP Error Notices were being displayed.
+	Update:      Updated 3rd party jQuery Date/Time picker library to v1.6.3
+	Update:      Updated 3rd party LeanModal library to v1.1
+	Cleanup:     Removed unused 3rd party SimpleExpand library
+	Major Release of all quick releases since 8.2.8.1
+		Bug Fix: Suppress errors related to open_basedir in ImportBuddy.
+		Bug Fix: Fixed duplicate element ID errors in browser console.
+		Bug Fix: Typo in loopback error corrected.
+		Bug Fix: Sometimes database shows skipped when wasn't skipped. Fixed confusion.
+		Bug Fix: Restoring from Stash Live sometimes opened a new tab/window.
+		Bug Fix: PHP notice when restoring from Stash Live
+		Enhancement: New Backup setting to include only active plugins in backup.
+		Bug Fix:     Resolved issue with database rollback.
+		Bug Fix:     Tweaked regular expression related to database prefix to remove warning when multiple underscores in prefix.
+		Bug Fix:     Additional logging for potential scheduling issues.
+		Bug Fix: Resolved issues with invalid schedules.
+		Bug Fix: Added schedule cleanup to Housekeeping to resolve some issues with bad schedules.
+8.3.0.0 - 2018-09-28 - Brian DiChiara, Glenn Ansley
+	Enhancement: Added new BackupBuddy API Verb for Editing Schedules.
+	Enhancement: Removed storage/tracking of option value and post content to reduce memory usage.
+	Bug Fix:     Added several third-party plugin exceptions to automatically ignore when tracking recent edits.
+	Bug Fix:     Fixed an issue where modal window isn't always centered.
+	Bug Fix:     Fixed a PHP Error/Notice occuring during Importbuddy.
+8.3.1.0 - 2018-10-18 - Brian DiChiara, Joshua Benham
+	Enhancement: Added Advanced Mode to Recent Edits tracking, with a toggle setting under Settings > Advanced > Logging.
+	Enhancement: Added new advanced dashboard widget with more detail when logging in Advanced mode.
+	Bug Fix:     Removed option variable comparison which sometimes causing recursive looping.
+	Bug Fix:     Recent Edits button jump issue in Chrome fixed.
+	Bug Fix:     Resolved issues where PHP Countable notice thrown on variables that were not countable.
+	Bug Fix:     Reduced the number of "Edits" in Dashboard Widget, limiting to 1 per item, with more detail in the Recent Edits modal window.
+8.3.1.1 - 2018-10-24 - Brian DiChiara
+	Bug Fix: Exclude BackupBuddy from Recent Edits Plugin tracking to prevent errors.
+8.3.2.0 - 2018-12-05 - Chris Jean, Joshua Benham
+	Enhancement: Added improvements to the Stash remote destination as preparation for merging both v2 and v3 into a unified single Stash version.
+8.3.3.0 - 2018-12-05 - Chris Jean, Joshua Benham
+	Bug Fix: Increased timeouts for Stash to fix some reported issues of requests timing out.
+	Bug Fix: Fixed issue that could cause failure to sign into Stash Live.
+	Bug Fix: Fixed source of the following warning: "Undefined index: finish_time in backupbuddy/classes/housekeeping.php on line 392".
+8.3.3.1 - 2018-12-12 - Chris Jean, Joshua Benham
+	Bug Fix: Fixed error that prevents users from disconnecting from Stash Live when no Stash remote destinations are active.

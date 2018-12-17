@@ -1,4 +1,6 @@
 <?php
+use WP_Rocket\Logger\Logger;
+
 defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 
 /**
@@ -150,16 +152,17 @@ function rocket_first_install() {
 				'cache_logged_user'           => 0,
 				'cache_ssl'                   => rocket_is_ssl_website() ? 1 : 0,
 				'emoji'                       => 1,
-				'embeds'                      => 1,
-				'cache_reject_uri'            => array(),
-				'cache_reject_cookies'        => array(),
-				'cache_reject_ua'             => array(),
-				'cache_query_strings'         => array(),
-				'cache_purge_pages'           => array(),
+				'embeds'                      => 0,
+				'cache_reject_uri'            => [],
+				'cache_reject_cookies'        => [],
+				'cache_reject_ua'             => [],
+				'cache_query_strings'         => [],
+				'cache_purge_pages'           => [],
 				'purge_cron_interval'         => 10,
 				'purge_cron_unit'             => 'HOUR_IN_SECONDS',
-				'exclude_css'                 => array(),
-				'exclude_js'                  => array(),
+				'exclude_css'                 => [],
+				'exclude_js'                  => [],
+				'exclude_inline_js'           => [],
 				'defer_all_js'                => 0,
 				'defer_all_js_safe'           => 1,
 				'async_css'                   => 0,
@@ -175,11 +178,10 @@ function rocket_first_install() {
 				'minify_concatenate_js'       => 0,
 				'minify_google_fonts'         => 1,
 				'minify_html'                 => 0,
-				'manual_preload'              => 0,
-				'automatic_preload'           => 0,
+				'manual_preload'              => 1,
 				'sitemap_preload'             => 0,
 				'sitemap_preload_url_crawl'   => '500000',
-				'sitemaps'                    => array(),
+				'sitemaps'                    => [],
 				'remove_query_strings'        => 0,
 				'dns_prefetch'                => 0,
 				'database_revisions'          => 0,
@@ -193,9 +195,9 @@ function rocket_first_install() {
 				'schedule_automatic_cleanup'  => 0,
 				'automatic_cleanup_frequency' => 'daily',
 				'cdn'                         => 0,
-				'cdn_cnames'                  => array(),
-				'cdn_zone'                    => array(),
-				'cdn_reject_files'            => array(),
+				'cdn_cnames'                  => [],
+				'cdn_zone'                    => [],
+				'cdn_reject_files'            => [],
 				'do_cloudflare'               => 0,
 				'cloudflare_email'            => '',
 				'cloudflare_api_key'          => '',
@@ -204,10 +206,17 @@ function rocket_first_install() {
 				'cloudflare_protocol_rewrite' => 0,
 				'cloudflare_auto_settings'    => 0,
 				'cloudflare_old_settings'     => '',
+				'control_heartbeat'           => 0,
+				'heartbeat_site_behavior'     => 'reduce_periodicity',
+				'heartbeat_admin_behavior'    => 'reduce_periodicity',
+				'heartbeat_editor_behavior'   => 'reduce_periodicity',
 				'varnish_auto_purge'          => 0,
 				'do_beta'                     => 0,
 				'analytics_enabled'           => 0,
 				'google_analytics_cache'      => 0,
+				'facebook_pixel_cache'        => 0,
+				'sucury_waf_cache_sync'       => 0,
+				'sucury_waf_api_key'          => '',
 			)
 		)
 	);
@@ -318,6 +327,60 @@ function rocket_new_upgrade( $wp_rocket_version, $actual_version ) {
 
 	if ( version_compare( $actual_version, '3.1.1', '<' ) ) {
 		rocket_generate_config_file();
+	}
+
+	if ( version_compare( $actual_version, '3.1.4', '<' ) ) {
+		rocket_generate_advanced_cache_file();
+	}
+
+	if ( version_compare( $actual_version, '3.2', '<' ) ) {
+		// Default Heartbeat settings.
+		$options                              = get_option( WP_ROCKET_SLUG, [] );
+		$options['heartbeat_site_behavior']   = 'reduce_periodicity';
+		$options['heartbeat_admin_behavior']  = 'reduce_periodicity';
+		$options['heartbeat_editor_behavior'] = 'reduce_periodicity';
+
+		if ( ! empty( $options['automatic_preload'] ) || ! empty( $options['sitemap_preload'] ) ) {
+			$options['manual_preload'] = 1;
+		}
+
+		update_option( WP_ROCKET_SLUG, $options );
+		rocket_generate_config_file();
+		rocket_generate_advanced_cache_file();
+
+		// Create a .htaccess file in the log folder.
+		$handler = Logger::get_stream_handler();
+
+		if ( method_exists( $handler, 'create_htaccess_file' ) ) {
+			try {
+				$success = $handler->create_htaccess_file();
+			} catch ( \Exception $e ) {
+				$success = false;
+			}
+
+			if ( ! $success ) {
+				Logger::delete_log_file();
+			}
+		}
+	}
+
+	if ( version_compare( $actual_version, '3.2.0.1', '<' ) ) {
+		flush_rocket_htaccess();
+		wp_safe_remote_get( esc_url( home_url() ) );
+	}
+
+	if ( version_compare( $actual_version, '3.2.1', '<' ) ) {
+		flush_rocket_htaccess();
+		rocket_generate_config_file();
+		rocket_clean_domain();
+	}
+
+	if ( version_compare( $actual_version, '3.2.1.1', '<' ) ) {
+		rocket_generate_config_file();
+	}
+
+	if ( version_compare( $actual_version, '3.2.2', '<' ) ) {
+		flush_rocket_htaccess();
 	}
 }
 add_action( 'wp_rocket_upgrade', 'rocket_new_upgrade', 10, 2 );

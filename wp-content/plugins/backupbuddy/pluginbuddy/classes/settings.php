@@ -271,6 +271,8 @@ class pb_backupbuddy_settings {
 				// The hard work.
 				foreach ( $_posts as $post_name => $post_value ) { // Loop through all post items (not all may be our form). @see 83429594837534987.
 					$this->_form->set_value( $post_name, $post_value );
+					$old_value = isset( pb_backupbuddy::$options[ $post_name ] ) ? pb_backupbuddy::$options[ $post_name ] : false;
+					do_action( 'itbub_save_setting', $post_name, $post_value, $old_value );
 
 					// From old save_settings().
 					$savepoint_subsection = &pb_backupbuddy::$options;

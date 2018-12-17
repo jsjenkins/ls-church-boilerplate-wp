@@ -16,9 +16,9 @@
  * 	$backup_options->options = array( 'hello' => 'world' );
  * 	$backup_options->save(); // Optional force save now. If omitted destructor will hopefully save.
  * }
- 
+
  Another in-use example:
- 
+
 pb_backupbuddy::status( 'details', 'About to load fileoptions data.' );
 require_once( pb_backupbuddy::plugin_path() . '/classes/fileoptions.php' );
 $fileoptions_obj = new pb_backupbuddy_fileoptions( backupbuddy_core::getLogDirectory() . 'fileoptions/send-' . $send_id . '.txt', $read_only = true, $ignore_lock = true, $create_file = false );
@@ -33,8 +33,8 @@ $fileoptions = &$fileoptions_obj->options;
  */
 
 class pb_backupbuddy_fileoptions {
-	
-	public $options = ''; // Current options.
+
+	public $options = array(); // Current options.
 	private $_options_hash = ''; // Hold hash of options so we don't perform file operations needlessly if things have not changed.
 	private $_file; // Filename options are stored in.
 	private $_is_ok = 'UNKNOWN'; // true on error; error message otherwise
@@ -42,7 +42,7 @@ class pb_backupbuddy_fileoptions {
 	private $_loaded = false; // Has file been succesfully loaded yet?
 	private $_live = false; // Stash Live mode.
 	private $_my_lock_id = ''; // Track my lock ID for this instance so we do not unlock for other instances/page loads by default.
-	
+
 	/* __construct()
 	 *
 	 * Reads and creates file lock. If file does not exist, creates it. Places options into this class's $options.
@@ -57,35 +57,35 @@ class pb_backupbuddy_fileoptions {
 	function __construct( $file, $read_only = false, $ignore_lock = false, $create_file = false, $live_mode = false ) {
 		$this->_file = $file;
 		$this->_read_only = $read_only;
-		
+
 		// If read-only then ignore locks is forced.
 		if ( $read_only === true ) {
 			$ignore_lock = true;
 		}
-		
+
 		if ( ! file_exists( dirname( $file ) ) ) { // Directory exist?
 			pb_backupbuddy::anti_directory_browsing( dirname( $file ), $die_on_fail = false, $deny_all = true );
 		}
-		
+
 		/*
 		if ( ! file_exists( $file ) ) { // File exist?
 			//$this->save();
 		}
 		*/
-		
+
 		if ( true === $live_mode ) {
 			$this->_live = true;
 		}
-		
+
 		$before_memory = memory_get_usage() / 1048576;
 		$this->load( $ignore_lock, $create_file );
 		$after_memory = memory_get_usage() / 1048576;
 		pb_backupbuddy::status( 'details', 'Fileoptions load using ' . round( $after_memory - $before_memory, 2 ) . ' MB of memory.' );
-		
+
 	} // End __construct().
-	
-	
-	
+
+
+
 	/* __destruct()
 	 *
 	 * Saves options on destruction.
@@ -94,14 +94,14 @@ class pb_backupbuddy_fileoptions {
 	 *
 	 */
 	function __destruct() {
-		
+
 		// IMPORTANT: We can NOT rely on any outside classes from here on out such as the framework status method. Pass true to unlock to insure it does not perform any status logging.
 		$this->unlock( $destructorCalled = true );
-		
+
 	} // End __destruct().
-	
-	
-	
+
+
+
 	/* is_ok()
 	 *
 	 * Determine whether options was loaded correctly and is ok.
@@ -110,13 +110,13 @@ class pb_backupbuddy_fileoptions {
 	 *
 	 */
 	public function is_ok() {
-		
+
 		return $this->_is_ok;
-		
+
 	} // End is_ok().
-	
-	
-	
+
+
+
 	/* load()
 	 *
 	 * Load options from file. Use is_ok() to verify integrity. If is_ok() !== true, returns error message.
@@ -128,7 +128,7 @@ class pb_backupbuddy_fileoptions {
 	 *
 	 */
 	public function load( $ignore_lock = false, $create_file = false, $retryCount = 0 ) {
-		
+
 		// Check if file exists.
 		if ( ! file_exists( $this->_file ) ) {
 			@unlink( $this->_file . '.lock' ); // fileoptions file did not exist so delete lock file for it if it exists.
@@ -139,10 +139,10 @@ class pb_backupbuddy_fileoptions {
 			}
 			$options = '';
 		}
-		
+
 		// If NOT ignoring lock (false|int) AND current locked.
 		if ( ( true !== $ignore_lock ) && ( true === $this->is_locked() ) ) {
-			
+
 			// Not set to ignore lock.
 			if ( false === $ignore_lock ) {
 				sleep( 1 ); // Wait 1 second befoe trying again.
@@ -155,7 +155,7 @@ class pb_backupbuddy_fileoptions {
 					}
 				}
 			}
-			
+
 			// Ignore lock only if file is unmodified for this number of seconds.
 			if ( is_numeric( $ignore_lock ) ) {
 				if ( false === ( $modified = @filemtime( $this->_file ) ) ) {
@@ -176,15 +176,15 @@ class pb_backupbuddy_fileoptions {
 				pb_backupbuddy::status( 'warning', 'Fileoptions file was locked `' . ( time() - $modified ) . '` seconds ago. Wait time of `' . $ignore_lock . '` seconds was exceeded so unlocking.' );
 				$this->unlock( false, $only_unlock_my_id = false ); // $only_unlock_my_id = false forces unlock since locking process likely timed out.
 			}
-			
+
 		}
-		
-		
+
+
 		// Only lock when not in read-only mode.
 		if ( false === $this->_read_only ) {
-			
+
 			$lock_results = $this->_lock();
-			
+
 			$lock_tries = 0;
 			$lock_tries_limit = 5;
 			while( ( $lock_tries < $lock_tries_limit ) && ( false === $lock_results ) ) {
@@ -193,19 +193,19 @@ class pb_backupbuddy_fileoptions {
 				sleep( 1 );
 				$lock_results = $this->_lock();
 			}
-			
+
 			if ( false === $lock_results ) { // If lock fails (possibly due to existing lock file) then fail load.
 				$this->_is_ok = 'ERROR_UNABLE_TO_LOCK';
 				return false;
 			}
 		}
-		
+
 		// BackupBuddy Stash Live mode. (one array entry per line for performance/memory usage).
 		if ( true === $this->_live ) {
 			$found_start = false;
 			$found_end = false;
 			$found_corrupt = false;
-			
+
 			if ( ! isset( $options ) ) { // Not set so file exists. Read in data.
 				if ( false === ( $fso = @fopen( $this->_file, 'r' ) ) ) {
 					pb_backupbuddy::status( 'error', 'Error #4394974: Unable to read fileoptions file `' . $this->_file . '` in Live mode. Verify permissions on this directory.' );
@@ -225,7 +225,7 @@ class pb_backupbuddy_fileoptions {
 						$found_end = true;
 						continue;
 					}
-					
+
 					$buffer = explode( '|', $buffer );
 					/*
 					if ( false === ( $data = base64_decode( $buffer[1] ) ) ) {
@@ -262,31 +262,31 @@ class pb_backupbuddy_fileoptions {
 					@fclose( $fso );
 					return false;
 				}
-				
+
 				@fclose( $fso );
 			}
-			
+
 			// Corrupt line encountered OR ( found start marker but did not find end marker ). If file seems incomplete or corrupted then we will check the .bak catalog backup and load it if its filesize is larger. Help avoid restarting process too far back.
 			if ( ( true === $found_corrupt ) || ( ( true === $found_start ) && ( false === $found_end ) ) ) {
 				pb_backupbuddy::status( 'warning', 'Live catalog detected corruption or incomplete file. Checking if we can load backup catalog instead.' );
-				
+
 				// Check if .bak backup file is larger than this catalog file.
 				if ( false !== ( $current_fileoptions_size = @filesize( $this->_file ) ) ) {
 					if ( false !== ( $backup_fileoptions_size = @filesize( $this->_file . '.bak' ) ) ) {
 						if ( $backup_fileoptions_size > $current_fileoptions_size ) { // Backup is larger. Load it instead.
 							pb_backupbuddy::status( 'warning', 'Live backup catalog is larger than current catalog. Copying over and re-loading backup instead.' );
-							
+
 							// Copy over file.
 							if ( true === @copy( $this->_file . '.bak', $this->_file ) ) {
 								pb_backupbuddy::status( 'warning', 'Restored previous catalog backup. Loading...' );
 								// Unlock fileoptions.
 								$this->unlock();
-								
+
 								return $this->load( $ignore_lock, $create_file, $retryCount );
 							} else {
 								pb_backupbuddy::status( 'error', 'Error #84949834: Failed restoring previous catalog backup. Could not copy.' );
 							}
-							
+
 						} else {
 							pb_backupbuddy::status( 'warning', 'Live backup catalog is SMALLER than current catalog. NOT switching to backup.' );
 						}
@@ -296,19 +296,19 @@ class pb_backupbuddy_fileoptions {
 				} else {
 					pb_backupbuddy::status( 'warning', 'Warning #3489239823: Unable to get size of current Live catalog `' . $this->_file . '`.' );
 				}
-				
+
 			}
-			
+
 			$this->_is_ok = true;
 			$this->_loaded = true;
-			
+
 			return true;
 		}
-		
+
 		if ( ! isset( $options ) ) { // File exists so try to load.
 			$options = @file_get_contents( $this->_file );
 		}
-		
+
 		if ( false === $options ) {
 			pb_backupbuddy::status( 'error', 'Error #3894843: Unable to read fileoptions file `' . $this->_file . '`. Verify permissions on this directory.' );
 			$this->_is_ok = 'ERROR_READ';
@@ -324,7 +324,7 @@ class pb_backupbuddy_fileoptions {
 			$this->_is_ok = 'ERROR_UNSERIALIZE';
 			return false;
 		}
-		
+
 		if ( true === $create_file ) {
 			$this->_is_ok = true;
 		} elseif ( '' != $options ) {
@@ -339,15 +339,17 @@ class pb_backupbuddy_fileoptions {
 				return $this->load( $ignore_lock, $create_file, $retryCount );
 			}
 		}
-		$this->options = $options;
+		if ( is_array( $options ) ) {
+			$this->options = $options;
+		}
 		$this->_loaded = true;
 		$this->_options_hash = md5( serialize( $options ) );
-		
+
 		return true;
 	} // End load();
-	
-	
-	
+
+
+
 	/* save()
 	 *
 	 * Save the options into file now without removing lock.
@@ -357,21 +359,21 @@ class pb_backupbuddy_fileoptions {
 	 *
 	 */
 	public function save( $remove_lock = false, $only_save_my_lock_id = true ) {
-		
+
 		if ( '' == $this->_file ) { // No file set yet. Just return.
 			return true;
 		}
-		
+
 		if ( true === $this->_read_only ) {
 			pb_backupbuddy::status( 'error', 'Attempted to write to fileoptions while in readonly mode; denied.' );
 			return false;
 		}
-		
+
 		if ( false === $this->_loaded ) { // Skip saving if we have not successfully loaded yet to prevent overwriting data.
 			return false;
 		}
-		
-		
+
+
 		// If file is locked and we ae only saving when it's our own lock ID then make sure IDs match.
 		if ( ( true === $this->is_locked() ) && ( false !== $only_save_my_lock_id ) ) {
 			if ( ( $this->_last_seen_lock_id != $this->_my_lock_id ) || ( '' == $this->_my_lock_id ) ) {
@@ -379,11 +381,11 @@ class pb_backupbuddy_fileoptions {
 				return false;
 			}
 		}
-		
-		
+
+
 		// BackupBuddy Stash Live mode. (one array entry per line for performance/memory usage).
 		if ( true === $this->_live ) {
-			
+
 			// Open for writing.
 			if ( false === ( $fso = @fopen( $this->_file, 'w' ) ) ) {
 				pb_backupbuddy::status( 'error', 'Error #83494757: Unable to open fileoptions file `' . $this->_file . '` for writing. Verify permissions.' );
@@ -393,9 +395,9 @@ class pb_backupbuddy_fileoptions {
 				@fclose( $fso );
 				return false;
 			}
-			
+
 			$bytesWritten = 0;
-			
+
 			// Write file start marker (new in data version 2 (BB v7.2.2.2)
 			if ( false === ( $written = @fwrite( $fso, "FILEOPTIONS_START\n" ) ) ) {
 				pb_backupbuddy::status( 'error', 'Error #329823955: Unable to write to fileoptions file `' . $this->_file . '`. Verify permissions.' );
@@ -407,10 +409,10 @@ class pb_backupbuddy_fileoptions {
 			} else { // Wrote.
 				$bytesWritten += $written;
 			}
-			
+
 			foreach( $this->options as $optionKey => $optionItem ) {
 				$optionItem = json_encode( $optionItem, JSON_FORCE_OBJECT );
-				
+
 				if ( false === ( $written = @fwrite( $fso, $optionKey . '|' . $optionItem . "\n" ) ) ) {
 					pb_backupbuddy::status( 'error', 'Error #839494455: Unable to write to fileoptions file `' . $this->_file . '`. Verify permissions.' );
 					if ( true === $remove_lock ) {
@@ -422,7 +424,7 @@ class pb_backupbuddy_fileoptions {
 					$bytesWritten += $written;
 				}
 			}
-			
+
 			// Write file end marker (new in data version 2 (BB v7.2.2.2)
 			if ( false === ( $written = @fwrite( $fso, 'FILEOPTIONS_END') ) ) {
 				pb_backupbuddy::status( 'error', 'Error #32893355: Unable to write to fileoptions file `' . $this->_file . '`. Verify permissions.' );
@@ -434,7 +436,7 @@ class pb_backupbuddy_fileoptions {
 			} else { // Wrote.
 				$bytesWritten += $written;
 			}
-			
+
 			// Success.
 			pb_backupbuddy::status( 'details', 'Fileoptions `' . basename( $this->_file ) . '` saved (Live mode). ' . $bytesWritten . ' bytes written.' );
 			//$this->_options_hash = $options_hash;
@@ -444,21 +446,21 @@ class pb_backupbuddy_fileoptions {
 			@fclose( $fso );
 			return true;
 		}
-		
-		
-		
+
+
+
 		$serialized = serialize( $this->options );
 		$options_hash = md5( $serialized );
-		
+
 		if ( $options_hash == $this->_options_hash ) { // Only update if options has changed so if equal then no change so return.
 			if ( true === $remove_lock ) {
 				$this->unlock();
 			}
 			return true;
 		}
-		
+
 		$options = base64_encode( $serialized );
-		
+
 		if ( false === ( $bytesWritten = file_put_contents( $this->_file, $options ) ) ) { // unable to write.
 			pb_backupbuddy::status( 'error', 'Error #478374745: Unable to write fileoptions file `' . $this->_file . '`. Verify permissions.' );
 			if ( true === $remove_lock ) {
@@ -473,11 +475,11 @@ class pb_backupbuddy_fileoptions {
 			}
 			return true;
 		}
-		
+
 	} // End save().
-	
-	
-	
+
+
+
 	/* _lock()
 	 *
 	 * Lock file.
@@ -486,14 +488,14 @@ class pb_backupbuddy_fileoptions {
 	 *
 	 */
 	private function _lock() {
-		
+
 		$lockFile = $this->_file . '.lock';
-		
+
 		if ( true === $this->_read_only ) {
 			pb_backupbuddy::status( 'error', 'Error #348943784: Attempted to lock fileoptions while in readonly mode; denied.' );
 			return false;
 		}
-		
+
 		$handle = @fopen( $lockFile, 'x' );
 		if ( false === $handle ) { // Failed creating file.
 			if ( file_exists( $lockFile ) ) {
@@ -513,11 +515,11 @@ class pb_backupbuddy_fileoptions {
 			}
 			@fclose( $handle );
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	/* unlock()
 	 *
 	 * Unlock file.
@@ -528,19 +530,19 @@ class pb_backupbuddy_fileoptions {
 	 *
 	 */
 	public function unlock( $destructorCalled = false, $only_unlock_my_id = true ) {
-		
+
 		$lockFile = $this->_file . '.lock';
-		
+
 		if ( file_exists( $lockFile ) ) { // Locked; continue to unlock;
 			$this->_last_seen_lock_id = @file_get_contents( $lockFile );
-			
+
 			if ( false !== $only_unlock_my_id ) {
 				if ( ( $this->_last_seen_lock_id != $this->_my_lock_id ) || ( '' == $this->_my_lock_id ) ) {
 					//pb_backupbuddy::status( 'details', 'Lock status: Last seen lock ID: `' . $this->_last_seen_lock_id . '`. My lock ID: `' . $this->_my_lock_id . '`.' );
 					return false;
 				}
 			}
-			
+
 			$result = @unlink(  $lockFile );
 			if ( true === $result ) { // Unlocked.
 				$this->_my_lock_id = '';
@@ -559,11 +561,11 @@ class pb_backupbuddy_fileoptions {
 		} else { // File already unlocked.
 			return true;
 		}
-		
+
 	} // End unlock().
-	
-	
-	
+
+
+
 	/* is_locked()
 	 *
 	 * Is this file locked / in use?
@@ -572,18 +574,18 @@ class pb_backupbuddy_fileoptions {
 	 *
 	 */
 	public function is_locked() {
-		
+
 		$lockFile = $this->_file . '.lock';
-		
+
 		if ( file_exists( $lockFile ) ) {
 			$this->_last_seen_lock_id = @file_get_contents( $lockFile );
 			return true;
 		} else {
 			return false;
 		}
-		
+
 	} // End is_locked().
-	
-	
-	
+
+
+
 } // End class pb_backupbuddy_fileoptions.

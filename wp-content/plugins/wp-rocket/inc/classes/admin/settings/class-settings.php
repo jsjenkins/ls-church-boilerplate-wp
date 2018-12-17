@@ -1,6 +1,8 @@
 <?php
 namespace WP_Rocket\Admin\Settings;
 
+use \WP_Rocket\Subscriber\Third_Party\Plugins\Security\Sucuri_Subscriber;
+
 defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 
 /**
@@ -210,12 +212,6 @@ class Settings {
 			$input['defer_all_js_safe'] = 1;
 		}
 
-		// Force mobile cache & specific mobile cache if one of the mobile plugins is active.
-		if ( rocket_is_mobile_plugin_active() ) {
-			$input['cache_mobile']            = 1;
-			$input['do_caching_mobile_files'] = 1;
-		}
-
 		$input['embeds'] = ! empty( $input['embeds'] ) ? 1 : 0;
 		$input['emoji']  = ! empty( $input['emoji'] ) ? 1 : 0;
 
@@ -346,13 +342,40 @@ class Settings {
 			if ( ! is_array( $input['exclude_js'] ) ) {
 				$input['exclude_js'] = explode( "\n", $input['exclude_js'] );
 			}
-			$input['exclude_js'] = array_map( 'trim', $input['exclude_js'] );
-			$input['exclude_js'] = array_map( 'rocket_clean_exclude_file', $input['exclude_js'] );
-			$input['exclude_js'] = array_map( 'rocket_sanitize_js', $input['exclude_js'] );
+
+			$input['exclude_js'] = array_map(
+				function( $file ) {
+					if ( $this->is_internal_file( $file ) ) {
+						$file = trim( $file );
+						$file = rocket_clean_exclude_file( $file );
+						$file = rocket_sanitize_js( $file );
+
+						return $file;
+					}
+
+					return sanitize_text_field( \rocket_remove_url_protocol( strtok( $file, '?' ) ) );
+				},
+				$input['exclude_js']
+			);
+
 			$input['exclude_js'] = array_filter( $input['exclude_js'] );
 			$input['exclude_js'] = array_unique( $input['exclude_js'] );
 		} else {
 			$input['exclude_js'] = [];
+		}
+
+		// Option: inline JS patterns to exclude from combine JS.
+		if ( ! empty( $input['exclude_inline_js'] ) ) {
+			if ( ! is_array( $input['exclude_inline_js'] ) ) {
+				$input['exclude_inline_js'] = explode( "\n", $input['exclude_inline_js'] );
+			}
+
+			$input['exclude_inline_js'] = array_map( 'sanitize_text_field', $input['exclude_inline_js'] );
+
+			$input['exclude_inline_js'] = array_filter( $input['exclude_inline_js'] );
+			$input['exclude_inline_js'] = array_unique( $input['exclude_inline_js'] );
+		} else {
+			$input['exclude_inline_js'] = [];
 		}
 
 		// Option: Async CSS.
@@ -385,8 +408,7 @@ class Settings {
 		}
 
 		// Options: Activate bot preload.
-		$input['manual_preload']    = ! empty( $input['manual_preload'] ) ? 1 : 0;
-		$input['automatic_preload'] = ! empty( $input['automatic_preload'] ) ? 1 : 0;
+		$input['manual_preload'] = ! empty( $input['manual_preload'] ) ? 1 : 0;
 
 		// Option: activate sitemap preload.
 		$input['sitemap_preload'] = ! empty( $input['sitemap_preload'] ) ? 1 : 0;
@@ -404,6 +426,8 @@ class Settings {
 			$input['sitemaps'] = [];
 		}
 
+		// Options : CloudFlare.
+		$input['do_cloudflare']               = ! empty( $input['do_cloudflare'] ) ? 1 : 0;
 		$input['cloudflare_email']            = isset( $input['cloudflare_email'] ) ? sanitize_email( $input['cloudflare_email'] ) : '';
 		$input['cloudflare_api_key']          = isset( $input['cloudflare_api_key'] ) ? sanitize_text_field( $input['cloudflare_api_key'] ) : '';
 		$input['cloudflare_zone_id']          = isset( $input['cloudflare_zone_id'] ) ? sanitize_text_field( $input['cloudflare_zone_id'] ) : '';
@@ -411,12 +435,40 @@ class Settings {
 		$input['cloudflare_auto_settings']    = ( isset( $input['cloudflare_auto_settings'] ) && is_numeric( $input['cloudflare_auto_settings'] ) ) ? (int) $input['cloudflare_auto_settings'] : 0;
 		$input['cloudflare_protocol_rewrite'] = ! empty( $input['cloudflare_protocol_rewrite'] ) ? 1 : 0;
 
-		// Option : CloudFlare.
-		$input['do_cloudflare'] = ! empty( $input['do_cloudflare'] ) ? 1 : 0;
-
 		if ( defined( 'WP_ROCKET_CF_API_KEY' ) ) {
 			$input['cloudflare_api_key'] = WP_ROCKET_CF_API_KEY;
 		}
+
+		// Options: Sucuri cache. And yeah, there's a typo, but now it's too late to fix ^^'.
+		$input['sucury_waf_cache_sync'] = ! empty( $input['sucury_waf_cache_sync'] ) ? 1 : 0;
+
+		if ( defined( 'WP_ROCKET_SUCURI_API_KEY' ) ) {
+			$input['sucury_waf_api_key'] = WP_ROCKET_SUCURI_API_KEY;
+		} else {
+			$input['sucury_waf_api_key'] = isset( $input['sucury_waf_api_key'] ) ? sanitize_text_field( $input['sucury_waf_api_key'] ) : '';
+		}
+
+		$input['sucury_waf_api_key'] = trim( $input['sucury_waf_api_key'] );
+
+		if ( ! Sucuri_Subscriber::is_api_key_valid( $input['sucury_waf_api_key'] ) ) {
+			$input['sucury_waf_api_key'] = '';
+
+			if ( $input['sucury_waf_cache_sync'] && empty( $input['ignore'] ) ) {
+				add_settings_error( 'general', 'sucuri_waf_api_key_invalid', __( 'The API key for the Sucuri firewall must be in format <code>{32 characters}/{32 characters}</code>.', 'rocket' ), 'error' );
+			}
+		}
+
+		// Options : Heartbeat.
+		$choices = [
+			''                   => 1,
+			'reduce_periodicity' => 1,
+			'disable'            => 1,
+		];
+
+		$input['control_heartbeat']         = ! empty( $input['control_heartbeat'] ) ? 1 : 0;
+		$input['heartbeat_site_behavior']   = isset( $input['heartbeat_site_behavior'], $choices[ $input['heartbeat_site_behavior'] ] ) ? $input['heartbeat_site_behavior'] : '';
+		$input['heartbeat_admin_behavior']  = isset( $input['heartbeat_admin_behavior'], $choices[ $input['heartbeat_admin_behavior'] ] ) ? $input['heartbeat_admin_behavior'] : '';
+		$input['heartbeat_editor_behavior'] = isset( $input['heartbeat_editor_behavior'], $choices[ $input['heartbeat_editor_behavior'] ] ) ? $input['heartbeat_editor_behavior'] : '';
 
 		// Option : CDN.
 		$input['cdn'] = ! empty( $input['cdn'] ) ? 1 : 0;
@@ -502,5 +554,37 @@ class Settings {
 	 */
 	public function sanitize_checkbox( $value ) {
 		return isset( $value ) ? 1 : 0;
+	}
+
+	/**
+	 * Checks if the passed value is an internal URL (default domain or CDN/Multilingual)
+	 *
+	 * @since 3.1.3
+	 * @author Remy Perona
+	 *
+	 * @param string $file string to test.
+	 * @return boolean
+	 */
+	private function is_internal_file( $file ) {
+		$file_host = wp_parse_url( $file, PHP_URL_HOST );
+
+		if ( ! $file_host ) {
+			return false;
+		}
+
+		$hosts   = get_rocket_cnames_host( [ 'all', 'css_and_js', 'css', 'js' ] );
+		$hosts[] = wp_parse_url( WP_CONTENT_URL, PHP_URL_HOST );
+		$langs   = get_rocket_i18n_uri();
+
+		// Get host for all langs.
+		if ( $langs ) {
+			foreach ( $langs as $lang ) {
+				$hosts[] = wp_parse_url( $lang, PHP_URL_HOST );
+			}
+		}
+
+		$hosts_index = array_flip( array_unique( $hosts ) );
+
+		return isset( $hosts_index[ $file_host ] );
 	}
 }

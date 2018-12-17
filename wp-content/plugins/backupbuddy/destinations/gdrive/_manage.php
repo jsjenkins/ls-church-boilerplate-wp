@@ -32,10 +32,10 @@ if ( pb_backupbuddy::_POST( 'bulk_action' ) == 'delete_backup' ) {
 		} else {
 			pb_backupbuddy::alert( 'Error: Unable to delete `' . $item . '`. Verify permissions or try again.' );
 		}
-		
-		
+
+
 	}
-	
+
 	if ( $deleted_files > 0 ) {
 		pb_backupbuddy::alert( 'Deleted ' . $deleted_files . ' file(s).' );
 	}
@@ -50,19 +50,19 @@ if ( '' != pb_backupbuddy::_GET( 'downloadlink_file' ) ) {
 
 // Copy file to local
 if ( '' != pb_backupbuddy::_GET( 'cpy_file' ) ) {
-	$destinationFile = 
+	$destinationFile =
 	$fileMeta = pb_backupbuddy_destination_gdrive::getFileMeta( $settings, pb_backupbuddy::_GET( 'cpy_file' ) );
 	/*
 	echo '<pre>';
 	print_r( $fileMeta );
 	echo '</pre>';
 	*/
-	
+
 	pb_backupbuddy::alert( 'The remote file is now being copied to your local backups. If the backup gets marked as bad during copying, please wait a bit then click the `Refresh` icon to rescan after the transfer is complete.' );
 	echo '<br>';
 	pb_backupbuddy::status( 'details',  'Scheduling Cron for creating Google Drive copy.' );
 	backupbuddy_core::schedule_single_event( time(), 'process_destination_copy', array( $destination, $fileMeta->originalFilename, pb_backupbuddy::_GET( 'cpy_file' ) ) );
-	
+
 	if ( '1' != pb_backupbuddy::$options['skip_spawn_cron_call'] ) {
 		update_option( '_transient_doing_cron', 0 ); // Prevent cron-blocking for next item.
 		spawn_cron( time() + 150 ); // Adds > 60 seconds to get around once per minute cron running limit.
@@ -126,11 +126,15 @@ foreach( $files as $file ) {
 	if ( '' == $file->originalFilename ) {
 		continue;
 	}
-	
+
 	$backup_type = backupbuddy_core::getBackupTypeFromFile( $file->originalFilename );
-	
+
+	if ( ! $backup_type ) {
+		continue;
+	}
+
 	$created = strtotime( $file->createdDate );
-	
+
 	$backup_files[ $file->id ] = array(
 		array( $file->id, $file->originalFilename ),
 		pb_backupbuddy::$format->date( pb_backupbuddy::$format->localize_time( $created ) ) . '<br /><span class="description">(' . pb_backupbuddy::$format->time_ago( $created ) . ' ago)</span>',

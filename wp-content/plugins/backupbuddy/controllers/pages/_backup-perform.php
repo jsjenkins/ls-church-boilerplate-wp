@@ -1314,7 +1314,7 @@ if ( 'deploy' == pb_backupbuddy::_GET( 'backupbuddy_backup' ) ) {
 		}
 	}
 
-	$deploy_data['sendPlugins']     = 'true' == pb_backupbuddy::_POST( 'sendPlugins' );
+	$deploy_data['sendPlugins']     = $send_plugins;
 	$deploy_data['sendMedia']       = 'true' == pb_backupbuddy::_POST( 'sendMedia' );
 	$deploy_data['sendExtras']      = 'true' == pb_backupbuddy::_POST( 'sendExtras' );
 	$deploy_data['doImportCleanup'] = 'true' == pb_backupbuddy::_POST( 'doImportCleanup' );

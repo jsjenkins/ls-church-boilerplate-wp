@@ -264,7 +264,11 @@ class backupbuddy_integrity_check {
 			$this->backup_options->options['fileoptions_rebuilt'] = true;
 
 			// If we have a DAT file in this zip, let's load that data into the newly created $backup_options.
-			$this->backup_options->options = array_merge( $this->backup_options->options, (array) backupbuddy_core::getDatArrayFromZip( $this->file ) );
+			$dat = backupbuddy_core::getDatArrayFromZip( $this->file );
+			if ( ! is_array( $dat ) ) {
+				$dat = array();
+			}
+			$this->backup_options->options = array_merge( $this->backup_options->options, $dat );
 		} elseif ( ! empty( $this->backup_options->options['integrity'] ) && pb_backupbuddy::_GET( 'reset_integrity' ) != $this->serial ) {
 			// Already have integrity data and NOT resetting this one.
 			pb_backupbuddy::status( 'details', 'Integrity data for backup `' . $this->serial . '` is cached; not scanning again.' );
@@ -554,9 +558,13 @@ class backupbuddy_integrity_check {
 	 */
 	private function _test_basic_file_scan() {
 		$files = pb_backupbuddy::$classes['zipbuddy']->get_file_list( $this->file );
-		$count = count( $files );
-		$pass  = ( is_array( $files ) && ( $count > 0 ) ) ? true : false;
-		$href  = admin_url( 'admin.php' ) . '?page=pb_backupbuddy_backup&zip_viewer=' . basename( $this->file ) . '&value=' . basename( $this->file ) . '&bub_rand=' . rand( 100, 999 );
+		$count = 0;
+		$pass  = false;
+		if ( is_array( $files ) ) {
+			$count = count( $files );
+			$pass  = $count > 0;
+		}
+		$href = admin_url( 'admin.php' ) . '?page=pb_backupbuddy_backup&zip_viewer=' . basename( $this->file ) . '&value=' . basename( $this->file ) . '&bub_rand=' . rand( 100, 999 );
 
 		return array(
 			'test'      => 'Basic file list scan (' . $count . ' files found inside) - <a target="_top" href="' . $href . '">Browse Files</a>',

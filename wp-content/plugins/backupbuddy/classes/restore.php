@@ -1130,7 +1130,7 @@ class backupbuddy_restore {
 					}
 
 					if ( false !== stristr( $config_contents, 'COOKIE_DOMAIN' ) ) { // Found cookie domain.
-						$trouble[] = 'Cookie domain set in wp-config.php file and has not been updated. You may need to manualy update this.';
+						$trouble[] = 'Cookie domain set in wp-config.php file and has not been updated. You may need to manually update this.';
 					}
 				}
 			}

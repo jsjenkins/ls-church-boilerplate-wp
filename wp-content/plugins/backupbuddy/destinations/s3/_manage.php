@@ -10,25 +10,25 @@ if ( isset( $destination['disabled'] ) && ( '1' == $destination['disabled'] ) ) 
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		
+
 		jQuery( '.pb_backupbuddy_hoveraction_copy' ).click( function() {
 			var backup_file = jQuery(this).attr( 'rel' );
 			var backup_url = '<?php echo pb_backupbuddy::page_url(); ?>&custom=remoteclient&destination_id=<?php echo pb_backupbuddy::_GET( 'destination_id' ); ?>&remote_path=<?php echo htmlentities( pb_backupbuddy::_GET( 'remote_path' ) ); ?>&cpy_file=' + backup_file;
-			
+
 			window.location.href = backup_url;
-			
+
 			return false;
 		} );
-		
+
 		jQuery( '.pb_backupbuddy_hoveraction_download_link' ).click( function() {
 			var backup_file = jQuery(this).attr( 'rel' );
 			var backup_url = '<?php echo pb_backupbuddy::page_url(); ?>&custom=remoteclient&destination_id=<?php echo pb_backupbuddy::_GET( 'destination_id' ); ?>&remote_path=<?php echo htmlentities( pb_backupbuddy::_GET( 'remote_path' ) ); ?>&downloadlink_file=' + backup_file;
-			
+
 			window.location.href = backup_url;
-			
+
 			return false;
 		} );
-		
+
 	});
 </script>
 
@@ -68,12 +68,12 @@ if( !$response->isOK() ) {
 
 	$this_error = 'Bucket region could not be determined for management operation. Message details: `' . (string)$response->body->Message . '`.';
 	pb_backupbuddy::status( 'error' , $this_error );
-	
+
 } else {
 
 	pb_backupbuddy::status( 'details', 'Bucket exists in region: ' .  (($response->body ==="") ? 'us-east-1' : $response->body ) );
 	$region = $response->body; // Must leave as is for actual operational usage
-	
+
 }
 
 // Set region context for later operations - will be s3.amazonaws.com or s3-<region>.amazonaws.com
@@ -84,17 +84,17 @@ if ( pb_backupbuddy::_POST( 'bulk_action' ) == 'delete_backup' ) {
 	pb_backupbuddy::verify_nonce();
 	$deleted_files = array();
 	foreach( (array)pb_backupbuddy::_POST( 'items' ) as $item ) {
-		
+
 		$response = $s3->delete_object( $manage_data['bucket'], $remote_path . $item );
 		if ( $response->isOK() ) {
 			$deleted_files[] = $item;
 		} else {
 			pb_backupbuddy::alert( 'Error: Unable to delete `' . $item . '`. Verify permissions.' );
 		}
-		
-		
+
+
 	}
-	
+
 	if ( count( $deleted_files ) > 0 ) {
 		pb_backupbuddy::alert( 'Deleted ' . implode( ', ', $deleted_files ) . '.' );
 	}
@@ -112,7 +112,7 @@ if ( pb_backupbuddy::_GET( 'cpy_file' ) != '' ) {
 		update_option( '_transient_doing_cron', 0 ); // Prevent cron-blocking for next item.
 		spawn_cron( time() + 150 ); // Adds > 60 seconds to get around once per minute cron running limit.
 	}
-	
+
 }
 
 
@@ -137,7 +137,7 @@ $response = $s3->list_objects(
 // Get list of files.
 $backup_list_temp = array();
 foreach( $response->body->Contents as $object ) {
-	
+
 	$file = str_ireplace( $remote_path, '', $object->Key );
 	if ( FALSE !== stristr( $file, '/' ) ) { // Do NOT display any files within a deeper subdirectory.
 		continue;
@@ -151,11 +151,16 @@ foreach( $response->body->Contents as $object ) {
 		continue;
 	}
 	*/
-	
+
+	$backup_type = backupbuddy_core::getBackupTypeFromFile( $file );
+
+	if ( ! $backup_type ) {
+		continue;
+	}
+
 	$last_modified = strtotime( $object->LastModified );
 	$size = (double) $object->Size;
-	$backup_type = backupbuddy_core::getBackupTypeFromFile( $file );
-	
+
 	// Generate array of table rows.
 	while( isset( $backup_list_temp[$last_modified] ) ) { // Avoid collisions.
 		$last_modified += 0.1;

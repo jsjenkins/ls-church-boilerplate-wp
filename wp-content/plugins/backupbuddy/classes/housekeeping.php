@@ -389,7 +389,7 @@ class backupbuddy_housekeeping {
 					continue;
 				} else {
 					// Keep unfinished. Keep non-fails that are not too old.
-					if ( 0 == $send_fileoption_obj->options['finish_time'] || ( -1 != $send_fileoption_obj->options['finish_time'] && ( ( time() - $send_fileoption_obj->options['finish_time'] ) < backupbuddy_constants::CLEANUP_FINISHED_FILEOPTIONS_AGE_DELAY ) ) ) { // Still unfinished OR ( NOT Failed AND finished too recently to delete ).
+					if ( ! isset( $send_fileoption_obj->options['finish_time'] ) || 0 == $send_fileoption_obj->options['finish_time'] || ( -1 != $send_fileoption_obj->options['finish_time'] && ( ( time() - $send_fileoption_obj->options['finish_time'] ) < backupbuddy_constants::CLEANUP_FINISHED_FILEOPTIONS_AGE_DELAY ) ) ) { // Still unfinished OR ( NOT Failed AND finished too recently to delete ).
 
 						// TODO: (maybe).. If 0==finish_time then check the filemtime of the fileoptions file. If no progress in a certain amount of time, consider timed out?
 						unset( $send_fileoption_obj );

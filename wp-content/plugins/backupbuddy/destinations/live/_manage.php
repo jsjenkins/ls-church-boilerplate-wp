@@ -591,11 +591,15 @@ if ( 0 != $state['stats']['files_pending_delete'] ) {
 
 
 $cron_warnings = array();
-require( pb_backupbuddy::plugin_path() . '/controllers/pages/server_info/_cron.php' );
+require pb_backupbuddy::plugin_path() . '/controllers/pages/server_info/_cron.php';
 if ( count( $cron_warnings ) > 2 ) {
 	$cronText = '';
-	$i = 0;
+	$i        = 0;
 	foreach( $crons as $time => $cron ) {
+		if ( ! is_int( $time ) ) {
+			continue;
+		}
+
 		if ( ($time+60) > time() ) { // Not past due. 60sec wiggle room.
 			continue;
 		}
@@ -606,7 +610,10 @@ if ( count( $cron_warnings ) > 2 ) {
 		}
 		$cronText .= 'Cron `' . $cron[0] . '` running `' . $cron[2] . '` should have ran `' . pb_backupbuddy::$format->time_ago( $time ) . '` ago.<br>';
 	}
-	pb_backupbuddy::alert( 'Warning #839984343: ' . count( $cron_warnings ) . ' cron(s) warnings were found (such as past due). _IF_ you encounter problems AND this persists there may be a problem with your WordPress cron (such as caused by a caching plugin). This can also be caused if there is very little site activity (not enough visitors). WordPress requires visitors to access the site to trigger scheduled activity. Use an uptime checker to help push this along if this is the case. This could be due to these files being large or a temporary transfer error. Potentially stuck crons:<br>' . $cronText );
+	if ( ! empty( $cronText ) ) {
+		$cronText = 'Potentially stuck crons:<br>' . $cronText;
+	}
+	pb_backupbuddy::alert( 'Warning #839984343: ' . count( $cron_warnings ) . ' cron(s) warnings were found (such as past due). _IF_ you encounter problems AND this persists there may be a problem with your WordPress cron (such as caused by a caching plugin). This can also be caused if there is very little site activity (not enough visitors). WordPress requires visitors to access the site to trigger scheduled activity. Use an uptime checker to help push this along if this is the case. This could be due to these files being large or a temporary transfer error.' . $cronText );
 }
 
 // BUB Schedule with Stash Destination Warning

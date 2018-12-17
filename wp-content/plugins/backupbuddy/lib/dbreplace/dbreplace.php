@@ -3,7 +3,7 @@
  *	pluginbuddy_dbreplace Class
  *
  *	Handles replacement of data in a table/database, text or serialized. A database connection should be initialized before instantiation.
- *	
+ *
  *	@since 1.0.0
  *	@author Dustin Bolton
  *
@@ -14,19 +14,19 @@
 if (!class_exists("pluginbuddy_dbreplace")) {
 	class pluginbuddy_dbreplace {
 		var $_version = '1.0';
-		
+
 		var $startTime;
 		var $timeWiggleRoom;
 		var $maxExecutionTime;
-		
+
 		const MAX_ROWS_PER_SELECT = 500;
-		
-		
+
+
 		/**
 		 *	__construct()
-		 *	
+		 *
 		 *	Default constructor. Sets up optional status() function class if applicable.
-		 *	
+		 *
 		 *	@param		reference	&$status_callback		[optional] Reference to the class containing the status() function for status updates.
 		 *	@return		null
 		 *
@@ -40,14 +40,14 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 			$this->timeWiggleRoom = $timeWiggleRoom;
 			$this->maxExecutionTime = $maxExecutionTime;
 		}
-		
-		
-		
+
+
+
 		/**
 		 *	text()
-		 *	
+		 *
 		 *	Replaces text within a table by specifying the table, rows to replace within and the old and new value(s).
-		 *	
+		 *
 		 *	@param		string		$table		Table to replace text in.
 		 *	@param		mixed		$olds		Old value(s) to find for replacement. May be a string or array of values.
 		 *	@param		mixed		$news		New value(s) to be replaced with. May be a string or array. If array there must be the same number of values as $olds.
@@ -57,7 +57,7 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 		 */
 		public function text( $table, $olds, $news, $rows ) {
 			$rows_sql = array();
-			
+
 			if ( !is_array( $olds ) ) {
 				$olds = array( $olds );
 			}
@@ -67,10 +67,10 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 			if ( !is_array( $rows ) ) {
 				$rows = array( $rows );
 			}
-			
+
 			// Prevent trying to replace data with the same data for performance.
 			$this->remove_matching_array_elements( $olds, $news );
-			
+
 			foreach ( $rows as $row ) {
 				$i = 0;
 				foreach ( $olds as $old ) {
@@ -78,20 +78,20 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 					$i++;
 				}
 			}
-			
+
 			global $wpdb;
 			$wpdb->query( "UPDATE `{$table}` SET " . implode( ',', $rows_sql ) . ";" );
-			
+
 			return true;
-			
+
 		} // End text().
-		
-		
+
+
 		/**
 		 *	serialized()
-		 *	
+		 *
 		 *	Replaces serialized text within a table by specifying the table, rows to replace within and the old and new value(s).
-		 *	
+		 *
 		 *	@param		string		$table		Table to replace text in.
 		 *	@param		mixed		$olds		Old value(s) to find for replacement. May be a string or array of values.
 		 *	@param		mixed		$news		New value(s) to be replaced with. May be a string or array. If array there must be the same number of values as $olds.
@@ -110,17 +110,17 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 			if ( !is_array( $rows ) ) {
 				$rows = array( $rows );
 			}
-			
+
 			global $wpdb;
-			
+
 			// Get the total row count for this table
 			$total_rows = 0;
 			$tables_status = $wpdb->get_results( "SHOW TABLE STATUS", ARRAY_A );
-			
+
 			foreach ( $tables_status as $table_status ) {
-			
+
 				if ( $table === $table_status[ 'Name' ] ) {
-				
+
 					// Fix up row count and average row length for InnoDB engine which returns inaccurate
 					// (and changing) values for these
 					if ( 'InnoDB' === $table_status[ 'Engine' ] ) {
@@ -128,13 +128,13 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 							$table_status[ 'Rows' ] = $count;
 						}
 					}
-			
+
 					$total_rows = $table_status[ 'Rows' ];
-				
+
 				}
-			
+
 			}
-			
+
 			// Prevent trying to replace data with the same data for performance.
 			$this->remove_matching_array_elements( $olds, $news );
 			$key_results = $wpdb->get_results( "SHOW KEYS FROM `{$table}` WHERE Key_name='PRIMARY';", ARRAY_A );
@@ -142,16 +142,16 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 				pb_backupbuddy::status( 'details', 'Table `' . $table . '` does not exist; skipping migration of this table.' );
 				return;
 			}
-			
+
 			// No primary key found; unsafe to edit this table. @since 2.2.32.
 			if ( count( $key_results ) == 0 ) {
 				pb_backupbuddy::status( 'message', 'Error #9029: Warning only! Table `'.  $table .'` does not contain a primary key; BackupBuddy cannot safely modify the contents of this table. Skipping migration of this table. (serialized()).' );
 				return true;
 			}
-			
+
 			$primary_key = $key_results[0]['Column_name'];
 			unset( $key_result );
-			
+
 			$updated = false; // Was something in DB updated?
 			$rows_remain = true; // More rows remaining / aka another query for more rows needed.
 			if ( '' == $rows_start ) {
@@ -164,20 +164,20 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 
 				// Provide an update on progress
 				if ( 0 === $rowsCount ) {
-					pb_backupbuddy::status( 'details', 'Table: `'. $table . '` - processing ' . $rowsCount . ' rows ( of ' . $total_rows . ' )' );				
+					pb_backupbuddy::status( 'details', 'Table: `'. $table . '` - processing ' . $rowsCount . ' rows ( of ' . $total_rows . ' )' );
 				} else {
-					pb_backupbuddy::status( 'details', 'Table: `'. $table . '` - processing ' . $rowsCount . ' rows ( Rows ' . $rows_start . '-' . ( $rows_start + $rowsCount - 1 ) . ' of ' . $total_rows . ' )' );	
+					pb_backupbuddy::status( 'details', 'Table: `'. $table . '` - processing ' . $rowsCount . ' rows ( Rows ' . $rows_start . '-' . ( $rows_start + $rowsCount - 1 ) . ' of ' . $total_rows . ' )' );
 				}
-				
+
 				$rows_start += self::MAX_ROWS_PER_SELECT; // Next loop we will begin at this offset.
 				if ( ( 0 == $rowsCount ) || ( $rowsCount < self::MAX_ROWS_PER_SELECT ) ) {
 					$rows_remain = false;
 				}
-				
+
 				foreach( $rowsResult as $row ) {
 					$needs_update = false;
 					$sql_update = array();
-					
+
 					foreach( $row as $column => $value ) {
 						if ( $column != $primary_key ) {
 							if ( false !== ( $edited_data = $this->replace_maybe_serialized( $value, $olds, $news ) ) ) { // Data changed.
@@ -188,20 +188,20 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 							$primary_key_value = $value;
 						}
 					}
-					
+
 					if ( $needs_update === true ) {
 						$updated = true;
 						$wpdb->query( "UPDATE `{$table}` SET " . implode( ',', $sql_update ) . " WHERE `{$primary_key}` = '{$primary_key_value}' LIMIT 1" );
 					}
 				}
 				unset( $rowsResult );
-				
+
 				// See how we are doing on time. Trigger chunking if needed.
 				if ( ( ( microtime( true ) - $this->startTime ) + $this->timeWiggleRoom ) >= $this->maxExecutionTime ) {
 					return array( $rows_start );
 				}
 			}
-			
+
 			if ( $updated === true ) {
 				pb_backupbuddy::status( 'details', 'Updated serialized data in table `' . $table . '`.' );
 			} else {
@@ -209,14 +209,14 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 			}
 			return true;
 		} // End serialized().
-		
-		
+
+
 		/**
 		 *	replace_maybe_serialized()
-		 *	
+		 *
 		 *	Replaces possibly serialized (or non-serialized) text if a change is needed. Returns false if there was no change.
 		 *  Note: As of BB v3.2.x supports double serialized data.
-		 *	
+		 *
 		 *	@param		string		$table		Text (possibly serialized) to update.
 		 *	@param		mixed		$olds		Text to search for to replace. May be an array of strings to search for.
 		 *	@param		mixed		$news		New value(s) to be replaced with. May be a string or array. If array there must be the same number of values as $olds.
@@ -230,7 +230,7 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 			if ( !is_array( $news ) ) {
 				$news = array( $news );
 			}
-			
+
 			$type = '';
 			$unserialized = false; // first assume not serialized data
 			if ( is_serialized( $data ) ) { // check if this is serialized data
@@ -238,24 +238,24 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 			}
 			if ( $unserialized !== false ) { // Serialized data.
 				$type = 'serialized';
-				
+
 				$double_serialized = false;
 				if ( is_serialized( $unserialized ) ) { // double-serialized data (opposite of a double rainbow). Some plugins seem to double-serialize for some unknown wacky reason...
 					$unserialized = @unserialize( $unserialized ); // unserialise - if false is returned we won't try to process it as serialised.
 					$double_serialized = true;
 				}
-				
+
 				$i = 0;
 				foreach ( $olds as $old ) {
 					$this->recursive_array_replace( $old, $news[$i], $unserialized );
 					$i++;
 				}
-				
+
 				$edited_data = serialize( $unserialized );
 				if ( true === $double_serialized ) {
 					$edited_data = serialize( $edited_data );
 				}
-				
+
 			}	else { // Non-serialized data.
 				$type = 'text';
 				$edited_data = $data;
@@ -265,7 +265,7 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 					$i++;
 				}
 			}
-			
+
 			// Return the results.
 			if ( $data != $edited_data ) {
 				return $edited_data;
@@ -273,14 +273,14 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 				return false;
 			}
 		} // End replace_maybe_serialized().
-		
-		
+
+
 		/**
 		 *	bruteforce_table()
 		 *
 		 *	!!! HANDLES SERIALIZED DATA !!!!
 		 *	Replaces text, serialized or not, within the entire table. Bruteforce method iterates through every row & column in the entire table and replaces if needed.
-		 *	
+		 *
 		 *	@param		string		$table		Text (possibly serialized) to update.
 		 *	@param		mixed		$olds		Text to search for to replace. May be an array of strings to search for.
 		 *	@param		mixed		$news		New value(s) to be replaced with. May be a string or array. If array there must be the same number of values as $olds.
@@ -295,20 +295,20 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 			if ( !is_array( $news ) ) {
 				$news = array( $news );
 			}
-			
+
 			$count_items_checked = 0;
 			$count_items_changed = 0;
-			
+
 			global $wpdb;
-			
+
 			// Get the total row count for this table
 			$total_rows = 0;
 			$tables_status = $wpdb->get_results( "SHOW TABLE STATUS", ARRAY_A );
-			
+
 			foreach ( $tables_status as $table_status ) {
-			
+
 				if ( $table === $table_status[ 'Name' ] ) {
-				
+
 					// Fix up row count and average row length for InnoDB engine which returns inaccurate
 					// (and changing) values for these
 					if ( 'InnoDB' === $table_status[ 'Engine' ] ) {
@@ -316,20 +316,20 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 							$table_status[ 'Rows' ] = $count;
 						}
 					}
-			
+
 					$total_rows = $table_status[ 'Rows' ];
-				
+
 				}
-			
+
 			}
-			
+
 			$fields = $wpdb->get_results( "DESCRIBE `{$table}`", ARRAY_A );
 			$column_name = array();
 			$table_index = array();
 			$i = 0;
-			
+
 			$found_primary_key = false;
-			
+
 			foreach( $fields as $field ) {
 				$column_name[$i++] = $field['Field'];
 				if ( $field['Key'] == 'PRI' ) {
@@ -337,13 +337,13 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 					$found_primary_key = true;
 				}
 			}
-			
+
 			// Skips migration of this table if there is no primary key. Modifying on any other key is not safe. mysql automatically returns a PRIMARY if a UNIQUE non-primary is found according to http://dev.mysql.com/doc/refman/5.1/en/create-table.html  @since 2.2.32.
 			if ( $found_primary_key === false ) {
 				pb_backupbuddy::status( 'warning', 'Error #9029b: Warning only! Table `' . $table . '` does not contain a primary key; BackupBuddy cannot safely modify the contents of this table. Skipping migration of this table. (bruteforce_table()).' );
 				return true;
 			}
-			
+
 			$row_loop = 0;
 
 			$rows_remain = true; // More rows remaining / aka another query for more rows needed.
@@ -357,30 +357,30 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 				if ( false === $data ) {
 					pb_backupbuddy::status( 'error', 'ERROR #44545343 ... SQL ERROR: ' . $wpdb->last_error );
 				}
-				
+
 				// Provide an update on progress
 				$rowsCount = count( $data );
 				if ( 0 === $rowsCount ) {
-					pb_backupbuddy::status( 'details', 'Table: `'. $table . '` - processing ' . $rowsCount . ' rows ( of ' . $total_rows . ' )' );				
+					pb_backupbuddy::status( 'details', 'Table: `'. $table . '` - processing ' . $rowsCount . ' rows ( of ' . $total_rows . ' )' );
 				} else {
-					pb_backupbuddy::status( 'details', 'Table: `'. $table . '` - processing ' . $rowsCount . ' rows ( Rows ' . $rows_start . '-' . ( $rows_start + $rowsCount - 1 ) . ' of ' . $total_rows . ' )' );	
+					pb_backupbuddy::status( 'details', 'Table: `'. $table . '` - processing ' . $rowsCount . ' rows ( Rows ' . $rows_start . '-' . ( $rows_start + $rowsCount - 1 ) . ' of ' . $total_rows . ' )' );
 				}
-				
+
 				$rows_start += self::MAX_ROWS_PER_SELECT; // Next loop we will begin at this offset.
 				if ( ( 0 == $rowsCount ) || ( $rowsCount < self::MAX_ROWS_PER_SELECT ) ) {
 					$rows_remain = false;
 				}
-		
+
 				foreach( $data as $row ) {
 					$need_to_update = false;
 					$UPDATE_SQL = 'UPDATE `' . $table . '` SET ';
 					$WHERE_SQL = ' WHERE ';
-				
+
 					$j = 0;
 					foreach ( $column_name as $current_column ) {
 						$j++;
 						$count_items_checked++;
-					
+
 						$data_to_fix = $row[$current_column];
 						if ( false !== ( $edited_data = $this->replace_maybe_serialized( $data_to_fix, $olds, $news ) ) ) { // no change needed
 							$count_items_changed++;
@@ -390,12 +390,12 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 							$UPDATE_SQL = $UPDATE_SQL . ' ' . $current_column . ' = "' . backupbuddy_core::dbEscape( $edited_data ) . '"';
 							$need_to_update = true; // Only set if we need to update - avoids wasted UPDATE statements.
 						}
-					
+
 						if ( isset( $table_index[$j] ) ) {
 							$WHERE_SQL = $WHERE_SQL . '`' . $current_column . '` = "' . backupbuddy_core::dbEscape( $row[$current_column] ) . '" AND ';
 						}
 					}
-				
+
 					if ( $need_to_update ) {
 						$WHERE_SQL = substr( $WHERE_SQL , 0, -4 ); // Strip off the excess AND - the easiest way to code this without extra flags, etc.
 						$UPDATE_SQL = $UPDATE_SQL . $WHERE_SQL;
@@ -407,9 +407,9 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 								$mysql_error = mysql_error( $wpdb->dbh );
 							}
 							pb_backupbuddy::status( 'error', 'ERROR: mysql error updating db: ' . $mysql_error . '. SQL Query: ' . htmlentities( $UPDATE_SQL ) );
-						} 
+						}
 					}
-					
+
 				}
 
 				unset( $data );
@@ -419,18 +419,18 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 					return array( $rows_start );
 				}
 			}
-			
+
 			pb_backupbuddy::status( 'message', 'Brute force data migration for table `' . $table . '` complete. Checked ' . $count_items_checked . ' items; ' . $count_items_changed . ' changed.' );
-			
+
 			return true;
 		} // End bruteforce_table().
-		
-		
+
+
 		/**
 		 *	recursive_array_replace()
-		 *	
+		 *
 		 *	Recursively replace text in an array, stepping through arrays/objects within arrays/objects as needed.
-		 *	
+		 *
 		 *	@param		string		$find		Text to find.
 		 *	@param		string		$replace	Text to replace found text with.
 		 *	@param		reference	&$data		Pass the variable to change the data within.
@@ -443,11 +443,11 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 					// ARRAYS
 					if ( is_array( $value ) ) {
 						$this->recursive_array_replace( $find, $replace, $data[$key] );
-						
+
 					// STRINGS
 					} elseif ( is_string( $value ) ) {
 						$data[$key] = str_replace( $find, $replace, $value );
-					
+
 					// OBJECTS
 					} elseif ( is_object( $value ) ) {
 						//error_log( var_export( $data[$key], true ) );
@@ -461,31 +461,36 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 				$this->recursive_object_replace( $find, $replace, $data );
 			}
 		}
-		
-		
+
+
 		/**
-		 *	recursive_object_replace()
-		 *	
-		 *	Recursively replace text in an object, stepping through objects/arrays within objects/arrays as needed.
-		 *	
-		 *	@param		string		$find		Text to find.
-		 *	@param		string		$replace	Text to replace found text with.
-		 *	@param		reference	&$data		Pass the variable to change the data within.
-		 *	@return		boolean					Always true currently.
+		 * Recursively replace text in an object, stepping through objects/arrays within objects/arrays as needed.
 		 *
+		 * @param string    $find     Text to find.
+		 * @param string    $replace  Text to replace found text with.
+		 * @param reference $data     Pass the variable to change the data within.
 		 */
 		public function recursive_object_replace( $find, $replace, &$data ) {
 			if ( is_object( $data ) ) {
+
+				if ( is_a( $data, '__PHP_Incomplete_Class' ) ) {
+					$serialized_object = serialize( $data );
+					$std_class_object  = preg_replace( '/^O:\d+:"[^"]++"/', 'O:' . strlen( 'stdClass' ) . ':"stdClass"', $serialized_object );
+					$data              = unserialize( $std_class_object );
+				}
+
 				$vars = get_object_vars( $data );
-				foreach( $vars as $key => $var ) {
-					// ARRAYS
-					if ( is_array( $data->{$key} ) ) {
+
+				foreach ( $vars as $key => $var ) {
+					$key = trim( $key );
+					if ( '' === $key || ord( $key[0] ) === 0 || ! isset( $data->{$key} ) ) {
+						continue;
+					}
+					if ( is_array( $data->{$key} ) ) { // ARRAYS.
 						$this->recursive_array_replace( $find, $replace, $data->{$key} );
-					// OBJECTS
-					} elseif ( is_object( $data->{$key} ) ) {
+					} elseif ( is_object( $data->{$key} ) ) { // OBJECTS.
 						$this->recursive_object_replace( $find, $replace, $data->{$key} );
-					// STRINGS
-					} elseif ( is_string( $data->{$key} ) ) {
+					} elseif ( is_string( $data->{$key} ) ) { // STRINGS.
 						$data->{$key} = str_replace( $find, $replace, $data->{$key} );
 					}
 				}
@@ -495,8 +500,8 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 				$this->recursive_array_replace( $find, $replace, $data );
 			}
 		} // End recursive_object_replace().
-		
-		
+
+
 		/**
 		 * Check value to find if it was serialized.
 		 *
@@ -538,11 +543,11 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 			}
 			return false;
 		}
-		
-		
+
+
 		/**
 		 *	remove_matching_array_elements()
-		 *	
+		 *
 		 *	Removes identical elements (same index and value) from both arrays where they match.
 		 *
 		 *	Ex:
@@ -553,7 +558,7 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 		 *		// After:
 		 *		$a = array( 'banana', 'carrot' );
 		 *		$b = array( 'beef', 'cucumber' );
-		 *	
+		 *
 		 *	@param		array		&$a		First array to compare with second. (reference)
 		 *	@param		array		&$b		Second array to compare with first. (reference)
 		 *	@return		null				Arrays passed are updated as they are passed by reference.
@@ -567,12 +572,12 @@ if (!class_exists("pluginbuddy_dbreplace")) {
 					unset( $b[$i] );
 				}
 			}
-			
+
 			$a = array_merge( $a ); // Reset numbering of keys.
 			$b = array_merge( $b ); // Reset numbering of keys.
 		}
-		
-		
+
+
 	} // end pluginbuddy_dbreplace class.
 }
 ?>
