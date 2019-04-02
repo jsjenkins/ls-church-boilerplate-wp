@@ -3,7 +3,7 @@
 Plugin Name: Gravity Forms
 Plugin URI: https://www.gravityforms.com
 Description: Easily create web forms and manage form entries within the WordPress admin.
-Version: 2.4.3
+Version: 2.4.6.15
 Author: rocketgenius
 Author URI: https://www.rocketgenius.com
 License: GPL-2.0+
@@ -11,7 +11,7 @@ Text Domain: gravityforms
 Domain Path: /languages
 
 ------------------------------------------------------------------------
-Copyright 2009-2018 Rocketgenius, Inc.
+Copyright 2009-2019 Rocketgenius, Inc.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ define( 'GF_SUPPORTED_WP_VERSION', version_compare( get_bloginfo( 'version' ), G
  *
  * @var string GF_MIN_WP_VERSION_SUPPORT_TERMS The version number
  */
-define( 'GF_MIN_WP_VERSION_SUPPORT_TERMS', '4.9' );
+define( 'GF_MIN_WP_VERSION_SUPPORT_TERMS', '5.0' );
 
 
 if ( ! defined( 'GRAVITY_MANAGER_URL' ) ) {
@@ -215,7 +215,7 @@ class GFForms {
 	 *
 	 * @var string $version The version number.
 	 */
-	public static $version = '2.4.3';
+	public static $version = '2.4.6.15';
 
 	/**
 	 * Handles background upgrade tasks.
@@ -448,6 +448,9 @@ class GFForms {
 
 						// Check status of upgrade
 						add_action( 'wp_ajax_gf_force_upgrade', array( 'GFForms', 'ajax_force_upgrade' ) );
+
+						// Disable logging.
+						add_action( 'wp_ajax_gf_disable_logging', array( 'GFForms', 'ajax_disable_logging' ) );
 
 					}
 
@@ -938,6 +941,12 @@ class GFForms {
 				'wp-plupload',
 				'gform_placeholder',
 				'gform_json',
+				'gform_gravityforms',
+				'gform_forms',
+				'gform_form_admin',
+				'jquery-ui-datepicker',
+				'gform_masked_input',
+				'sack',
 				'jquery-ui-autocomplete',
 				'wp-tinymce',
 				'wp-tinymce-root',
@@ -1169,10 +1178,10 @@ class GFForms {
 
 		if ( ! self::has_members_plugin() ) {
 			//give full access to administrators if the members plugin is not installed
-			if ( current_user_can( 'administrator' ) || is_super_admin() ) {
+			if ( current_user_can( 'administrator' ) || ( is_multisite() && is_super_admin() ) ) {
 				$all_caps['gform_full_access'] = true;
 			}
-		} else if ( current_user_can( 'administrator' ) || is_super_admin() ) {
+		} elseif ( current_user_can( 'administrator' ) || ( is_multisite() && is_super_admin() ) ) {
 
 			//checking if user has any GF permission.
 			$has_gf_cap = false;
@@ -1803,7 +1812,7 @@ class GFForms {
                  padding-left: 0.4em;
                 }
              </style>
-              <a href="#" class="button gform_media_link" id="add_gform" title="' . esc_attr__( 'Add Gravity Form', 'gravityforms' ) . '"><div class="gform_media_icon svg" style="background-image: url(\'' . self::get_admin_icon_b64() . '\')"><br /></div><div style="padding-left: 20px;">' . esc_html__( 'Add Form', 'gravityforms' ) . '</div></a>';
+              <a href="#" class="button gform_media_link" id="add_gform" aria-label="' . esc_attr__( 'Add Gravity Form', 'gravityforms' ) . '"><div class="gform_media_icon svg" style="background-image: url(\'' . self::get_admin_icon_b64() . '\')"><br /></div><div style="padding-left: 20px;">' . esc_html__( 'Add Form', 'gravityforms' ) . '</div></a>';
 	}
 
 	/**
@@ -2069,13 +2078,13 @@ class GFForms {
 						?>
 						<tr class='author-self status-inherit' valign="top">
 							<td class="gf_dashboard_form_title column-title" style="padding:8px 18px;">
-								<a <?php echo $form['unread_count'] > 0 ? "class='form_title_unread' style='font-weight:bold;'" : '' ?> href="admin.php?page=gf_entries&view=entries&id=<?php echo absint( $form['id'] ) ?>" title="<?php echo esc_attr( $form['title'] ) ?> : <?php esc_attr_e( 'View All Entries', 'gravityforms' ) ?>"><?php echo esc_html( $form['title'] ) ?></a>
+								<a <?php echo $form['unread_count'] > 0 ? "class='form_title_unread' style='font-weight:bold;'" : '' ?> href="admin.php?page=gf_entries&view=entries&id=<?php echo absint( $form['id'] ) ?>"><?php echo esc_html( $form['title'] ) ?></a>
 							</td>
 							<td class="gf_dashboard_entries_unread column-date" style="padding:8px 18px; text-align:center;">
-								<a <?php echo $form['unread_count'] > 0 ? "class='form_entries_unread' style='font-weight:bold;'" : '' ?> href="admin.php?page=gf_entries&view=entries&filter=unread&id=<?php echo absint( $form['id'] ) ?>" title="<?php printf( esc_attr__( 'Last Entry: %s', 'gravityforms' ), $date_display ); ?>"><?php echo absint( $form['unread_count'] ) ?></a>
+								<a <?php echo $form['unread_count'] > 0 ? "class='form_entries_unread' style='font-weight:bold;'" : '' ?> href="admin.php?page=gf_entries&view=entries&filter=unread&id=<?php echo absint( $form['id'] ) ?>" aria-label="<?php printf( esc_attr__( 'Last Entry: %s', 'gravityforms' ), $date_display ); ?>"><?php echo absint( $form['unread_count'] ) ?></a>
 							</td>
 							<td class="gf_dashboard_entries_total column-date" style="padding:8px 18px; text-align:center;">
-								<a href="admin.php?page=gf_entries&view=entries&id=<?php echo absint( $form['id'] ) ?>" title="<?php esc_attr_e( 'View All Entries', 'gravityforms' ) ?>"><?php echo absint( $form['total_entries'] ) ?></a>
+								<a href="admin.php?page=gf_entries&view=entries&id=<?php echo absint( $form['id'] ) ?>" aria-label="<?php esc_attr_e( 'View All Entries', 'gravityforms' ) ?>"><?php echo absint( $form['total_entries'] ) ?></a>
 							</td>
 						</tr>
 						<?php
@@ -2739,6 +2748,36 @@ class GFForms {
 
 
 		GFCommon::dismiss_message( $key );
+	}
+
+	/**
+	 * Target for the wp_ajax_gf_disable_logging AJAX action requested from WordPress admin pages.
+	 *
+	 * @since  2.2.4.2
+	 * @access public
+	 *
+	 * @uses   GFCommon::get_base_path()
+	 * @uses   GFSettings::disable_logging()
+	 */
+	public static function ajax_disable_logging() {
+
+		// Verify nonce.
+		check_admin_referer( 'gf_disable_logging_nonce', 'nonce' );
+
+		// Load Settings class.
+		if ( ! class_exists( 'GFSettings' ) ) {
+			require_once( GFCommon::get_base_path() . '/settings.php' );
+		}
+
+		// Disable logging.
+		$disabled = GFSettings::disable_logging();
+
+		if ( $disabled ) {
+			wp_send_json_success( esc_html__( 'Logging disabled.', 'gravityforms' ) );
+		} else {
+			wp_send_json_error( esc_html__( 'Unable to disable logging.', 'gravityforms' ) );
+		}
+
 	}
 
 	/**
@@ -4065,12 +4104,13 @@ class GFForms {
 					$link_class = esc_attr( rgar( $menu_item, 'link_class' ) );
 					$icon       = rgar( $menu_item, 'icon' );
 					$url        = esc_url( rgar( $menu_item, 'url' ) );
-					$title      = esc_attr( rgar( $menu_item, 'title' ) );
+					$aria_label = rgar( $menu_item, 'aria-label' );
+					$aria_label = ( ! empty( $aria_label ) ) ? "aria-label='" . esc_attr( $aria_label ) . "'" : '';
 					$onclick    = esc_attr( rgar( $menu_item, 'onclick' ) );
 					$label      = esc_html( $label );
 					$target     = rgar( $menu_item, 'target' );
 
-					$link = "<a class='{$link_class}' onclick='{$onclick}' onkeypress='{$onclick}' title='{$title}' href='{$url}' target='{$target}'>{$icon} {$label}</a>" . $sub_menu_str;
+					$link = "<a class='{$link_class}' onclick='{$onclick}' onkeypress='{$onclick}' {$aria_label} href='{$url}' target='{$target}'>{$icon} {$label}</a>" . $sub_menu_str;
 					if ( $compact ) {
 						if ( $key == 'delete' ) {
 
@@ -4131,7 +4171,6 @@ class GFForms {
 			'label'        => __( 'Edit', 'gravityforms' ),
 			'short_label'  => esc_html__( 'Editor', 'gravityforms' ),
 			'icon'         => '<i class="fa fa-pencil-square-o fa-lg"></i>',
-			'title'        => __( 'Edit this form', 'gravityforms' ),
 			'url'          => '?page=gf_edit_forms&id=' . $form_id,
 			'menu_class'   => 'gf_form_toolbar_editor',
 			'link_class'   => self::toolbar_class( 'editor' ),
@@ -4146,7 +4185,7 @@ class GFForms {
 		$menu_items['settings'] = array(
 			'label'          => __( 'Settings', 'gravityforms' ),
 			'icon'           => '<i class="fa fa-cogs fa-lg"></i>',
-			'title'          => __( 'Edit settings for this form', 'gravityforms' ),
+			'aria-label'     => __( 'Edit settings for this form', 'gravityforms' ),
 			'url'            => $is_mobile ? '#' : '?page=gf_edit_forms&view=settings&id=' . $form_id,
 			'menu_class'     => 'gf_form_toolbar_settings',
 			'link_class'     => self::toolbar_class( 'settings' ),
@@ -4167,7 +4206,7 @@ class GFForms {
 		$menu_items['entries'] = array(
 			'label'        => __( 'Entries', 'gravityforms' ),
 			'icon'         => '<i class="fa fa-comment-o fa-lg"></i>',
-			'title'        => __( 'View entries generated by this form', 'gravityforms' ),
+			'aria-label'   => __( 'View entries generated by this form', 'gravityforms' ),
 			'url'          => '?page=gf_entries&id=' . $form_id,
 			'menu_class'   => 'gf_form_toolbar_entries',
 			'link_class'   => self::toolbar_class( 'entries' ),
@@ -4186,7 +4225,6 @@ class GFForms {
 		$menu_items['preview'] = array(
 			'label'        => __( 'Preview', 'gravityforms' ),
 			'icon'         => '<i class="fa fa-eye fa-lg"></i>',
-			'title'        => __( 'Preview this form', 'gravityforms' ),
 			'url'          => trailingslashit( site_url() ) . '?gf_page=preview&id=' . $form_id,
 			'menu_class'   => 'gf_form_toolbar_preview',
 			'link_class'   => self::toolbar_class( 'preview' ),
@@ -4955,14 +4993,38 @@ class GFForms {
 
 		// Prepare message.
 		$message = sprintf(
-			esc_html__( "Gravity Forms logging is currently enabled. Log files can contain sensitive information so ensure that logging is only enabled for as long as is required for troubleshooting. %sClick here to disable logging.%s %sIf you're currently receiving support, do not disable logging until the issue is resolved.%s" ),
-			'<a href="' . esc_url( admin_url( 'admin.php?page=gf_settings' ) ) . '">',
-			'</a>',
-			'<strong>',
-			'</strong>'
+			'<p>%s</p><p><strong>%s</strong></p>',
+			sprintf(
+				esc_html__( "Gravity Forms logging is currently enabled. Log files can contain sensitive information so ensure that logging is only enabled for as long as is required for troubleshooting. %sClick here to disable logging.%s", 'gravityforms' ),
+				'<a href="' . esc_url( admin_url( 'admin.php?page=gf_settings' ) ) . '">',
+				'</a>'
+			),
+			esc_html__( "If you're currently receiving support, do not disable logging until the issue is resolved.", 'gravityforms' )
 		);
 
-		printf( '<div class="notice notice-error"><p>%s</p></div>', $message );
+		// Prepare script.
+		$script = "<script type='text/javascript'>
+			jQuery( document ).on( 'click', '#gform_disable_logging_notice a', function( e ) {
+				e.preventDefault();
+				var container = jQuery( '#gform_disable_logging_notice' );
+				jQuery.ajax( {
+					url: ajaxurl,
+					dataType: 'json',
+					data: {
+						action: 'gf_disable_logging',
+						nonce:  container.data( 'nonce' )
+					},
+					success: function( response ) {
+						if ( response.success ) {
+							container.removeClass( 'notice-error' ).addClass( 'notice-success' );
+						}
+						container.html( '<p>' + response.data + '</p>' );
+					}
+				} );             	
+			} );
+		</script>";
+
+		printf( '<div class="notice notice-error" id="gform_disable_logging_notice" data-nonce="%s">%s</div>%s', wp_create_nonce( 'gf_disable_logging_nonce' ), $message, $script );
 
 	}
 

@@ -227,6 +227,7 @@ add_action( 'wp_ajax_nopriv_itbub_http_loop_back_test', 'itbub_ajax_nopriv_itbub
 function backupbuddy_register_sync_verbs( $api ) {
 	$verbs = array(
 		'backupbuddy-run-backup'				=> 'Ithemes_Sync_Verb_Backupbuddy_Run_Backup',
+		'backupbuddy-add-profile'				=> 'Ithemes_Sync_Verb_Backupbuddy_Add_Profile',
 		'backupbuddy-list-profiles'				=> 'Ithemes_Sync_Verb_Backupbuddy_List_Profiles',
 		'backupbuddy-list-schedules'			=> 'Ithemes_Sync_Verb_Backupbuddy_List_Schedules',
 		'backupbuddy-list-destinations'			=> 'Ithemes_Sync_Verb_Backupbuddy_List_Destinations',

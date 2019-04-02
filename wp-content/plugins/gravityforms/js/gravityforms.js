@@ -1183,7 +1183,9 @@ var GFMergeTag = function() {
 
 		var fieldId = parseInt(inputId,10);
 		var field = jQuery('#field_' + formId + '_' + fieldId);
-		var input = field.find('input[name^="input_' + inputId + '"], select[name^="input_' + inputId + '"], textarea[name="input_' + inputId + '"]');
+
+		var inputSelector = fieldId == inputId ? 'input[name^="input_' + fieldId + '"]' : 'input[name="input_' + inputId + '"]';
+		var input = field.find( inputSelector + ', select[name^="input_' + inputId + '"], textarea[name="input_' + inputId + '"]');
 
 		// checking conditional logic
 		var isVisible = window['gf_check_field_rule'] ? gf_check_field_rule( formId, fieldId, true, '' ) == 'show' : true,
@@ -1545,8 +1547,9 @@ var GFCalc = function(formId, formulaFields){
 			else {
 				var is_product_radio =  jQuery('.gfield_price input[name=input_' + fieldId + ']').is('input[type=radio]');
                 var is_product_dropdown = jQuery('.gfield_price select[name=input_' + fieldId + ']').length > 0;
+                var is_option_checkbox = jQuery('.gfield_price input[name="input_' + inputId + '"]').is('input[type=checkbox]');
 
-                if( is_product_dropdown || is_product_radio ) {
+                if( is_product_dropdown || is_product_radio || is_option_checkbox ) {
 					modifier = 'price';
 				}
 			}
@@ -1760,15 +1763,26 @@ function renderRecaptcha() {
             parameters.stoken = $elem.data( 'stoken' );
         }
 
-	    /**
-	     * Allows a custom callback function to be executed when the user successfully submits the captcha.
-	     *
-	     * @since 2.2.5.20
-	     *
-	     * @param string|false callback The name of the callback function to be executed when the user successfully submits the captcha.
-	     * @param object       $elem    The jQuery object containing the div element with the ginput_recaptcha class for the current reCaptcha field.
-	     */
-	    var callback = gform.applyFilters( 'gform_recaptcha_callback', false, $elem );
+        var callback = false;
+
+        if ( $elem.data( 'size' ) == 'invisible' ) {
+            callback = function( token ) {
+                if ( token ) {
+                    $elem.closest('form').submit();
+                }
+            }
+        }
+
+        /**
+         * Allows a custom callback function to be executed when the user successfully submits the captcha.
+         *
+         * @since 2.4.x     The callback will be a function if reCAPTCHA v2 Invisible is used.
+         * @since 2.2.5.20
+         *
+         * @param string|false|object   The name of the callback function or the function object itself to be executed when the user successfully submits the captcha.
+         * @param object       $elem    The jQuery object containing the div element with the ginput_recaptcha class for the current reCaptcha field.
+         */
+	    callback = gform.applyFilters( 'gform_recaptcha_callback', callback, $elem );
 	    if ( callback ) {
 		    parameters.callback = callback;
 	    }
@@ -1780,6 +1794,7 @@ function renderRecaptcha() {
 	    }
 
         gform.doAction( 'gform_post_recaptcha_render', $elem );
+
 
     } );
 
@@ -1812,13 +1827,9 @@ function gformValidateFileSize( field, max_file_size ) {
 	if ( file && file.size > max_file_size ) {
 
 		// Set validation message.
-		validation_element.text( file.name + " - " + gform_gravityforms.strings.file_exceeds_limit );
+		validation_element.text(file.name + " - " + gform_gravityforms.strings.file_exceeds_limit);
 
-		// Unset file selection.
-		var input = jQuery( field );
-		input.replaceWith( input.val( '' ).clone( true ) );
-
-	} else {
+    } else {
 
 		// Reset validation message.
 		validation_element.text( '' );
@@ -2295,7 +2306,23 @@ jQuery( document ).on( 'submit.gravityforms', '.gform_wrapper form', function( e
 		window[ 'gf_submitting_' + formID ] = false;
 		formWrapper.find( '.gform_ajax_spinner' ).remove();
 		event.preventDefault();
-	}
+	} else if ( isSubmit || isSubmit ) {
+        var $reCaptcha = formWrapper.find( '.ginput_recaptcha' );
+
+        if ( $reCaptcha.length !== 0 && $reCaptcha.data( 'size' ) === 'invisible' ) {
+            // Check for the verified invisible captcha token first.
+            var $reCaptchaResponse = formWrapper.find( 'input[name="g-recaptcha-response"]' );
+            if ( $reCaptchaResponse.length === 0 ) {
+                $reCaptchaResponse = $reCaptcha.find( '.g-recaptcha-response' );
+            }
+            var token = $reCaptchaResponse.val();
+            if ( ! token ) {
+                // Execute the invisible captcha.
+                grecaptcha.execute();
+                event.preventDefault();
+            }
+        }
+    }
 
 } );
 

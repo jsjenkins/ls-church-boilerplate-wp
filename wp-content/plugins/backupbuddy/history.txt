@@ -1960,3 +1960,22 @@
 	Bug Fix: Fixed source of the following warning: "Undefined index: finish_time in backupbuddy/classes/housekeeping.php on line 392".
 8.3.3.1 - 2018-12-12 - Chris Jean, Joshua Benham
 	Bug Fix: Fixed error that prevents users from disconnecting from Stash Live when no Stash remote destinations are active.
+8.3.4.0 - 2018-12-18 - Glenn Ansley
+	Enhancement: Added new Sync Verb addProfile allows for backup profile to be added via API.
+8.3.5.0 - 2019-01-30 - Glenn Ansley, Brian DiChiara
+	Enhancement: Add Sync Verb for creating a Backup Profile.
+	Enhancement: Add Sync Verb for Editing Remote Destinations.
+	Enhancement: Edit Sync Verb for start backup to allow option to send to Remote Destinations.
+	Bug Fix:     Resolved memory issue when sending large backups to Stash/S3 Destinations.
+8.3.6.0 - 2019-02-20 - Chris Jean, Joshua Benham
+	Enhancement: Improvements to Stash v2 and v3 that can dramatically improve performance of sending files.
+8.3.6.1 - 2019-02-21 - Lew Ayotte
+	Enhancement: Updating http to https
+8.3.7.0 - 2019-03-08 - Chris Jean
+	Bug Fix: Fixed Stash remote destinations sometimes not removing older uploads per the destination settings.
+8.3.8.0 - 2019-03-12 - Lew Ayotte
+	Enhancement: Added nextRun to getSchedules API.
+8.3.9.0 - 2019-03-12 - Chris Jean
+	Bug Fix: Fixed importbuddy bug that prevents all files in Stash from showing properly.
+8.3.10.0 - 2019-03-22 - Lew Ayotte
+	Enhancement: Adding filters for LiquidWeb UI improvements (Managed Press)
