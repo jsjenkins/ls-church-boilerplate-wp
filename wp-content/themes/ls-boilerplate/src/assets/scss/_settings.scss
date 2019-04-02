@@ -95,6 +95,7 @@ $global-color-pick-contrast-tolerance: 0;
 $print-transparent-backgrounds: true;
 
 @include add-foundation-colors;
+$print-hrefs: false;
 
 // 2. Breakpoints
 // --------------
@@ -318,6 +319,7 @@ $button-opacity-disabled: 0.25;
 $button-background-hover-lightness: -20%;
 $button-hollow-hover-lightness: -50%;
 $button-transition: background-color 0.25s ease-out, color 0.25s ease-out;
+$button-responsive-expanded: false;
 
 // 12. Button Group
 // ----------------
