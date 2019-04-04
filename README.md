@@ -1,4 +1,4 @@
-# [Landslide Creative Wordpress Boilerplate]
+# Landslide Creative Wordpress Boilerplate
 
 A Wordpress installation boilerplate for projects launched by [Landslide Creative](http://landslidecreative.com).
 

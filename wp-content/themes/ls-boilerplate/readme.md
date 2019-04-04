@@ -1,12 +1,9 @@
-# ZURB Template
+# Landslide Creative Wordpress Theme Boilerplate
 
-[![devDependency Status](https://david-dm.org/zurb/foundation-zurb-template/dev-status.svg)](https://david-dm.org/zurb/foundation-zurb-template#info=devDependencies)
+This theme boilerplate is maintained by [Landslide Creative](https://landslidecreative.com) using [Foundation by Zurb](https://foundation.zurb.com/sites/docs/) (version 6.5.3) with some functionality pulled from a legacy version of [HTML5 Blank](http://html5blank.com/).
 
-**Please open all issues with this template on the main [Foundation for Sites](https://github.com/zurb/foundation-sites/issues) repo.**
+It has a Gulp-powered build system with these features:
 
-This is the official ZURB Template for use with [Foundation for Sites](http://foundation.zurb.com/sites). We use this template at ZURB to deliver static code to our clients. It has a Gulp-powered build system with these features:
-
-- Handlebars HTML templates with Panini
 - Sass compilation and prefixing
 - JavaScript module bundling with webpack
 - Built-in BrowserSync server
@@ -15,56 +12,62 @@ This is the official ZURB Template for use with [Foundation for Sites](http://fo
   - JavaScript compression
   - Image compression
 
-## Installation
+## Using the Boilerplate
 
-To use this template, your computer needs:
+### Installation
 
-- [NodeJS](https://nodejs.org/en/) (0.12 or greater)
+To develop this theme, your computer needs:
+
+- [NodeJS](https://nodejs.org/en/) (Version 6 or greater recommended, tested with 6.11.4 and 8.12.0)
 - [Git](https://git-scm.com/)
 
-This template can be installed with the Foundation CLI, or downloaded and set up manually.
-
-### Using the CLI
-
-Install the Foundation CLI with this command:
+To install the needed dependencies, open the theme folder via CLI and run:
 
 ```bash
-npm install foundation-cli --global
-```
-
-Use this command to set up a blank Foundation for Sites project with this template:
-
-```bash
-foundation new --framework sites --template zurb
-```
-
-The CLI will prompt you to give your project a name. The template will be downloaded into a folder with this name.
-
-Now `cd` to your project name and to start your project run 
-
-```bash
-foundation watch
-```
-
-### Manual Setup
-
-To manually set up the template, first download it with Git:
-
-```bash
-git clone https://github.com/zurb/foundation-zurb-template projectname
-```
-
-Then open the folder in your command line, and install the needed dependencies:
-
-```bash
-cd projectname
 npm install
 ```
 
-Finally, run `npm start` to run Gulp. Your finished site will be created in a folder called `dist`, viewable at this URL:
+The BrowserSync server uses a proxy to open a virtual host URL, like localhost.boilerplate, on your local development environment. To change that URL for your project, open the _config.yml_ file and update the LOCALHOST variable. This should be set to the address you use to access the homepage of your wordpress install.
+
+### Development
+
+Next, to start Gulp, run: 
+
+```bash
+npm run build
+```
+
+Your finished theme will be created in a folder called `dist`, and your BorwserSync site will be viewable at this URL:
 
 ```
 http://localhost:8000
 ```
 
-To create compressed, production-ready assets, run `npm run build`.
+### Production
+
+To create compressed, production-ready assets, run:
+
+```bash
+npm run build
+```
+
+## Theme Organization
+
+The boilerplate theme is organized to improve team development and promote future scalability. All development will be done in the _/src/_ directory.
+
+### Theme Files
+
+Theme files are generally found in _/src/theme/_. These include header, footer, archives, taxonomies, single posts, and the generic page template. Specific page templates are found in the _/src/theme/templates/_ folder and template parts are found in the _/src/theme/partials/_ folder.
+
+### Theme Functions
+
+Theme functions are either found in _/src/theme/functions.php_ or _/src/theme/inc/_. The _/inc/_ folder is used to group functions based on what they do. Most functions should be added there.
+
+### Theme Styles
+
+This theme uses SASS. Variable files are found at _src/assets/scss/_ while the styles are in _src/assets/scss/components/_. To add another component, add the file to that folder and import it in the _app.scss_ file
+
+### Theme Scripts
+
+Theme javascript is located in the _src/assets/js/_ folder. The theme includes JQuery.
+
