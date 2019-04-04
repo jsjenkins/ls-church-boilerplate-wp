@@ -50,7 +50,7 @@ function html5blank_header_scripts()
         wp_register_script( 'jquery', '', '', '', true );
 
         // Add theme scripts
-        wp_register_script('theme-scripts', get_template_directory_uri() . '/assets/js/app.js', array(), '1.0.0');
+        wp_register_script('theme-scripts', get_template_directory_uri() . '/assets/js/app.js', array(), '1.0.0', true);
         wp_enqueue_script('theme-scripts');
         
     }

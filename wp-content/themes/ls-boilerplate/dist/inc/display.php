@@ -46,7 +46,7 @@ function acf_image_array( $variable_name, $sub=FALSE, $options='' ) {
 	return $image;
 }
 
-function link_from_link( $variable_name, $sub=FALSE, $options='' ) {
+function link_from_link( $variable_name, $sub=FALSE, $options='', $class='' ) {
 
 	if( $sub ) {
 		$link = get_sub_field($variable_name);
@@ -55,7 +55,7 @@ function link_from_link( $variable_name, $sub=FALSE, $options='' ) {
 	}
 
 	if( $link ) { 
-		echo '<a href="'.$link['url'].'" target="'.$link['target'].'">'.$link['title'].'</a>';
+		echo '<a href="'.$link['url'].'" class="'.$class.'" target="'.$link['target'].'">'.$link['title'].'</a>';
 	} else {
 		return FALSE;
 	}
@@ -63,7 +63,7 @@ function link_from_link( $variable_name, $sub=FALSE, $options='' ) {
 	return TRUE;
 }
 
-function button_from_link( $variable_name, $sub=FALSE, $options='' ) {
+function button_from_link( $variable_name, $sub=FALSE, $options='', $class=''  ) {
 
 	if( $sub ) {
 		$link = get_sub_field($variable_name);
