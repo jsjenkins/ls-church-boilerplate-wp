@@ -37,7 +37,7 @@ Next, to start Gulp, run:
 npm run build
 ```
 
-Your finished theme will be created in a folder called `dist`, and your BorwserSync site will be viewable at this URL:
+Your finished theme will be created in a folder called `dist`, and your BrowserSync site will be viewable at this URL:
 
 ```
 http://localhost:8000
