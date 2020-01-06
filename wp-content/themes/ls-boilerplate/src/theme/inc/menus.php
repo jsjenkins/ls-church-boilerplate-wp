@@ -57,5 +57,3 @@ function my_wp_nav_menu_args($args = '')
 
 add_action('init', 'register_html5_menu'); // Add HTML5 Blank Menu
 add_filter('wp_nav_menu_args', 'my_wp_nav_menu_args'); // Remove surrounding <div> from WP Navigation
-
-?>
