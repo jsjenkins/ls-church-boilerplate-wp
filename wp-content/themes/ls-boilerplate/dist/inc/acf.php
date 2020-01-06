@@ -1,12 +1,12 @@
-<?php
+<?php // Advanced Custom Fields settings
 
 // ACF map API
-function acf_maps_api() {
+/* function acf_maps_api() {
     
     acf_update_setting('google_api_key', '');
 }
 
-add_action('acf/init', 'acf_maps_api');
+add_action('acf/init', 'acf_maps_api'); */
 
 // Save fields to ../acf-json
 function custom_acf_json_save_point( $path ) {
@@ -16,7 +16,6 @@ function custom_acf_json_save_point( $path ) {
     return $path;
     
 }
-
 add_filter('acf/settings/save_json', 'custom_acf_json_save_point');
 
 // Load fields from ../acf-json
@@ -28,7 +27,6 @@ function custom_acf_json_load_point( $paths ) {
     return $paths;
     
 }
-
 add_filter('acf/settings/load_json', 'custom_acf_json_load_point');
 
 // Add styles for flexible content
@@ -53,7 +51,6 @@ function acf_modify_styles() {
     <?php    
     
 }
-
 add_action('acf/input/admin_head', 'acf_modify_styles');
 
 // Remove ACF WYSIWYG styles
@@ -67,23 +64,3 @@ function remove_acf_wysiwyg_styles() { ?>
     </script>
 <?php }
 add_action('acf/input/admin_footer', 'remove_acf_wysiwyg_styles');
-
-// ACF Options Page
-if( function_exists('acf_add_options_page') ) {
-    
-    acf_add_options_page(array(
-        'page_title'    => 'Theme Settings',
-        'menu_title'    => 'Theme Settings',
-        'menu_slug'     => 'theme-settings',
-        'capability'    => 'edit_posts',
-        'redirect'      => false
-    ));
-    
-    acf_add_options_sub_page(array(
-        'page_title'    => 'Social Media Links',
-        'menu_title'    => 'Social Media',
-        'parent_slug'   => 'theme-settings',
-    ));
-}
-
-?>

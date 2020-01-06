@@ -1,22 +1,11 @@
-<?php 
-// Display functions
+<?php // Display functions
 
-function thumbnail_image_array() {
-
+// Get single featured image size URL
+function thumbnail_image_single( $size='medium' ) {
 	if ( has_post_thumbnail() ) {
 		$thumb_id = get_post_thumbnail_id();
-		$image['full'] = wp_get_attachment_image_src( $thumb_id, 'full', FALSE );
-		$image['full'] = $image['full'][0];
-		$image['large'] = wp_get_attachment_image_src( $thumb_id, 'large', FALSE );
-		$image['large'] = $image['large'][0];
-		$image['medium'] = wp_get_attachment_image_src( $thumb_id, 'medium', FALSE );
-		$image['medium'] = $image['medium'][0];
-		$image['small'] = wp_get_attachment_image_src( $thumb_id, 'small', FALSE );
-		$image['small'] = $image['small'][0];
-		$image['square'] = wp_get_attachment_image_src( $thumb_id, 'square', FALSE );
-		$image['square'] = $image['square'][0];
-		$image['small-square'] = wp_get_attachment_image_src( $thumb_id, 'small-square', FALSE );
-		$image['small-square'] = $image['small-square'][0];
+		$image = wp_get_attachment_image_src( $thumb_id, $size, FALSE );
+		$image = $image[0];
 	} else {
 		return FALSE;
 	}
@@ -24,8 +13,39 @@ function thumbnail_image_array() {
 	return $image;
 }
 
-function acf_image_array( $variable_name, $sub=FALSE, $options='' ) {
+// Get featured image alt tag
+function thumbnail_alt() {
+	if ( has_post_thumbnail() ) {
+		$thumb_id = get_post_thumbnail_id();
+		$alt = get_post_meta($thumb_id, '_wp_attachment_image_alt', TRUE);
+	} else {
+		return FALSE;
+	}
 
+	return $alt;
+}
+
+// Get full array of featured image URLs
+function thumbnail_image_array() {
+	if ( has_post_thumbnail() ) {
+		$thumb_id = get_post_thumbnail_id();
+		$image['alt'] = get_post_meta($thumb_id, '_wp_attachment_image_alt', TRUE);
+		$image['full'] = wp_get_attachment_image_src( $thumb_id, 'full', FALSE );
+		$image['full'] = $image['full'][0];
+		$all_sizes = get_intermediate_image_sizes();
+		foreach( $all_sizes as $size ) {
+			$image[$size] = wp_get_attachment_image_src( $thumb_id, $size, FALSE );
+			$image[$size] = $image[$size][0];
+		}
+	} else {
+		return FALSE;
+	}
+
+	return $image;
+}
+
+// Get single acf image size URL
+function acf_image_single( $variable_name, $size='medium', $sub=FALSE, $options='' ) {
 	if( $sub ) {
 		$variable_image = get_sub_field($variable_name);
 	} else {
@@ -33,12 +53,11 @@ function acf_image_array( $variable_name, $sub=FALSE, $options='' ) {
 	}
 
 	if( $variable_image ) {
-		$image['full'] = $variable_image['url'];
-		$image['large'] = $variable_image['sizes']['large'];
-		$image['medium'] = $variable_image['sizes']['medium'];
-		$image['small'] = $variable_image['sizes']['small'];
-		$image['square'] = $variable_image['sizes']['square'];
-		$image['small-square'] = $variable_image['sizes']['small-square'];
+		if( $size =='full' ) {
+			$image = $variable_image['url'];
+		} else {
+			$image = $variable_image['sizes'][$size];
+		}
 	} else {
 		return FALSE;
 	}
@@ -46,6 +65,29 @@ function acf_image_array( $variable_name, $sub=FALSE, $options='' ) {
 	return $image;
 }
 
+// Get full array of ACF image URLs
+function acf_image_array( $variable_name, $sub=FALSE, $options='' ) {
+	if( $sub ) {
+		$variable_image = get_sub_field($variable_name);
+	} else {
+		$variable_image = get_field($variable_name, $options);
+	}
+
+	if( $variable_image ) {
+		$image['alt'] = $variable_image['alt'];
+		$image['full'] = $variable_image['url'];
+		$all_sizes = get_intermediate_image_sizes();
+		foreach( $all_sizes as $size ) {
+			$image[$size] = $variable_image['sizes'][$size];
+		}
+	} else {
+		return FALSE;
+	}
+
+	return $image;
+}
+
+// Get link from link
 function link_from_link( $variable_name, $sub=FALSE, $options='', $class='' ) {
 
 	if( $sub ) {
@@ -63,6 +105,7 @@ function link_from_link( $variable_name, $sub=FALSE, $options='', $class='' ) {
 	return TRUE;
 }
 
+// Get button from link
 function button_from_link( $variable_name, $sub=FALSE, $options='', $class=''  ) {
 
 	if( $sub ) {
