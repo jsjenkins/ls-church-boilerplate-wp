@@ -7,14 +7,14 @@ defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
  * @since  1.6.10
  * @author Grégory Viguier
  */
-class Imagify_Assets {
+class Imagify_Assets extends Imagify_Assets_Deprecated {
 
 	/**
 	 * Class version.
 	 *
 	 * @var string
 	 */
-	const VERSION = '1.0.2';
+	const VERSION = '1.0.4';
 
 	/**
 	 * Prefix used for stylesheet handles.
@@ -125,9 +125,6 @@ class Imagify_Assets {
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles_and_scripts' ), IMAGIFY_INT_MAX );
 		add_action( 'wp_enqueue_media',      array( $this, 'enqueue_media_modal' ) );
-
-		add_action( 'admin_footer-media_page_imagify-bulk-optimization', array( $this, 'print_support_script' ) );
-		add_action( 'admin_footer-settings_page_imagify',                array( $this, 'print_support_script' ) );
 	}
 
 	/**
@@ -209,19 +206,21 @@ class Imagify_Assets {
 
 		$this->register_script( 'twentytwenty', 'jquery.twentytwenty', array( 'jquery', 'event-move', 'chart', 'admin' ) )->defer_localization( 'imagifyTTT' );
 
-		$this->register_script( 'media-modal', 'media-modal', array( 'jquery', 'chart', 'admin' ) );
+		$this->register_script( 'beat', 'beat', array( 'jquery' ) )->localize( 'imagifybeatSettings' );
+
+		$this->register_script( 'media-modal', 'media-modal', array( 'jquery', 'beat', 'underscore', 'chart', 'admin' ) )->localize( 'imagifyModal' );
 
 		$this->register_script( 'pricing-modal', 'pricing-modal', array( 'jquery', 'admin' ) )->defer_localization( 'imagifyPricingModal' );
 
 		$this->register_script( 'library', 'library', array( 'jquery', 'media-modal' ) )->defer_localization( 'imagifyLibrary' );
 
-		$this->register_script( 'async', 'imagify-gulp', array(), '2017-07-28' );
+		$this->register_script( 'async', 'imagify-gulp' );
 
-		$this->register_script( 'bulk', 'bulk', array( 'jquery', 'heartbeat', 'underscore', 'chart', 'sweetalert', 'async', 'admin' ) )->defer_localization( 'imagifyBulk' );
+		$this->register_script( 'bulk', 'bulk', array( 'jquery', 'beat', 'underscore', 'chart', 'sweetalert', 'async', 'admin' ) )->defer_localization( 'imagifyBulk' );
 
-		$this->register_script( 'options', 'options', array( 'jquery', 'sweetalert', 'underscore', 'admin' ) )->defer_localization( 'imagifyOptions' );
+		$this->register_script( 'options', 'options', array( 'jquery', 'beat', 'sweetalert', 'underscore', 'admin' ) )->defer_localization( 'imagifyOptions' );
 
-		$this->register_script( 'files-list', 'files-list', array( 'jquery', 'chart', 'admin' ) )->defer_localization( 'imagifyFiles' );
+		$this->register_script( 'files-list', 'files-list', array( 'jquery', 'beat', 'underscore', 'chart', 'admin' ) )->defer_localization( 'imagifyFiles' );
 	}
 
 	/**
@@ -329,6 +328,9 @@ class Imagify_Assets {
 
 		$this->enqueue_style( 'admin' )->enqueue_script( 'media-modal' );
 
+		// When the optimization buttons are displayed in the media modal, they are fetched through ajax, so they can’t print the "processing" button template in the footer.
+		Imagify_Views::get_instance()->print_js_template_in_footer( 'button/processing' );
+
 		/**
 		 * Triggered after Imagify CSS and JS have been enqueued for the media modal.
 		 *
@@ -338,33 +340,6 @@ class Imagify_Assets {
 		do_action( 'imagify_media_modal_assets_enqueued' );
 	}
 
-	/**
-	 * Add Intercom on Options page an Bulk Optimization.
-	 * Previously was _imagify_admin_print_intercom()
-	 *
-	 * @since  1.6.10
-	 * @author Grégory Viguier
-	 */
-	public function print_support_script() {
-		if ( ! Imagify_Requirements::is_api_key_valid() ) {
-			return;
-		}
-
-		$user = get_imagify_user();
-
-		if ( empty( $user->is_intercom ) || empty( $user->display_support ) ) {
-			return;
-		}
-		?>
-		<script>
-		window.intercomSettings = {
-			app_id: 'cd6nxj3z',
-			user_id: <?php echo (int) $user->id; ?>
-		};
-		(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/cd6nxj3z';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()
-		</script>
-		<?php
-	}
 
 
 	/** ----------------------------------------------------------------------------------------- */
@@ -398,7 +373,7 @@ class Imagify_Assets {
 
 		wp_register_style(
 			$handle,
-			IMAGIFY_ASSETS_CSS_URL . $file_name . $extension,
+			IMAGIFY_URL . 'assets/css/' . $file_name . $extension,
 			$dependencies,
 			$version
 		);
@@ -488,7 +463,7 @@ class Imagify_Assets {
 
 		wp_register_script(
 			$handle,
-			IMAGIFY_ASSETS_JS_URL . $file_name . $extension,
+			IMAGIFY_URL . 'assets/js/' . $file_name . $extension,
 			$dependencies,
 			$version,
 			true
@@ -517,8 +492,6 @@ class Imagify_Assets {
 
 			$this->current_handle      = $handle;
 			$this->current_handle_type = 'js';
-
-			$this->maybe_register_heartbeat( $handle );
 
 			if ( ! empty( $this->scripts[ $handle ] ) ) {
 				// If we registered it, it's one of our scripts.
@@ -784,41 +757,6 @@ class Imagify_Assets {
 	}
 
 	/**
-	 * Make sure Heartbeat is registered if the given script requires it.
-	 * Lots of people love deregister Heartbeat.
-	 *
-	 * @since  1.6.11
-	 * @author Grégory Viguier
-	 *
-	 * @param  string $handle Name of the script. Should be unique.
-	 */
-	protected function maybe_register_heartbeat( $handle ) {
-		if ( wp_script_is( 'heartbeat', 'registered' ) ) {
-			return;
-		}
-
-		if ( ! empty( $this->scripts[ $handle ] ) ) {
-			// If we registered it, it's one of our scripts.
-			$handle = self::JS_PREFIX . $handle;
-		}
-
-		$dependencies = wp_scripts()->query( $handle );
-
-		if ( ! $dependencies || ! $dependencies->deps ) {
-			return;
-		}
-
-		$dependencies = array_flip( $dependencies->deps );
-
-		if ( ! isset( $dependencies['heartbeat'] ) ) {
-			return;
-		}
-
-		$suffix = SCRIPT_DEBUG ? '' : '.min';
-		wp_register_script( 'heartbeat', "/wp-includes/js/heartbeat$suffix.js", array( 'jquery' ), false, true );
-	}
-
-	/**
 	 * Tell if debug is on.
 	 *
 	 * @since  1.6.10
@@ -843,6 +781,6 @@ class Imagify_Assets {
 			return false;
 		}
 
-		return get_imagify_option( 'api_key' ) && is_admin_bar_showing() && imagify_current_user_can() && get_imagify_option( 'admin_bar_menu' );
+		return get_imagify_option( 'api_key' ) && is_admin_bar_showing() && imagify_get_context( 'wp' )->current_user_can( 'manage' ) && get_imagify_option( 'admin_bar_menu' );
 	}
 }

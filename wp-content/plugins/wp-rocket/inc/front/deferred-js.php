@@ -1,5 +1,6 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Defer all JS files.
@@ -11,6 +12,10 @@ defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
  * @return string Updated HTML content
  */
 function rocket_defer_js( $buffer ) {
+	if ( ( defined( 'DONOTROCKETOPTIMIZE' ) && DONOTROCKETOPTIMIZE ) || ( defined( 'DONOTASYNCCSS' ) && DONOTASYNCCSS ) ) {
+		return;
+	}
+
 	if ( ! get_rocket_option( 'defer_all_js' ) ) {
 		return $buffer;
 	}
@@ -51,4 +56,4 @@ function rocket_defer_js( $buffer ) {
 
 	return $buffer;
 }
-add_filter( 'rocket_buffer', 'rocket_defer_js', 15 );
+add_filter( 'rocket_buffer', 'rocket_defer_js', 24 );

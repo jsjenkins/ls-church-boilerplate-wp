@@ -1,5 +1,6 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Used to get compatibility between multidomain and get_rocket_parse_url()
@@ -14,7 +15,7 @@ function rocket_parse_url_domain_mapping( $url ) {
 	$domain_mapping_siteurl_host = rocket_extract_url_component( domain_mapping_siteurl( false ), PHP_URL_HOST );
 
 	if ( false === strpos( $domain_mapping_siteurl_host, $original_siteurl_host ) ) {
-		$url[0] = str_replace( $original_siteurl_host, $domain_mapping_siteurl_host, $url[0] );
+		$url['host'] = str_replace( $original_siteurl_host, $domain_mapping_siteurl_host, $url['host'] );
 	}
 
 	return $url;

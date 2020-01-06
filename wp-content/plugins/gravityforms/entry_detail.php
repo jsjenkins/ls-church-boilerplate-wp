@@ -141,7 +141,7 @@ class GFEntryDetail {
 
 		$sort_field      = empty( $_GET['orderby'] ) ? 0 : $_GET['orderby'];
 		$sort_field_meta = RGFormsModel::get_field( $form, $sort_field );
-		$is_numeric      = $sort_field_meta['type'] == 'number';
+		$is_numeric      = rgar( $sort_field_meta, 'type' ) == 'number';
 
 		$search_criteria['status'] = $status;
 
@@ -293,7 +293,7 @@ class GFEntryDetail {
 				 */
 				gf_do_action( array( 'gform_after_update_entry', $form['id'] ), $form, $lead['id'], $original_entry );
 
-				$lead = RGFormsModel::get_lead( $lead['id'] );
+				$lead = GFFormsModel::get_entry( $lead['id'] );
 				$lead = GFFormsModel::set_entry_meta( $lead, $form );
 				self::set_current_entry( $lead );
 
@@ -319,7 +319,7 @@ class GFEntryDetail {
 					}
 
 					if ( ! empty( $consent_update_note ) ) {
-						RGFormsModel::add_note( $lead['id'], $current_user->ID, $user_data->display_name, $consent_update_note );
+						GFFormsModel::add_note( $lead['id'], $current_user->ID, $user_data->display_name, $consent_update_note );
 					}
 				}
 
@@ -328,7 +328,7 @@ class GFEntryDetail {
 			case 'add_note' :
 				check_admin_referer( 'gforms_update_note', 'gforms_update_note' );
 				$user_data = get_userdata( $current_user->ID );
-				RGFormsModel::add_note( $lead['id'], $current_user->ID, $user_data->display_name, stripslashes( $_POST['new_note'] ) );
+				GFFormsModel::add_note( $lead['id'], $current_user->ID, $user_data->display_name, stripslashes( $_POST['new_note'] ) );
 
 				//emailing notes if configured
 				if ( rgpost( 'gentry_email_notes_to' ) ) {
@@ -371,7 +371,7 @@ class GFEntryDetail {
 			case 'add_quick_note' :
 				check_admin_referer( 'gforms_save_entry', 'gforms_save_entry' );
 				$user_data = get_userdata( $current_user->ID );
-				RGFormsModel::add_note( $lead['id'], $current_user->ID, $user_data->display_name, stripslashes( $_POST['quick_note'] ) );
+				GFFormsModel::add_note( $lead['id'], $current_user->ID, $user_data->display_name, stripslashes( $_POST['quick_note'] ) );
 				break;
 
 			case 'bulk' :
@@ -380,12 +380,15 @@ class GFEntryDetail {
 					if ( ! GFCommon::current_user_can_any( 'gravityforms_edit_entry_notes' ) ) {
 						wp_die( esc_html__( "You don't have adequate permission to delete notes.", 'gravityforms' ) );
 					}
-					RGFormsModel::delete_notes( $_POST['note'] );
+					GFFormsModel::delete_notes( $_POST['note'] );
 				}
 				break;
 
 			case 'trash' :
 				check_admin_referer( 'gforms_save_entry', 'gforms_save_entry' );
+				if ( ! GFCommon::current_user_can_any( 'gravityforms_delete_entries' ) ) {
+					wp_die( esc_html__( "You don't have adequate permission to trash entries.", 'gravityforms' ) );
+				}
 				GFFormsModel::update_entry_property( $lead['id'], 'status', 'trash' );
 				$admin_url = admin_url( 'admin.php?page=gf_entries&view=entries&id=' . absint( $form['id'] ) . '&trashed_entry=' . absint( $lead['id'] ) );
 				?>
@@ -396,17 +399,26 @@ class GFEntryDetail {
 				break;
 
 			case 'restore' :
+				check_admin_referer( 'gforms_save_entry', 'gforms_save_entry' );
+				if ( ! GFCommon::current_user_can_any( 'gravityforms_delete_entries' ) ) {
+					wp_die( esc_html__( "You don't have adequate permission to restore entries.", 'gravityforms' ) );
+				}
+				GFFormsModel::update_entry_property( $lead['id'], 'status', 'active' );
+				$lead = RGFormsModel::get_lead( $lead['id'] );
+				self::set_current_entry( $lead );
+				break;
+
 			case 'unspam' :
 				check_admin_referer( 'gforms_save_entry', 'gforms_save_entry' );
 				GFFormsModel::update_entry_property( $lead['id'], 'status', 'active' );
-				$lead = RGFormsModel::get_lead( $lead['id'] );
+				$lead = GFFormsModel::get_entry( $lead['id'] );
 				self::set_current_entry( $lead );
 				break;
 
 			case 'spam' :
 				check_admin_referer( 'gforms_save_entry', 'gforms_save_entry' );
 				GFFormsModel::update_entry_property( $lead['id'], 'status', 'spam' );
-				$lead = RGFormsModel::get_lead( $lead['id'] );
+				$lead = GFFormsModel::get_entry( $lead['id'] );
 				self::set_current_entry( $lead );
 				break;
 
@@ -631,10 +643,10 @@ class GFEntryDetail {
 							 */
 							do_action( 'gform_entry_detail_content_before', $form, $lead );
 
-							if ( $mode == 'view' ) {
-								self::lead_detail_grid( $form, $lead, true );
-							} else {
+							if ( 'edit' === $mode && GFCommon::current_user_can_any( 'gravityforms_edit_entries' ) ) {
 								self::lead_detail_edit( $form, $lead );
+							} else {
+								self::lead_detail_grid( $form, $lead, true );
 							}
 
 							/**
@@ -852,8 +864,25 @@ class GFEntryDetail {
 			foreach ( $notes as $note ) {
 				$count ++;
 				$is_last = $count >= $notes_count ? true : false;
+
+				// Prepare note classes.
+				$classes = array();
+
+				// Add base note class.
+				if ( $note->note_type ) {
+					$classes[] = sprintf( 'gforms_note_%s', $note->note_type );
+				}
+
+				// Add sub type note class.
+				if ( rgobj( $note, 'sub_type' ) ) {
+					$classes[] = sprintf( 'gforms_note_%s', $note->sub_type );
+				}
+
+				// Escape note classes.
+				$classes = array_map( 'esc_attr', $classes );
+
 				?>
-				<tr valign="top">
+				<tr valign="top" data-id="<?php echo esc_attr( $note->id ); ?>" data-type="<?php echo esc_attr( $note->note_type ); ?>"<?php echo rgobj( $note, 'sub_type' ) ? ' data-sub-type="' . esc_attr( $note->sub_type ) . '"' : ''; ?>>
 					<?php
 					if ( $is_editable && GFCommon::current_user_can_any( 'gravityforms_edit_entry_notes' ) ) {
 					?>
@@ -868,29 +897,35 @@ class GFEntryDetail {
 					<td class="entry-detail-note<?php echo $is_last ? ' lastrow' : '' ?>">
 						<?php
 						}
-						$class = $note->note_type ? " gforms_note_{$note->note_type}" : '';
 						?>
-						<div class="note-meta-container <?php echo $note->user_email ? 'note-has-email' : ''; ?>">
+						<div class="note-meta-container">
 							<div class="note-avatar">
 								<?php
+
+								if ( $note->user_id ) {
+									$avatar = get_avatar( $note->user_id, 48 );
+								} else {
+									$avatar = sprintf(
+										'<img src="%s" alt="%s" />',
+										GFCommon::get_base_url() . '/images/note-placeholder.svg',
+										esc_attr( $note->user_name )
+									);
+								}
+
 								/**
 								 * Allows filtering of the notes avatar
 								 *
 								 * @param array $note The Note object that is being filtered when modifying the avatar
 								 */
-								echo apply_filters( 'gform_notes_avatar', get_avatar( $note->user_id, 48 ), $note ); ?>
+								echo apply_filters( 'gform_notes_avatar', $avatar, $note ); ?>
 							</div>
 							<div class="note-meta">
 								<h6 class="note-author"><?php echo esc_html( $note->user_name ) ?></h6>
-								<p class="note-email">
-									<?php if( $note->user_email ): ?>
-										<a href="mailto:<?php echo esc_attr( $note->user_email ) ?>"><?php echo esc_html( $note->user_email ) ?></a> <br>
-									<?php endif; ?>
-									<?php esc_html_e( 'added on', 'gravityforms' ); ?> <?php echo esc_html( GFCommon::format_date( $note->date_created, false ) ) ?>
-								</p>
+								<?php if ( $note->user_email ): ?><a href="mailto:<?php echo esc_attr( $note->user_email ) ?>" class="note-email"><?php echo esc_html( $note->user_email ) ?></a><?php endif; ?><br />
+								<time class="note-date"><?php esc_html_e( 'added', 'gravityforms' ); ?> <?php echo esc_html( GFCommon::format_date( $note->date_created, true ) ) ?></time>
 							</div>
 						</div>
-						<div class="detail-note-content<?php echo $class ?>"><?php echo nl2br( esc_html( $note->value ) ) ?></div>
+						<div class="detail-note-content <?php echo implode( ' ', $classes ); ?>"><?php echo nl2br( esc_html( $note->value ) ) ?></div>
 					</td>
 
 				</tr>
@@ -1401,11 +1436,9 @@ class GFEntryDetail {
 							break;
 
 						case 'trash' :
-							?>
-							<a onclick="jQuery('#action').val('restore'); jQuery('#entry_form').submit()" href="#"><?php esc_html_e( 'Restore', 'gravityforms' ) ?></a>
-							<?php
 							if ( GFCommon::current_user_can_any( 'gravityforms_delete_entries' ) ) {
-								?>
+							?>
+								<a onclick="jQuery('#action').val('restore'); jQuery('#entry_form').submit()" href="#"><?php esc_html_e( 'Restore', 'gravityforms' ) ?></a>
 								|
 								<a class="submitdelete deletion" onclick="if ( confirm('<?php echo esc_js( __( "You are about to delete this entry. 'Cancel' to stop, 'OK' to delete.", 'gravityforms' ) ); ?>') ) {jQuery('#action').val('delete'); jQuery('#entry_form').submit(); return true;} return false;" href="#"><?php esc_html_e( 'Delete Permanently', 'gravityforms' ) ?></a>
 								<?php

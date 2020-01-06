@@ -4,7 +4,7 @@ namespace WP_Rocket\Optimization\CSS;
 use MatthiasMullie\PathConverter\ConverterInterface;
 use MatthiasMullie\PathConverter\Converter;
 /**
- * Trait used to rewriter path of files inside CSS file contente
+ * Trait used to rewriter path of files inside CSS file content
  *
  * @since 3.1
  * @author Remy Perona
@@ -22,7 +22,37 @@ trait Path_Rewriter {
 	 * @return string
 	 */
 	public function rewrite_paths( $source, $target, $content ) {
-		return \rocket_cdn_css_properties( $this->move( $this->get_converter( $source, $target ), $content ) );
+		/**
+		 * Filters the source path for an asset inside a CSS file
+		 *
+		 * @since 3.3.1
+		 * @author Remy Perona
+		 *
+		 * @param string $source Source filepath.
+		 */
+		$source = apply_filters( 'rocket_css_asset_source_path', $source );
+
+		/**
+		 * Filters the target path for an asset inside a CSS file
+		 *
+		 * @since 3.3.1
+		 * @author Remy Perona
+		 *
+		 * @param string $target Target filepath.
+		 */
+		$target = apply_filters( 'rocket_css_asset_target_path', $target );
+
+		/**
+		 * Filters the content of a CSS file
+		 *
+		 * @since 3.4
+		 * @author Remy Perona
+		 *
+		 * @param string $content CSS content.
+		 * @param string $source  Source filepath.
+		 * @param string $target  Target filepath.
+		 */
+		return apply_filters( 'rocket_css_content', $this->move( $this->get_converter( $source, $target ), $content ), $source, $target );
 	}
 
 	/**

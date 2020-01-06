@@ -77,11 +77,13 @@ class GFFormsModel {
 	 * @return string
 	 */
 	public static function get_database_version() {
-		static $db_version = null;
-		if ( empty( $db_version ) ) {
-			$db_version = get_option( 'gf_db_version' );
+		static $db_version = array();
+		$blog_id = get_current_blog_id();
+		if ( empty( $db_version[ $blog_id ] ) ) {
+			$db_version[ $blog_id ] = get_option( 'gf_db_version' );
 		}
-		return $db_version;
+
+		return $db_version[ $blog_id ];
 	}
 
 	/**
@@ -753,6 +755,15 @@ class GFFormsModel {
 			}
 		}
 
+		/**
+		 * Modifies the summary of all forms, includes unread and total entry counts.
+		 *
+		 * @since 2.4.16
+		 *
+		 * @param array $forms Form summary.
+		 */
+		$forms = apply_filters( 'gform_form_summary', $forms );
+
 		return $forms;
 	}
 
@@ -899,7 +910,7 @@ class GFFormsModel {
 
 
 		// Loading main form object (supports serialized strings as well as JSON strings)
-		$form = self::unserialize( $form_row['display_meta'] );
+		$form = self::unserialize( rgar( $form_row, 'display_meta' ) );
 
 		if ( ! $form ) {
 			return null;
@@ -1424,7 +1435,7 @@ class GFFormsModel {
 	}
 
 	public static function update_entry_property( $lead_id, $property_name, $property_value, $update_akismet = true, $disable_hook = false ) {
-		global $wpdb;
+		global $wpdb, $current_user;
 
 		if ( version_compare( GFFormsModel::get_database_version(), '2.3-dev-1', '<' ) ) {
 			return GF_Forms_Model_Legacy::update_lead_property( $lead_id, $property_name, $property_value, $update_akismet, $disable_hook );
@@ -1445,6 +1456,11 @@ class GFFormsModel {
 				$form = self::get_form_meta( $lead['form_id'] );
 				GFCommon::mark_akismet_spam( $form, $lead, true );
 			}
+		}
+
+		// If property is trash, log user login
+		if ( $property_name == 'status' && $property_value == 'trash' && ! empty( $current_user->user_login ) ) {
+			GFCommon::log_debug( __METHOD__ . "(): User ID {$current_user->ID} requested moving of entry #{$lead_id} to trash." );
 		}
 
 		//updating lead
@@ -1535,7 +1551,7 @@ class GFFormsModel {
 	}
 
 	public static function delete_entries_by_form( $form_id, $status = '' ) {
-		global $wpdb;
+		global $wpdb, $current_user;
 
 		if ( version_compare( self::get_database_version(), '2.3-dev-1', '<' ) ) {
 			GF_Forms_Model_Legacy::delete_leads_by_form( $form_id, $status );
@@ -1564,6 +1580,11 @@ class GFFormsModel {
 
 		// If entries were found, loop through them and run action.
 		if ( ! empty( $entry_ids ) ) {
+
+		// Log user login for user requesting the deletion of entries
+		if ( ! empty( $current_user->user_login ) ) {
+			GFCommon::log_debug( __METHOD__ . "(): User ID {$current_user->ID} requested deletion of entries: " . json_encode( $entry_ids ) );
+		}
 
 			foreach ( $entry_ids as $entry_id ) {
 
@@ -1623,7 +1644,12 @@ class GFFormsModel {
 			return new WP_Error( 'submissions_blocked', __( 'Submissions are currently blocked due to an upgrade in progress', 'gravityforms' ) );
 		}
 
-		global $wpdb;
+		global $wpdb, $current_user;
+
+		// Log user login for user requesting deletion of views
+		if ( ! empty( $current_user->user_login ) ) {
+			GFCommon::log_debug( __METHOD__ . "(): User ID {$current_user->ID} requested deletion of views for form #{$form_id}." );
+		}
 
 		$form_view_table = self::get_form_view_table_name();
 
@@ -1645,7 +1671,12 @@ class GFFormsModel {
 			return new WP_Error( 'submissions_blocked', __( 'Submissions are currently blocked due to an upgrade in progress', 'gravityforms' ) );
 		}
 
-		global $wpdb;
+		global $wpdb, $current_user;
+
+		// Log user login for user requesting deletion of form
+		if ( ! empty( $current_user->user_login ) ) {
+			GFCommon::log_debug( __METHOD__ . "(): User ID {$current_user->ID} requested deletion of form #{$form_id}." );
+		}
 
         /**
          * Fires before a form is deleted
@@ -1676,6 +1707,12 @@ class GFFormsModel {
 		$sql = $wpdb->prepare( "DELETE FROM $form_table WHERE id=%d", $form_id );
 		$wpdb->query( $sql );
 
+		// Prepare the cache key.
+		$key = get_current_blog_id() . '_' . $form_id;
+
+		// Remove the cached form.
+		self::$_current_forms[ $key ] = null;
+
         /**
          * Fires after a form is deleted
          *
@@ -1690,7 +1727,11 @@ class GFFormsModel {
 			return new WP_Error( 'submissions_blocked', __( 'Submissions are currently blocked due to an upgrade in progress', 'gravityforms' ) );
 		}
 
-		global $wpdb;
+		global $wpdb, $current_user;
+		// Log user login for user moving the form to trash
+		if ( ! empty( $current_user->user_login ) ) {
+			GFCommon::log_debug( __METHOD__ . "(): User ID {$current_user->ID} requested moving of form #{$form_id} to trash." );
+		}
 		$form_table_name = self::get_form_table_name();
 		$sql             = $wpdb->prepare( "UPDATE $form_table_name SET is_trash=1 WHERE id=%d", $form_id );
 		$result          = $wpdb->query( $sql );
@@ -1750,7 +1791,7 @@ class GFFormsModel {
 	 * @static
 	 * @param  int $form_id Form ID to duplicate.
 	 *
-	 * @return int $new_id New form ID.
+	 * @return int|WP_Error
 	 */
 	public static function duplicate_form( $form_id ) {
 
@@ -2442,7 +2483,12 @@ class GFFormsModel {
 	}
 
 	public static function delete_entry( $entry_id ) {
-		global $wpdb;
+		global $wpdb, $current_user;
+
+		// Log if user requested deletion of entries
+		if ( ! empty( $current_user->user_login ) ) {
+			GFCommon::log_debug( __METHOD__ . "(): User ID {$current_user->ID} requested deletion of entry #{$entry_id}" );
+		}
 
 		if ( version_compare( GFFormsModel::get_database_version(), '2.3-dev-1', '<' ) ) {
 			GF_Forms_Model_Legacy::delete_lead( $entry_id );
@@ -2488,7 +2534,7 @@ class GFFormsModel {
 		$wpdb->query( $sql );
 	}
 
-	public static function add_note( $entry_id, $user_id, $user_name, $note, $note_type = 'note' ) {
+	public static function add_note( $entry_id, $user_id, $user_name, $note, $note_type = 'user', $sub_type = null ) {
 		global $wpdb;
 
 		if ( version_compare( GFFormsModel::get_database_version(), '2.3-dev-1', '<' ) ) {
@@ -2497,21 +2543,26 @@ class GFFormsModel {
 		}
 
 		$table_name = self::get_entry_notes_table_name();
-		$sql        = $wpdb->prepare( "INSERT INTO $table_name(entry_id, user_id, user_name, value, note_type, date_created) values(%d, %d, %s, %s, %s, utc_timestamp())", $entry_id, $user_id, $user_name, $note, $note_type );
+		$sql        = $wpdb->prepare( "INSERT INTO $table_name(entry_id, user_id, user_name, value, note_type, sub_type, date_created) values(%d, %d, %s, %s, %s, %s, utc_timestamp())", $entry_id, $user_id, $user_name, $note, $note_type, $sub_type );
 
 		$wpdb->query( $sql );
 
 		/**
 		 * Fires after a note has been added to an entry
 		 *
+		 * @since 2.4.13  Added sub_type parameter.
+		 * @since Unknown
+		 *
 		 * @param int    $wpdb->insert_id The row ID of this note in the database
-		 * @param int    $entry_id         The ID of the entry that the note was added to
+		 * @param int    $entry_id        The ID of the entry that the note was added to
 		 * @param int    $user_id         The ID of the current user adding the note
 		 * @param string $user_name       The user name of the current user
 		 * @param string $note            The content of the note being added
 		 * @param string $note_type       The type of note being added.  Defaults to 'note'
+		 * @param string $sub_type        The sub-type of note being added.
+		 *
 		 */
-		do_action( 'gform_post_note_added', $wpdb->insert_id, $entry_id, $user_id, $user_name, $note, $note_type );
+		do_action( 'gform_post_note_added', $wpdb->insert_id, $entry_id, $user_id, $user_name, $note, $note_type, $sub_type );
 	}
 
 	public static function delete_note( $note_id ) {
@@ -2549,6 +2600,65 @@ class GFFormsModel {
 	}
 
 	/**
+	 * Add note to entry containing the notification sending result
+	 *
+	 * @since  2.4.14
+	 *
+	 * @param integer        $entry_id       Id number for entry being processed.
+	 * @param string|boolean $result         The result returned by wp_mail().
+	 * @param array          $notification   The notification properties.
+	 * @param string         $error_info     Additional details for notifications with error.
+	 * @param array          $email          Array containing email details.
+	 * @param array          $note_args      Array containing text, type and subtype for the note.
+	 */
+	public static function add_notification_note( $entry_id, $result, $notification, $error_info = '', $email = array(), $note_args = array() ) {
+
+		// Skip if no entry id (e.g. Save and Continue notifications).
+		if ( empty( $entry_id ) ) {
+			return;
+		}
+
+		// If $note_args is empty, use default arguments for Gravity Forms core notifications.
+		if ( empty( $note_args ) ) {
+			if ( $result === true ) {
+
+				$note_args['type'] = 'notification';
+				$note_args['subtype'] = 'success';
+				$note_args['text'] = esc_html__( 'WordPress successfully passed the notification email to the sending server.', 'gravityforms' );
+
+			} elseif ( $result === false ) {
+
+				$note_args['type'] = 'notification';
+				$note_args['subtype'] = 'error';
+				$note_args['text'] = esc_html__( 'WordPress was unable to send the notification email.', 'gravityforms' );
+
+				// Add additional error message if any.
+				if ( ! empty( $error_info ) ) {
+					$note_args['text'] .= PHP_EOL . $error_info;
+				}
+			}
+		}
+
+		/**
+		 * Allow customization of the Sending Result Note.
+		 *
+		 * @param array  $note_args        Array containing text, type and subtype for the note.
+		 * @param int    $entry_id         Id number for entry being processed.
+		 * @param bool   $result           The result returned by wp_mail().
+		 * @param array  $notification     The notification properties.
+		 * @param string $error_info       Additional details for notifications with error.
+		 * @param array  $email            Array containing email details.
+		 */
+		$note_args = apply_filters( 'gform_notification_note', $note_args, $entry_id, $result, $notification, $error_info, $email );
+
+		if ( ! empty( $note_args['text'] ) ) {
+			// translators: Notification name followed by its ID. e.g. Admin Notification (ID: 5d4c0a2a37204).
+			self::add_note( $entry_id, 0, sprintf( esc_html__( '%1$s (ID: %2$s)', 'gravityforms' ), $notification['name'], $notification['id'] ), $note_args['text'], $note_args['type'], $note_args['subtype'] );
+		}
+
+	}
+
+	/**
 	 * Gets the IP to be used within the entry.
 	 *
 	 * @since 2.2 Using $_SERVER['REMOTE_ADDR'].
@@ -2581,8 +2691,17 @@ class GFFormsModel {
 		self::save_entry( $form, $entry );
 	}
 
+	/**
+	 * Save Entry to database.
+	 *
+	 * @since 2.4.8.13 Updated created_by property to save as an empty value when undefined.
+	 * @since Unknown
+	 *
+	 * @param array $form  Form object.
+	 * @param array $entry Entry object.
+	 */
 	public static function save_entry( $form, &$entry ) {
-		global $wpdb;
+		global $wpdb, $current_user;
 
 		if ( version_compare( self::get_database_version(), '2.3-dev-1', '<' ) ) {
 			GF_Forms_Model_Legacy::save_lead( $form, $entry );
@@ -2603,6 +2722,11 @@ class GFFormsModel {
 		$entry_meta_table = self::get_entry_meta_table_name();
 		$is_new_lead      = empty( $entry );
 
+		// Log user login for user updating the entry
+		if ( ! $is_new_lead && ! empty( $entry['id'] ) && ! empty( $current_user->ID ) ) {
+			GFCommon::log_debug( __METHOD__ . "(): User ID {$current_user->ID} requested update of entry #{$entry['id']}." );
+		}
+
 		if ( ! $is_new_lead && ! self::entry_exists( rgar( $entry, 'id' ) ) ) {
 			// Force a new entry to be saved when an entry does not exist for the supplied id.
 			$entry       = array();
@@ -2618,8 +2742,7 @@ class GFFormsModel {
 		if ( $is_new_lead ) {
 			// Saving the new entry.
 
-			global $current_user;
-			$user_id = $current_user && $current_user->ID ? $current_user->ID : 'NULL';
+			$user_id = $current_user && $current_user->ID ? $current_user->ID : null;
 
 			$user_agent = self::truncate( rgar( $_SERVER, 'HTTP_USER_AGENT' ), 250 );
 			$user_agent = sanitize_text_field( $user_agent );
@@ -2636,7 +2759,29 @@ class GFFormsModel {
 
 			$ip = rgars( $form, 'personalData/preventIP' ) ? '' : self::get_ip();
 
-			$wpdb->query( $wpdb->prepare( "INSERT INTO $entry_table(form_id, ip, source_url, date_created, date_updated, user_agent, currency, created_by) VALUES(%d, %s, %s, %s, %s, %s, %s, {$user_id})", $form['id'], $ip, $source_url, $current_date, $current_date, $user_agent, $currency ) );
+			$wpdb->insert(
+				$entry_table,
+				array(
+					'form_id'      => $form['id'],
+					'ip'           => $ip,
+					'source_url'   => $source_url,
+					'date_created' => $current_date,
+					'date_updated' => $current_date,
+					'user_agent'   => $user_agent,
+					'currency'     => $currency,
+					'created_by'   => $user_id,
+				),
+				array(
+					'form_id'      => '%d',
+					'ip'           => '%s',
+					'source_url'   => '%s',
+					'date_created' => '%s',
+					'date_updated' => '%s',
+					'user_agent'   => '%s',
+					'currency'     => '%s',
+					'created_by'   => '%s',
+				)
+			);
 
 			// Reading newly created lead id
 			$lead_id = $wpdb->insert_id;
@@ -2701,7 +2846,7 @@ class GFFormsModel {
 			}
 
 			//Ignore fields that are marked as display only
-			if ( $field->displayOnly && $field->type != 'password' ) {
+			if ( $field->displayOnly ) {
 				continue;
 			}
 
@@ -2922,7 +3067,7 @@ class GFFormsModel {
 			/* @var $field GF_Field */
 
 			// ignore fields that are marked as display only
-			if ( $field->displayOnly && $field->type != 'password' ) {
+			if ( $field->displayOnly ) {
 				continue;
 			}
 
@@ -3085,6 +3230,13 @@ class GFFormsModel {
 		}
 
 		$cache_key = 'GFFormsModel::is_field_hidden_' . $form['id'] . '_' . $field->id;
+
+		if ( ! empty( $lead ) && isset( $lead['id'] ) ) {
+			// Make sure that we cache field visiblity on a per-entry basis
+			// https://github.com/gravityview/GravityView/issues/1307
+			$cache_key = $cache_key . '_' . $lead['id'];
+		}
+
 		$display   = GFCache::get( $cache_key, $is_hit, false );
 		if ( $display !== false ) {
 			return $display;
@@ -3282,7 +3434,13 @@ class GFFormsModel {
 				break;
 
 			case 'ends_with' :
+				// If target value is a 0 set $val2 to 0 rather than the empty string it currently is to prevent false positives.
+				if ( empty( $val2 ) ) {
+					$val2 = '0';
+				}
+
 				$start = strlen( $val1 ) - strlen( $val2 );
+
 				if ( $start < 0 ) {
 					return false;
 				}
@@ -4987,14 +5145,26 @@ class GFFormsModel {
 			}
 
 		} else {
-			// Deleting details for this field
-			$sql    = $wpdb->prepare( "DELETE FROM $entry_meta_table_name WHERE entry_id=%d AND meta_key = %s ", $entry_id, $input_id );
-			if ( $item_index ) {
-				$sql .= $wpdb->prepare( ' AND item_index=%s', $item_index );
-			}
-			$result = $wpdb->query( $sql );
-			if ( false === $result ) {
-				return false;
+			// when the value is empty and no $entry_meta_id was set, check if it's a repeater field.
+			if ( empty( $entry_meta_id ) && $field instanceof GF_Field_Repeater && isset( $field->fields ) && is_array( $field->fields ) ) {
+				foreach ( $field->fields as $subfield ) {
+					self::update_entry_field_value( $form, $entry, $subfield, 0, $subfield->id, '' );
+				}
+			} else {
+				// Deleting details for this field
+				if ( is_array( $field->get_entry_inputs() ) ) {
+					$_input_id = ( false === strpos( $input_id, '.' ) ) ? sprintf( '%d.%%', $input_id ) : $input_id;
+					$sql = $wpdb->prepare( "DELETE FROM $entry_meta_table_name WHERE entry_id=%d AND meta_key LIKE %s ", $entry_id, $_input_id );
+				} else {
+					$sql = $wpdb->prepare( "DELETE FROM $entry_meta_table_name WHERE entry_id=%d AND meta_key = %s ", $entry_id, $input_id );
+				}
+				if ( $item_index ) {
+					$sql .= $wpdb->prepare( ' AND item_index=%s', $item_index );
+				}
+				$result = $wpdb->query( $sql );
+				if ( false === $result ) {
+					return false;
+				}
 			}
 		}
 
@@ -5214,7 +5384,7 @@ class GFFormsModel {
 
 	public static function get_file_upload_path( $form_id, $file_name ) {
 
-		if ( get_magic_quotes_gpc() ) {
+		if ( version_compare( phpversion(), '7.4', '<' ) && get_magic_quotes_gpc() ) {
 			$file_name = stripslashes( $file_name );
 		}
 
@@ -5336,6 +5506,9 @@ class GFFormsModel {
 
 		$drop_tables = array_merge( $drop_tables, $legacy_tables );
 
+		// Prevent the legacy table query notice when they are dropped by wp_uninitialize_site().
+		remove_filter( 'query', array( 'GFForms', 'filter_query' ) );
+
 		return $drop_tables;
 	}
 
@@ -5365,8 +5538,9 @@ class GFFormsModel {
 			return GF_Forms_Model_Legacy::is_duplicate( $form_id, $field, $value );
 		}
 
-		$entry_meta_table_name = self::get_entry_meta_table_name();
+		$entry_meta_table_name   = self::get_entry_meta_table_name();
 		$entry_table_name        = self::get_entry_table_name();
+		$sql_comparison          = 'ld.meta_value = %s';
 
 		switch ( GFFormsModel::get_input_type( $field ) ) {
 			case 'time':
@@ -5380,7 +5554,7 @@ class GFFormsModel {
 				break;
 			case 'phone':
 				$value          = str_replace( array( ')', '(', '-', ' ' ), '', $value );
-				$sql_comparison = 'replace( replace( replace( replace( ld.value, ")", "" ), "(", "" ), "-", "" ), " ", "" ) = %s';
+				$sql_comparison = 'replace( replace( replace( replace( ld.meta_value, ")", "" ), "(", "" ), "-", "" ), " ", "" ) = %s';
 				break;
 			case 'email':
 				$value = is_array( $value ) ? rgar( $value, 0 ) : $value;
@@ -5394,7 +5568,7 @@ class GFFormsModel {
 
 		$inner_sql_template .= "WHERE l.form_id=%d AND ld.form_id=%d
                                 AND ld.meta_key = %s
-                                AND status='active' AND ld.meta_value = %s";
+                                AND status='active' AND {$sql_comparison}";
 
 		$sql = "SELECT count(distinct input) as match_count FROM ( ";
 
@@ -5443,7 +5617,7 @@ class GFFormsModel {
 
 		return $wpdb->get_results(
 			$wpdb->prepare(
-				"  SELECT n.id, n.user_id, n.date_created, n.value, n.note_type, ifnull(u.display_name,n.user_name) as user_name, u.user_email
+				"  SELECT n.id, n.user_id, n.date_created, n.value, n.note_type, n.sub_type, ifnull(u.display_name,n.user_name) as user_name, u.user_email
                                                     FROM $notes_table n
                                                     LEFT OUTER JOIN $wpdb->users u ON n.user_id = u.id
                                                     WHERE entry_id=%d ORDER BY id", $lead_id
@@ -6201,34 +6375,91 @@ class GFFormsModel {
 	}
 
 	/**
-	 * v1.7 introduces conditional confirmations. If the form's "confirmations" key is empty, grab the existing confirmation
-	 * and populate it in the form's "confirmations" property.
+	 * Converts the legacy confirmation from forms created prior to v1.7 to the current format or adds the default confirmation.
 	 *
-	 * @param mixed $form
+	 * @since 1.7
+	 * @since 2.4.15 Fixed corrupt confirmation being created when form doesn't have one to convert.
+	 *
+	 * @param array $form The form being processed.
+	 *
 	 * @return array
 	 */
 	public static function convert_confirmation( $form ) {
+		$confirmation = rgar( $form, 'confirmation' );
 
-		$id = uniqid();
+		if ( ! empty( $confirmation['type'] ) ) {
+			// Complete converting legacy confirmation by adding missing properties.
+			$confirmation['id']        = uniqid();
+			$confirmation['name']      = esc_html__( 'Default Confirmation', 'gravityforms' );
+			$confirmation['isDefault'] = true;
+		} else {
+			// Form does not have a valid legacy confirmation add the default confirmation instead.
+			$confirmation = self::get_default_confirmation();
+		}
 
-		// convert confirmation to new confirmations format
-		$confirmation              = rgar( $form, 'confirmation' );
-		$confirmation['id']        = $id;
-		$confirmation['name']      = esc_html__( 'Default Confirmation', 'gravityforms' );
-		$confirmation['isDefault'] = true;
-
-		$form['confirmations'] = array( $id => $confirmation );
+		$form['confirmations'] = array( $confirmation['id'] => $confirmation );
 
 		self::save_form_confirmations( $form['id'], $form['confirmations'] );
 
 		return $form;
 	}
 
+	/**
+	 * Returns a default confirmation.
+	 *
+	 * @since 2.4.15
+	 *
+	 * @param string $event The confirmation event. form_saved, form_save_email_sent, or an empty string for the default form submission event.
+	 *
+	 * @return array
+	 */
+	public static function get_default_confirmation( $event = '' ) {
+		switch ( $event ) {
+			case 'form_saved':
+				return array(
+					'id'          => uniqid( 'sc1' ),
+					'event'       => 'form_saved',
+					'name'        => __( 'Save and Continue Confirmation', 'gravityforms' ),
+					'isDefault'   => true,
+					'type'        => 'message',
+					'message'     => __( '<p>Please use the following link to return and complete this form from any computer.</p><p class="resume_form_link_wrapper"> {save_link} </p><p> Note: This link will expire after 30 days.<br />Enter your email address if you would like to receive the link via email.</p></p> {save_email_input}</p>', 'gravityforms' ),
+					'url'         => '',
+					'pageId'      => '',
+					'queryString' => '',
+				);
+
+			case 'form_save_email_sent':
+				return array(
+					'id'          => uniqid( 'sc2' ),
+					'event'       => 'form_save_email_sent',
+					'name'        => __( 'Save and Continue Email Sent Confirmation', 'gravityforms' ),
+					'isDefault'   => true,
+					'type'        => 'message',
+					'message'     => __( '<span class="saved_message_success">Success!</span>The link was sent to the following email address: <span class="saved_message_email">{save_email}</span>', 'gravityforms' ),
+					'url'         => '',
+					'pageId'      => '',
+					'queryString' => '',
+				);
+
+			default:
+				return array(
+					'id'          => uniqid(),
+					'name'        => __( 'Default Confirmation', 'gravityforms' ),
+					'isDefault'   => true,
+					'type'        => 'message',
+					'message'     => __( 'Thanks for contacting us! We will get in touch with you shortly.', 'gravityforms' ),
+					'url'         => '',
+					'pageId'      => '',
+					'queryString' => '',
+				);
+		}
+	}
+
 	public static function load_confirmations( $form ) {
 
 		$confirmations = self::get_form_confirmations( $form['id'] );
 
-		// if there are no confirmations, convert existing (singular) confirmation (prior to 1.7) to new (plural) confirmations format
+		// If there are no confirmations convert the legacy confirmation or add the default.
 		if ( empty( $confirmations ) ) {
 			$form = self::convert_confirmation( $form );
 		} else {
@@ -6250,11 +6481,40 @@ class GFFormsModel {
 		$tablename     = GFFormsModel::get_meta_table_name();
 		$sql           = $wpdb->prepare( "SELECT confirmations FROM $tablename WHERE form_id = %d", $form_id );
 		$results       = $wpdb->get_results( $sql, ARRAY_A );
-		$confirmations = rgars( $results, '0/confirmations' );
+		$confirmations = rgars( $results, '0/confirmations', array() );
 
-		self::$_confirmations[ $key ] = $confirmations ? self::unserialize( $confirmations ) : array();
+		if ( ! empty( $confirmations ) ) {
+			$confirmations = self::remove_corrupt_confirmations( self::unserialize( $confirmations ) );
+		}
+
+		self::$_confirmations[ $key ] = $confirmations;
 
 		return self::$_confirmations[ $key ];
+	}
+
+	/**
+	 * Remove corrupt confirmations created by old versions of GFFormsModel::convert_confirmation().
+	 *
+	 * @since 2.4.15
+	 *
+	 * @param mixed $confirmations The confirmations to be processed.
+	 *
+	 * @return array
+	 */
+	public static function remove_corrupt_confirmations( $confirmations ) {
+		if ( ! is_array( $confirmations ) ) {
+			return array();
+		}
+
+		foreach ( $confirmations as $id => $confirmation ) {
+			if ( is_array( $confirmation ) && ! empty( $confirmation['type'] ) ) {
+				continue;
+			}
+
+			unset( $confirmations[ $id ] );
+		}
+
+		return $confirmations;
 	}
 
 	public static function save_form_confirmations( $form_id, $confirmations ) {
@@ -6776,6 +7036,14 @@ class GFFormsModel {
 	}
 
 
+	/**
+	 * @deprecated 2.4.16
+	 *
+	 * @param $entry
+	 * @param $form
+	 *
+	 * @return mixed
+	 */
 	public static function delete_password( $entry, $form ) {
 		$password_fields = self::get_fields_by_type( $form, array( 'password' ) );
 		if ( is_array( $password_fields ) ) {
@@ -6912,7 +7180,7 @@ class GFFormsModel {
 		if ( isset( $logic['rules'] ) && is_array( $logic['rules'] ) ) {
 			foreach ( $logic['rules'] as &$rule ) {
 				if ( isset( $rule['fieldId'] ) ) {
-					// Field ID could be meta key
+					// Field ID could be meta key.
 					$rule['fieldId'] = wp_strip_all_tags( $rule['fieldId'] );
 				}
 				if ( isset( $rule['operator'] ) ) {
@@ -6921,7 +7189,11 @@ class GFFormsModel {
 				}
 
 				if ( isset( $rule['value'] ) ) {
-					$rule['value'] = wp_strip_all_tags( $rule['value'] );
+					// Strip scripts but don't encode.
+					$allowed_protocols = wp_allowed_protocols();
+					$rule['value']     = wp_kses_no_null( $rule['value'], array( 'slash_zero' => 'keep' ) );
+					$rule['value']     = wp_kses_hook( $rule['value'], 'post', $allowed_protocols );
+					$rule['value']     = wp_kses_split( $rule['value'], 'post', $allowed_protocols );
 				}
 			}
 		}
@@ -7038,7 +7310,7 @@ class GFFormsModel {
 
 		$recent_form_ids = get_user_meta( $current_user_id, 'gform_recent_forms', true );
 
-		if ( empty( $recent_form_ids ) ) {
+		if ( empty( $recent_form_ids ) || ! is_array( $recent_form_ids ) ) {
 			$all_form_ids    = self::get_form_ids();
 			$all_form_ids    = array_reverse( $all_form_ids );
 			$recent_form_ids = array_slice( $all_form_ids, 0, 10 );

@@ -14,7 +14,7 @@ class Imagify_Options extends Imagify_Abstract_Options {
 	 * @var   string
 	 * @since 1.7
 	 */
-	const VERSION = '1.0';
+	const VERSION = '1.1';
 
 	/**
 	 * Suffix used in the name of the option.
@@ -35,16 +35,20 @@ class Imagify_Options extends Imagify_Abstract_Options {
 	 * @access protected
 	 */
 	protected $default_values = array(
-		'api_key'            => '',
-		'optimization_level' => 0,
-		'auto_optimize'      => 0,
-		'backup'             => 0,
-		'resize_larger'      => 0,
-		'resize_larger_w'    => 0,
-		'exif'               => 0,
-		'disallowed-sizes'   => array(),
-		'admin_bar_menu'     => 0,
-		'partner_links'      => 0,
+		'api_key'             => '',
+		'optimization_level'  => 0,
+		'auto_optimize'       => 0,
+		'backup'              => 0,
+		'resize_larger'       => 0,
+		'resize_larger_w'     => 0,
+		'convert_to_webp'     => 0,
+		'display_webp'        => 0,
+		'display_webp_method' => 'picture',
+		'cdn_url'             => '',
+		'exif'                => 0,
+		'disallowed-sizes'    => array(),
+		'admin_bar_menu'      => 0,
+		'partner_links'       => 0,
 	);
 
 	/**
@@ -59,6 +63,7 @@ class Imagify_Options extends Imagify_Abstract_Options {
 		'optimization_level' => 1,
 		'auto_optimize'      => 1,
 		'backup'             => 1,
+		'convert_to_webp'    => 1,
 		'admin_bar_menu'     => 1,
 		'partner_links'      => 1,
 	);
@@ -83,6 +88,25 @@ class Imagify_Options extends Imagify_Abstract_Options {
 	protected function __construct() {
 		if ( defined( 'IMAGIFY_API_KEY' ) && IMAGIFY_API_KEY ) {
 			$this->default_values['api_key'] = (string) IMAGIFY_API_KEY;
+		}
+
+		if ( function_exists( 'wp_get_original_image_path' ) ) {
+			$this->reset_values['resize_larger'] = 1;
+
+			$filter_cb = [ imagify_get_context( 'wp' ), 'get_resizing_threshold' ];
+			$filtered  = has_filter( 'big_image_size_threshold', $filter_cb );
+
+			if ( $filtered ) {
+				remove_filter( 'big_image_size_threshold', $filter_cb, IMAGIFY_INT_MAX );
+			}
+
+			/** This filter is documented in wp-admin/includes/image.php */
+			$this->reset_values['resize_larger_w'] = (int) apply_filters( 'big_image_size_threshold', 2560, [ 0, 0 ], '', 0 );
+			$this->reset_values['resize_larger_w'] = $this->sanitize_and_validate_value( 'resize_larger_w', $this->reset_values['resize_larger_w'], $this->default_values['resize_larger_w'] );
+
+			if ( $filtered ) {
+				add_filter( 'big_image_size_threshold', $filter_cb, IMAGIFY_INT_MAX );
+			}
 		}
 
 		$this->network_option = imagify_is_active_for_network();
@@ -145,6 +169,8 @@ class Imagify_Options extends Imagify_Abstract_Options {
 			case 'auto_optimize':
 			case 'backup':
 			case 'resize_larger':
+			case 'convert_to_webp':
+			case 'display_webp':
 			case 'exif':
 			case 'admin_bar_menu':
 			case 'partner_links':
@@ -153,7 +179,7 @@ class Imagify_Options extends Imagify_Abstract_Options {
 			case 'resize_larger_w':
 				if ( $value <= 0 ) {
 					// Invalid.
-					return 0;
+					return $default;
 				}
 				if ( ! isset( $max_sizes ) ) {
 					$max_sizes = get_imagify_max_intermediate_image_size();
@@ -172,6 +198,31 @@ class Imagify_Options extends Imagify_Abstract_Options {
 				$value = array_keys( $value );
 				$value = array_map( 'sanitize_text_field', $value );
 				return array_fill_keys( $value, 1 );
+
+			case 'display_webp_method':
+				$values = [
+					'picture' => 1,
+					'rewrite' => 1,
+				];
+				if ( isset( $values[ $value ] ) ) {
+					return $value;
+				}
+				// For an invalid value, return the "reset" value.
+				$reset_values = $this->get_reset_values();
+				return $reset_values[ $key ];
+
+			case 'cdn_url':
+				$cdn_source = \Imagify\Webp\Picture\Display::get_instance()->get_cdn_source( $value );
+
+				if ( 'option' !== $cdn_source['source'] ) {
+					/**
+					 * If the URL is defined via constant or filter, unset the option.
+					 * This is useful when the CDN is disabled: there is no need to do anything then.
+					 */
+					return '';
+				}
+
+				return $cdn_source['url'];
 		}
 
 		return false;
@@ -191,6 +242,11 @@ class Imagify_Options extends Imagify_Abstract_Options {
 		// The max width for the "Resize larger images" option can't be 0.
 		if ( empty( $values['resize_larger_w'] ) ) {
 			unset( $values['resize_larger'], $values['resize_larger_w'] );
+		}
+
+		// Don't display wepb if conversion is disabled.
+		if ( empty( $values['convert_to_webp'] ) ) {
+			unset( $values['convert_to_webp'], $values['display_webp'] );
 		}
 
 		return $values;

@@ -4,7 +4,7 @@ if (!defined('WORDFENCE_VERSION')) { exit; }
  * @var wfActivityReportView $this
  */
 ?>
-<a class="wf-logo" href="//www.wordfence.com/zz8/"><img src="<?php echo wfUtils::getBaseURL(); ?>images/logo.png" alt=""/></a>
+<a class="wf-logo" href="//www.wordfence.com/zz8/"><img src="<?php echo wfUtils::getBaseURL(); ?>images/wf-horizontal.svg" alt="Wordfence"/></a>
 
 <h2><?php printf(__('Top %d IPs Blocked', 'wordfence'), $limit); ?></h2>
 
@@ -163,6 +163,11 @@ if (!defined('WORDFENCE_VERSION')) { exit; }
 
 <h2><?php _e('Updates Needed', 'wordfence'); ?></h2>
 
+<?php
+if (!is_array($updates_needed)) {
+	$updates_needed = array('core' => array(), 'plugins' => array(), 'themes' => array());
+}
+?>
 <?php if ($updates_needed['core']): ?>
 	<h4><?php _e('Core', 'wordfence'); ?></h4>
 	<ul>

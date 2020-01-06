@@ -1,5 +1,6 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Send data to Varnish
@@ -57,16 +58,19 @@ function rocket_varnish_http_purge( $url ) {
 			 *
 			 * @param array $headers Headers to send.
 			 */
-			'headers'     => apply_filters( 'rocket_varnish_purge_headers', array(
-				/**
-				 * Filters the host value passed in the request headers
-				 *
-				 * @since 2.8.15
-				 * @param string The host
-				 */
-				'host'           => apply_filters( 'rocket_varnish_purge_request_host', $parse_url['host'] ),
-				'X-Purge-Method' => $varnish_x_purgemethod,
-			) ),
+			'headers'     => apply_filters(
+				'rocket_varnish_purge_headers',
+				[
+					/**
+					 * Filters the host value passed in the request headers
+					 *
+					 * @since 2.8.15
+					 * @param string The host
+					 */
+					'host'           => apply_filters( 'rocket_varnish_purge_request_host', $parse_url['host'] ),
+					'X-Purge-Method' => $varnish_x_purgemethod,
+				]
+			),
 		)
 	);
 }

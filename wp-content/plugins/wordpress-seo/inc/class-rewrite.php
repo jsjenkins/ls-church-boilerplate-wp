@@ -11,19 +11,19 @@
 class WPSEO_Rewrite {
 
 	/**
-	 * Class constructor
+	 * Class constructor.
 	 */
 	public function __construct() {
-		add_filter( 'query_vars', array( $this, 'query_vars' ) );
-		add_filter( 'category_link', array( $this, 'no_category_base' ) );
-		add_filter( 'request', array( $this, 'request' ) );
-		add_filter( 'category_rewrite_rules', array( $this, 'category_rewrite_rules' ) );
+		add_filter( 'query_vars', [ $this, 'query_vars' ] );
+		add_filter( 'category_link', [ $this, 'no_category_base' ] );
+		add_filter( 'request', [ $this, 'request' ] );
+		add_filter( 'category_rewrite_rules', [ $this, 'category_rewrite_rules' ] );
 
-		add_action( 'created_category', array( $this, 'schedule_flush' ) );
-		add_action( 'edited_category', array( $this, 'schedule_flush' ) );
-		add_action( 'delete_category', array( $this, 'schedule_flush' ) );
+		add_action( 'created_category', [ $this, 'schedule_flush' ] );
+		add_action( 'edited_category', [ $this, 'schedule_flush' ] );
+		add_action( 'delete_category', [ $this, 'schedule_flush' ] );
 
-		add_action( 'init', array( $this, 'flush' ), 999 );
+		add_action( 'init', [ $this, 'flush' ], 999 );
 	}
 
 	/**
@@ -39,6 +39,7 @@ class WPSEO_Rewrite {
 	 * If the flush option is set, flush the rewrite rules.
 	 *
 	 * @since 1.2.8
+	 *
 	 * @return bool
 	 */
 	public function flush() {
@@ -81,7 +82,7 @@ class WPSEO_Rewrite {
 	}
 
 	/**
-	 * Update the query vars with the redirect var when stripcategorybase is active
+	 * Update the query vars with the redirect var when stripcategorybase is active.
 	 *
 	 * @param array $query_vars Main query vars to filter.
 	 *
@@ -111,14 +112,14 @@ class WPSEO_Rewrite {
 	}
 
 	/**
-	 * This function taken and only slightly adapted from WP No Category Base plugin by Saurabh Gupta
+	 * This function taken and only slightly adapted from WP No Category Base plugin by Saurabh Gupta.
 	 *
 	 * @return array
 	 */
 	public function category_rewrite_rules() {
 		global $wp_rewrite;
 
-		$category_rewrite = array();
+		$category_rewrite = [];
 
 		$taxonomy            = get_taxonomy( 'category' );
 		$permalink_structure = get_option( 'permalink_structure' );
@@ -128,8 +129,8 @@ class WPSEO_Rewrite {
 			$blog_prefix = 'blog/';
 		}
 
-		$categories = get_categories( array( 'hide_empty' => false ) );
-		if ( is_array( $categories ) && $categories !== array() ) {
+		$categories = get_categories( [ 'hide_empty' => false ] );
+		if ( is_array( $categories ) && $categories !== [] ) {
 			foreach ( $categories as $category ) {
 				$category_nicename = $category->slug;
 				if ( $category->parent == $category->cat_ID ) {
@@ -200,7 +201,7 @@ class WPSEO_Rewrite {
 		}
 
 		$names = explode( '/', $name );
-		$names = array_map( array( $this, 'encode_to_upper' ), $names );
+		$names = array_map( [ $this, 'encode_to_upper' ], $names );
 
 		return implode( '/', $names );
 	}

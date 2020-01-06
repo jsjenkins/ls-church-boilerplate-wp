@@ -13,16 +13,22 @@
 class WPSEO_Utils {
 
 	/**
-	 * @var bool $has_filters Whether the PHP filter extension is enabled.
+	 * Whether the PHP filter extension is enabled.
+	 *
 	 * @since 1.8.0
+	 *
+	 * @var bool $has_filters
 	 */
 	public static $has_filters;
 
 	/**
-	 * @var array Notifications to be shown in the JavaScript console.
+	 * Notifications to be shown in the JavaScript console.
+	 *
 	 * @since 3.3.2
+	 *
+	 * @var array
 	 */
-	protected static $console_notifications = array();
+	protected static $console_notifications = [];
 
 	/**
 	 * Check whether the current user is allowed to access the configuration.
@@ -51,7 +57,7 @@ class WPSEO_Utils {
 	 *
 	 * {@internal current_user_can() checks internally whether a user is on wp-ms and adjusts accordingly.}}
 	 *
-	 * @since    1.8.0
+	 * @since 1.8.0
 	 *
 	 * @return bool
 	 */
@@ -119,7 +125,7 @@ class WPSEO_Utils {
 		static $registered_hook;
 
 		if ( is_null( $registered_hook ) ) {
-			add_action( 'admin_footer', array( __CLASS__, 'localize_console_notices' ), 999 );
+			add_action( 'admin_footer', [ __CLASS__, 'localize_console_notices' ], 999 );
 			$registered_hook = true;
 		}
 
@@ -193,7 +199,7 @@ class WPSEO_Utils {
 	 * @return string
 	 */
 	public static function standardize_whitespace( $string ) {
-		return trim( str_replace( '  ', ' ', str_replace( array( "\t", "\n", "\r", "\f" ), ' ', $string ) ) );
+		return trim( str_replace( '  ', ' ', str_replace( [ "\t", "\n", "\r", "\f" ], ' ', $string ) ) );
 	}
 
 	/**
@@ -225,7 +231,7 @@ class WPSEO_Utils {
 			$value = trim( $value );
 		}
 		elseif ( is_array( $value ) ) {
-			$value = array_map( array( __CLASS__, 'trim_recursive' ), $value );
+			$value = array_map( [ __CLASS__, 'trim_recursive' ], $value );
 		}
 
 		return $value;
@@ -254,14 +260,14 @@ class WPSEO_Utils {
 	/**
 	 * Emulate the WP native sanitize_text_field function in a %%variable%% safe way.
 	 *
-	 * @see   https://core.trac.wordpress.org/browser/trunk/src/wp-includes/formatting.php for the original
+	 * @link https://core.trac.wordpress.org/browser/trunk/src/wp-includes/formatting.php for the original.
 	 *
 	 * Sanitize a string from user input or from the db.
 	 *
-	 * - Check for invalid UTF-8,
-	 * - Convert single < characters to entity,
-	 * - Strip all tags,
-	 * - Remove line breaks, tabs and extra white space,
+	 * - Check for invalid UTF-8;
+	 * - Convert single < characters to entity;
+	 * - Strip all tags;
+	 * - Remove line breaks, tabs and extra white space;
 	 * - Strip octets - BUT DO NOT REMOVE (part of) VARIABLES WHICH WILL BE REPLACED.
 	 *
 	 * @since 1.8.0
@@ -310,7 +316,7 @@ class WPSEO_Utils {
 	 * Sanitize a url for saving to the database.
 	 * Not to be confused with the old native WP function.
 	 *
-	 * @todo  [JRF => whomever] Check/improve url verification.
+	 * @todo [JRF => whomever] Check/improve url verification.
 	 *
 	 * @since 1.8.0
 	 *
@@ -319,7 +325,7 @@ class WPSEO_Utils {
 	 *
 	 * @return string
 	 */
-	public static function sanitize_url( $value, $allowed_protocols = array( 'http', 'https' ) ) {
+	public static function sanitize_url( $value, $allowed_protocols = [ 'http', 'https' ] ) {
 		return esc_url_raw( sanitize_text_field( rawurldecode( $value ) ), $allowed_protocols );
 	}
 
@@ -355,7 +361,7 @@ class WPSEO_Utils {
 	 * @return bool
 	 */
 	public static function emulate_filter_bool( $value ) {
-		$true  = array(
+		$true  = [
 			'1',
 			'true',
 			'True',
@@ -368,8 +374,8 @@ class WPSEO_Utils {
 			'on',
 			'On',
 			'ON',
-		);
-		$false = array(
+		];
+		$false = [
 			'0',
 			'false',
 			'False',
@@ -382,7 +388,7 @@ class WPSEO_Utils {
 			'off',
 			'Off',
 			'OFF',
-		);
+		];
 
 		if ( is_bool( $value ) ) {
 			return $value;
@@ -508,33 +514,33 @@ class WPSEO_Utils {
 	/**
 	 * Do simple reliable math calculations without the risk of wrong results.
 	 *
-	 * @see   http://floating-point-gui.de/
-	 * @see   the big red warning on http://php.net/language.types.float.php
+	 * @link http://floating-point-gui.de/
+	 * @link http://php.net/language.types.float.php See the big red warning.
 	 *
 	 * In the rare case that the bcmath extension would not be loaded, it will return the normal calculation results.
 	 *
 	 * @since 1.5.0
 	 * @since 1.8.0 Moved from stand-alone function to this class.
 	 *
-	 * @param mixed  $number1     Scalar (string/int/float/bool).
-	 * @param string $action      Calculation action to execute. Valid input:
-	 *                            '+' or 'add' or 'addition',
-	 *                            '-' or 'sub' or 'subtract',
-	 *                            '*' or 'mul' or 'multiply',
-	 *                            '/' or 'div' or 'divide',
-	 *                            '%' or 'mod' or 'modulus'
-	 *                            '=' or 'comp' or 'compare'.
-	 * @param mixed  $number2     Scalar (string/int/float/bool).
-	 * @param bool   $round       Whether or not to round the result. Defaults to false.
-	 *                            Will be disregarded for a compare operation.
-	 * @param int    $decimals    Decimals for rounding operation. Defaults to 0.
-	 * @param int    $precision   Calculation precision. Defaults to 10.
+	 * @param mixed  $number1   Scalar (string/int/float/bool).
+	 * @param string $action    Calculation action to execute. Valid input:
+	 *                          '+' or 'add' or 'addition',
+	 *                          '-' or 'sub' or 'subtract',
+	 *                          '*' or 'mul' or 'multiply',
+	 *                          '/' or 'div' or 'divide',
+	 *                          '%' or 'mod' or 'modulus'
+	 *                          '=' or 'comp' or 'compare'.
+	 * @param mixed  $number2   Scalar (string/int/float/bool).
+	 * @param bool   $round     Whether or not to round the result. Defaults to false.
+	 *                          Will be disregarded for a compare operation.
+	 * @param int    $decimals  Decimals for rounding operation. Defaults to 0.
+	 * @param int    $precision Calculation precision. Defaults to 10.
 	 *
-	 * @return mixed            Calculation Result or false if either or the numbers isn't scalar or
-	 *                          an invalid operation was passed.
-	 *                          - for compare the result will always be an integer.
-	 *                          - for all other operations, the result will either be an integer (preferred)
-	 *                            or a float.
+	 * @return mixed Calculation Result or false if either or the numbers isn't scalar or
+	 *               an invalid operation was passed.
+	 *               - For compare the result will always be an integer.
+	 *               - For all other operations, the result will either be an integer (preferred)
+	 *                 or a float.
 	 */
 	public static function calc( $number1, $action, $number2, $round = false, $decimals = 0, $precision = 10 ) {
 		static $bc;
@@ -646,7 +652,7 @@ class WPSEO_Utils {
 	 * @return string
 	 */
 	public static function trim_nbsp_from_string( $string ) {
-		$find   = array( '&nbsp;', chr( 0xC2 ) . chr( 0xA0 ) );
+		$find   = [ '&nbsp;', chr( 0xC2 ) . chr( 0xA0 ) ];
 		$string = str_replace( $find, ' ', $string );
 		$string = trim( $string );
 
@@ -793,7 +799,7 @@ class WPSEO_Utils {
 	 * @return bool
 	 */
 	public static function is_yoast_seo_free_page( $current_page ) {
-		$yoast_seo_free_pages = array(
+		$yoast_seo_free_pages = [
 			'wpseo_dashboard',
 			'wpseo_titles',
 			'wpseo_social',
@@ -801,8 +807,7 @@ class WPSEO_Utils {
 			'wpseo_tools',
 			'wpseo_search_console',
 			'wpseo_licenses',
-			'wpseo_courses',
-		);
+		];
 
 		return in_array( $current_page, $yoast_seo_free_pages, true );
 	}
@@ -940,9 +945,9 @@ class WPSEO_Utils {
 				<ellipse fill="#C8C8C8" cx="15" cy="36.1" rx="5.7" ry="5.6"/>
 			</g>
 			<g class="traffic-light-color traffic-light-init">
-				<ellipse fill="#5B2942" cx="15" cy="23.5" rx="5.7" ry="5.6"/>
-				<ellipse fill="#5B2942" cx="15" cy="10.9" rx="5.7" ry="5.6"/>
-				<ellipse fill="#5B2942" cx="15" cy="36.1" rx="5.7" ry="5.6"/>
+				<ellipse fill="#C8C8C8" cx="15" cy="23.5" rx="5.7" ry="5.6"/>
+				<ellipse fill="#C8C8C8" cx="15" cy="10.9" rx="5.7" ry="5.6"/>
+				<ellipse fill="#C8C8C8" cx="15" cy="36.1" rx="5.7" ry="5.6"/>
 			</g>
 		</g>
 	</g>
@@ -997,7 +1002,7 @@ SVG;
 	 * @return bool Whether or not the metabox should be displayed.
 	 */
 	protected static function display_taxonomy_metabox( $taxonomy = null ) {
-		if ( ! isset( $taxonomy ) || ! in_array( $taxonomy, get_taxonomies( array( 'public' => true ), 'names' ), true ) ) {
+		if ( ! isset( $taxonomy ) || ! in_array( $taxonomy, get_taxonomies( [ 'public' => true ], 'names' ), true ) ) {
 			return false;
 		}
 
@@ -1065,10 +1070,9 @@ SVG;
 	 * @return array The Adminl10n array.
 	 */
 	public static function get_admin_l10n() {
-		$wpseo_admin_l10n = array();
-		$wpseo_admin_l10n = array_merge( $wpseo_admin_l10n, WPSEO_Help_Center::get_translated_texts() );
+		$wpseo_admin_l10n = [];
 
-		$additional_entries = apply_filters( 'wpseo_admin_l10n', array() );
+		$additional_entries = apply_filters( 'wpseo_admin_l10n', [] );
 		if ( is_array( $additional_entries ) ) {
 			$wpseo_admin_l10n = array_merge( $wpseo_admin_l10n, $additional_entries );
 		}
@@ -1106,7 +1110,7 @@ SVG;
 	 */
 	public static function get_home_url() {
 		// Add a new filter to undo WPML's changing of home url.
-		add_filter( 'wpml_get_home_url', array( 'WPSEO_Utils', 'wpml_get_home_url' ), 10, 2 );
+		add_filter( 'wpml_get_home_url', [ 'WPSEO_Utils', 'wpml_get_home_url' ], 10, 2 );
 
 		$url = home_url();
 
@@ -1115,14 +1119,14 @@ SVG;
 			$url = network_home_url();
 		}
 
-		remove_filter( 'wpml_get_home_url', array( 'WPSEO_Utils', 'wpml_get_home_url' ), 10 );
+		remove_filter( 'wpml_get_home_url', [ 'WPSEO_Utils', 'wpml_get_home_url' ], 10 );
 
 		return $url;
 	}
 
 	/**
 	 * Returns the original URL instead of the language-enriched URL.
-	 * This method gets automatically triggered by the wpml_get_home_url filter
+	 * This method gets automatically triggered by the wpml_get_home_url filter.
 	 *
 	 * @codeCoverageIgnore
 	 *
@@ -1146,12 +1150,240 @@ SVG;
 		return class_exists( 'WPSEO_MyYoast_Client' );
 	}
 
+	/**
+	 * Prepares data for outputting as JSON.
+	 *
+	 * @param array $data The data to format.
+	 *
+	 * @return false|string The prepared JSON string.
+	 */
+	public static function format_json_encode( $data ) {
+		$flags = JSON_UNESCAPED_SLASHES;
+
+		if ( self::is_development_mode() ) {
+			$flags = ( $flags | JSON_PRETTY_PRINT );
+
+			/**
+			 * Filter the Yoast SEO development mode.
+			 *
+			 * @api array $data Allows filtering of the JSON data for debug purposes.
+			 */
+			$data = apply_filters( 'wpseo_debug_json_data', $data );
+		}
+
+		return wp_json_encode( $data, $flags );
+	}
+
+	/**
+	 * Output a Schema blob.
+	 *
+	 * @param array  $graph The Schema graph array to output.
+	 * @param string $class The (optional) class to add to the script tag.
+	 *
+	 * @return bool
+	 */
+	public static function schema_output( $graph, $class = 'yoast-schema-graph' ) {
+		if ( ! is_array( $graph ) || empty( $graph ) ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.Security.EscapeOutput -- Escaping happens in WPSEO_Utils::schema_tag, which should be whitelisted.
+		echo self::schema_tag( $graph, $class );
+		return true;
+	}
+
+	/**
+	 * Returns a script tag with Schema blob.
+	 *
+	 * @param array  $graph The Schema graph array to output.
+	 * @param string $class The (optional) class to add to the script tag.
+	 *
+	 * @return false|string A schema blob with script tags.
+	 */
+	public static function schema_tag( $graph, $class = 'yoast-schema-graph' ) {
+		if ( ! is_array( $graph ) || empty( $graph ) ) {
+			return false;
+		}
+
+		$output = [
+			'@context' => 'https://schema.org',
+			'@graph'   => $graph,
+		];
+		return "<script type='application/ld+json' class='" . esc_attr( $class ) . "'>" . self::format_json_encode( $output ) . '</script>' . "\n";
+	}
+
+	/**
+	 * Extends the allowed post tags with accessibility-related attributes.
+	 *
+	 * @param array $allowed_post_tags The allowed post tags.
+	 * @codeCoverageIgnore
+	 *
+	 * @return array The allowed tags including post tags, input tags and select tags.
+	 */
+	public static function extend_kses_post_with_a11y( $allowed_post_tags ) {
+		static $a11y_tags;
+
+		if ( isset( $a11y_tags ) === false ) {
+			$a11y_tags = [
+				'button'   => [
+					'aria-expanded' => true,
+					'aria-controls' => true,
+				],
+				'div'      => [
+					'tabindex' => true,
+				],
+				// Below are attributes that are needed for backwards compatibility (WP < 5.1).
+				'span'     => [
+					'aria-hidden' => true,
+				],
+				'input'    => [
+					'aria-describedby' => true,
+				],
+				'select'   => [
+					'aria-describedby' => true,
+				],
+				'textarea' => [
+					'aria-describedby' => true,
+				],
+			];
+
+			// Add the global allowed attributes to each html element.
+			$a11y_tags = array_map( '_wp_add_global_attributes', $a11y_tags );
+		}
+
+		return array_merge_recursive( $allowed_post_tags, $a11y_tags );
+	}
+
+	/**
+	 * Extends the allowed post tags with input, select and option tags.
+	 *
+	 * @param array $allowed_post_tags The allowed post tags.
+	 * @codeCoverageIgnore
+	 *
+	 * @return array The allowed tags including post tags, input tags, select tags and option tags.
+	 */
+	public static function extend_kses_post_with_forms( $allowed_post_tags ) {
+		static $input_tags;
+
+		if ( isset( $input_tags ) === false ) {
+			$input_tags = [
+				'input' => [
+					'accept'          => true,
+					'accesskey'       => true,
+					'align'           => true,
+					'alt'             => true,
+					'autocomplete'    => true,
+					'autofocus'       => true,
+					'checked'         => true,
+					'contenteditable' => true,
+					'dirname'         => true,
+					'disabled'        => true,
+					'draggable'       => true,
+					'dropzone'        => true,
+					'form'            => true,
+					'formaction'      => true,
+					'formenctype'     => true,
+					'formmethod'      => true,
+					'formnovalidate'  => true,
+					'formtarget'      => true,
+					'height'          => true,
+					'hidden'          => true,
+					'lang'            => true,
+					'list'            => true,
+					'max'             => true,
+					'maxlength'       => true,
+					'min'             => true,
+					'multiple'        => true,
+					'name'            => true,
+					'pattern'         => true,
+					'placeholder'     => true,
+					'readonly'        => true,
+					'required'        => true,
+					'size'            => true,
+					'spellcheck'      => true,
+					'src'             => true,
+					'step'            => true,
+					'tabindex'        => true,
+					'translate'       => true,
+					'type'            => true,
+					'value'           => true,
+					'width'           => true,
+
+					/*
+					 * Below are attributes that are needed for backwards compatibility (WP < 5.1).
+					 * They are used for the social media image in the metabox.
+					 * These can be removed once we move to the React versions of the social previews.
+					 */
+					'data-target'     => true,
+					'data-target-id'  => true,
+				],
+				'select' => [
+					'accesskey'       => true,
+					'autofocus'       => true,
+					'contenteditable' => true,
+					'disabled'        => true,
+					'draggable'       => true,
+					'dropzone'        => true,
+					'form'            => true,
+					'hidden'          => true,
+					'lang'            => true,
+					'multiple'        => true,
+					'name'            => true,
+					'onblur'          => true,
+					'onchange'        => true,
+					'oncontextmenu'   => true,
+					'onfocus'         => true,
+					'oninput'         => true,
+					'oninvalid'       => true,
+					'onreset'         => true,
+					'onsearch'        => true,
+					'onselect'        => true,
+					'onsubmit'        => true,
+					'required'        => true,
+					'size'            => true,
+					'spellcheck'      => true,
+					'tabindex'        => true,
+					'translate'       => true,
+				],
+				'option' => [
+					'class'    => true,
+					'disabled' => true,
+					'id'       => true,
+					'label'    => true,
+					'selected' => true,
+					'value'    => true,
+				],
+			];
+
+			// Add the global allowed attributes to each html element.
+			$input_tags = array_map( '_wp_add_global_attributes', $input_tags );
+		}
+
+		return array_merge_recursive( $allowed_post_tags, $input_tags );
+	}
+
+	/**
+	 * Gets an array of enabled features.
+	 *
+	 * @return string[] The array of enabled features.
+	 */
+	public static function retrieve_enabled_features() {
+		$enabled_features = [];
+		if ( defined( 'YOAST_SEO_ENABLED_FEATURES' ) ) {
+			$enabled_features = preg_split( '/,\W*/', YOAST_SEO_ENABLED_FEATURES );
+		}
+		// Make the array of enabled features filterable, so features can be enabled at will.
+		$enabled_features = apply_filters( 'wpseo_enable_feature', $enabled_features );
+
+		return $enabled_features;
+	}
+
 	/* ********************* DEPRECATED METHODS ********************* */
 
 	/**
 	 * Returns the language part of a given locale, defaults to english when the $locale is empty.
 	 *
-	 * @see        WPSEO_Language_Utils::get_language()
+	 * @see WPSEO_Language_Utils::get_language()
 	 *
 	 * @deprecated 9.5
 	 * @codeCoverageIgnore
@@ -1174,7 +1406,7 @@ SVG;
 	 * Can be removed when support for WordPress 4.6 will be dropped, in favor
 	 * of WordPress get_user_locale() that already fallbacks to the site's locale.
 	 *
-	 * @see        WPSEO_Language_Utils::get_user_locale()
+	 * @see WPSEO_Language_Utils::get_user_locale()
 	 *
 	 * @deprecated 9.5
 	 * @codeCoverageIgnore

@@ -39,7 +39,7 @@ class Minify_HTML_Subscriber implements Subscriber_Interface {
 	 */
 	public static function get_subscribed_events() {
 		return [
-			'rocket_buffer' => [ 'process', 21 ],
+			'rocket_buffer' => [ 'process', 14 ],
 		];
 	}
 
@@ -53,6 +53,10 @@ class Minify_HTML_Subscriber implements Subscriber_Interface {
 	 * @return string
 	 */
 	public function process( $html ) {
+		if ( defined( 'DONOTROCKETOPTIMIZE' ) && DONOTROCKETOPTIMIZE ) {
+			return $html;
+		}
+
 		if ( ! $this->options->get( 'minify_html' ) || \is_rocket_post_excluded_option( 'minify_html' ) ) {
 			return $html;
 		}

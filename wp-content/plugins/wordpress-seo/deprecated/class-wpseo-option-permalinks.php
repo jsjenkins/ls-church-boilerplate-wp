@@ -33,18 +33,18 @@ class WPSEO_Option_Permalinks {
 	}
 
 	/**
-	 * Add the actions and filters for the option
+	 * Add the actions and filters for the option.
 	 *
 	 * @deprecated 7.0
 	 *
 	 * @return void
 	 */
 	protected function __construct() {
-		_deprecated_constructor( __CLASS__, 'WPSEO 7.0' );
+		_deprecated_function( __METHOD__, '7.0' );
 	}
 
 	/**
-	 * Get the singleton instance of this class
+	 * Get the singleton instance of this class.
 	 *
 	 * @deprecated 7.0
 	 *
@@ -55,7 +55,7 @@ class WPSEO_Option_Permalinks {
 	}
 
 	/**
-	 * Validate the option
+	 * Validate the option.
 	 *
 	 * @deprecated 7.0
 	 *

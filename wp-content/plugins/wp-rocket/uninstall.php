@@ -1,13 +1,13 @@
 <?php
-defined( 'WP_UNINSTALL_PLUGIN' ) || die( 'Cheatin&#8217; uh?' );
+
+defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 if ( ! defined( 'WP_ROCKET_CACHE_ROOT_PATH' ) ) {
 	define( 'WP_ROCKET_CACHE_ROOT_PATH', WP_CONTENT_DIR . '/cache/' );
 }
 
 // Delete all transients.
-delete_site_transient( 'update_wprocket' );
-delete_site_transient( 'update_wprocket_response' );
+delete_site_transient( 'wp_rocket_update_data' );
 delete_transient( 'wp_rocket_settings' );
 delete_transient( 'rocket_cloudflare_ips' );
 delete_transient( 'rocket_send_analytics_data' );
@@ -25,6 +25,9 @@ delete_metadata( 'user', '', 'rocket_boxes', '', true );
 // Clear scheduled WP Rocket Cron.
 wp_clear_scheduled_hook( 'rocket_purge_time_event' );
 wp_clear_scheduled_hook( 'rocket_database_optimization_time_event' );
+wp_clear_scheduled_hook( 'rocket_google_tracking_cache_update' );
+wp_clear_scheduled_hook( 'rocket_facebook_tracking_cache_update' );
+wp_clear_scheduled_hook( 'rocket_cache_dir_size_check' );
 
 /**
  * Remove all cache files.

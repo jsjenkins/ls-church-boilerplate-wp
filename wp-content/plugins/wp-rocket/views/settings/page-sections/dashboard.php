@@ -20,7 +20,8 @@
  * }
  */
 
-defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
+defined( 'ABSPATH' ) || exit;
+
 ?>
 <div id="<?php echo esc_attr( $data['id'] ); ?>" class="wpr-Page">
 	<div class="wpr-sectionHeader">
@@ -28,22 +29,7 @@ defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 	</div>
 
 	<?php
-		$rocket_boxes = get_user_meta( get_current_user_id(), 'rocket_boxes', true );
-
-	if ( ! in_array( 'rocket_adblock_noticer', (array) $rocket_boxes, true ) ) :
-		?>
-	<div class="wpr-adblock">
-		<div class="wpr-adblock-container">
-			<img src="<?php echo esc_url( WP_ROCKET_ASSETS_IMG_URL ); ?>logo-adblock.svg" width="52" height="52" alt="Logo Adblock">
-			<div>
-				<div class="wpr-adblock-title"><?php esc_html_e( 'WP Rocket : Ad blocker detected.', 'rocket' ); ?></div>
-				<h2 class="wpr-adblock-description"><?php printf( esc_html( 'Disable it on your site to access our support features. %1$sLearn more%2$s', 'rocket' ), '<a href="https://docs.wp-rocket.me/article/1080-disable-ad-blocker-for-support-integration" target="_blank">', '</a>' ); ?></h2>
-			</div>
-			<a class="wpr-adblock-close wpr-icon-close rocket-dismiss" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=rocket_ignore&box=rocket_adblock_notice' ), 'rocket_ignore_rocket_adblock_notice' ) ); ?>"><span class="screen-reader-text"><?php esc_html_e( 'Dismiss this notice.', 'rocket' ); ?></span></a>
-		</div>
-	</div>
-		<?php
-	endif;
+	$rocket_boxes = get_user_meta( get_current_user_id(), 'rocket_boxes', true );
 
 	if ( ! in_array( 'rocket_activation_notice', (array) $rocket_boxes, true ) ) :
 		?>
@@ -120,6 +106,7 @@ defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 
 			<div class="wpr-fieldsContainer">
 				<fieldset class="wpr-fieldsContainer-fieldset">
+					<?php if ( current_user_can( 'rocket_purge_cache' ) ) : ?>
 					<div class="wpr-field">
 						<h4 class="wpr-title3"><?php esc_html_e( 'Remove all cached files', 'rocket' ); ?></h4>
 						<?php
@@ -138,8 +125,8 @@ defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 						);
 						?>
 					</div>
-
-					<?php if ( get_rocket_option( 'manual_preload' ) ) : ?>
+					<?php endif; ?>
+					<?php if ( get_rocket_option( 'manual_preload' ) && current_user_can( 'rocket_preload_cache' ) ) : ?>
 					<div class="wpr-field">
 						<h4 class="wpr-title3"><?php esc_html_e( 'Start cache preloading', 'rocket' ); ?></h4>
 						<?php
@@ -157,7 +144,13 @@ defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 					</div>
 					<?php endif; ?>
 
-					<?php if ( function_exists( 'opcache_reset' ) ) : ?>
+					<?php
+					$restrict_api     = ini_get( 'opcache.restrict_api' );
+					$can_restrict_api = true;
+					if ( $restrict_api && strpos(__FILE__, $restrict_api) !== 0 ) {
+					    $can_restrict_api = false;
+					}
+					if ( function_exists( 'opcache_reset' ) && current_user_can( 'rocket_purge_opcache' ) && $can_restrict_api ) : ?>
 					<div class="wpr-field">
 						<h4 class="wpr-title3"><?php esc_html_e( 'Purge OPCache content', 'rocket' ); ?></h4>
 						<?php
@@ -174,7 +167,7 @@ defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 						?>
 					</div>
 					<?php endif; ?>
-					<?php if ( get_rocket_option( 'async_css' ) && apply_filters( 'do_rocket_critical_css_generation', true ) ) : ?>
+					<?php if ( get_rocket_option( 'async_css' ) && apply_filters( 'do_rocket_critical_css_generation', true ) && current_user_can( 'rocket_regenerate_critical_css' ) ) : ?>
 					<div class="wpr-field">
 						<h4 class="wpr-title3"><?php esc_html_e( 'Regenerate Critical CSS', 'rocket' ); ?></h4>
 						<?php
@@ -197,10 +190,11 @@ defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 	</div>
 	<div class="wpr-Page-row">
 		<div class="wpr-Page-col">
+			<?php $this->render_part( 'getting-started' ); ?>
 			<div class="wpr-optionHeader">
 				<h3 class="wpr-title2"><?php esc_html_e( 'Frequently Asked Questions', 'rocket' ); ?></h3>
 			</div>
-			<fieldset class="wpr-fieldsContainer-fieldset">
+			<div class="wpr-fieldsContainer-fieldset">
 				<div class="wpr-field">
 					<ul class="wpr-field-list">
 					<?php foreach ( $data['faq'] as $rocket_faq_item ) : ?>
@@ -231,7 +225,7 @@ defined( 'ABSPATH' ) || die( 'Cheatin&#8217; uh?' );
 						</div>
 					</div>
 				</div>
-			</fieldset>
+			</div>
 		</div>
 
 		<div class="wpr-Page-col wpr-Page-col--fixed">
