@@ -19,7 +19,7 @@ const $ = plugins();
 const PRODUCTION = !!(yargs.argv.production);
 
 // Load settings from settings.yml
-const { COMPATIBILITY, PORT, LOCALHOST, PATHS } = loadConfig();
+const { PORT, LOCALHOST, PATHS } = loadConfig();
 
 function loadConfig() {
   let ymlFile = fs.readFileSync('config.yml', 'utf8');
@@ -58,7 +58,8 @@ function pages() {
 function sass() {
   const postCssPlugins = [
     // Autoprefixer
-    autoprefixer({ browsers: COMPATIBILITY }),
+    autoprefixer(),
+
   ].filter(Boolean);
 
   return gulp.src('src/assets/scss/app.scss')
@@ -100,7 +101,7 @@ function javascript() {
     .pipe(named())
     .pipe($.sourcemaps.init())
     .pipe(webpackStream(webpackConfig, webpack2))
-    .pipe($.if(PRODUCTION, $.uglify()
+    .pipe($.if(PRODUCTION, $.terser()
       .on('error', e => { console.log(e); })
     ))
     .pipe($.if(!PRODUCTION, $.sourcemaps.write()))

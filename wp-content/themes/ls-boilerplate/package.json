@@ -10,10 +10,9 @@
   "author": "Landslide Creative <info@landslidecreative.com>",
   "license": "MIT",
   "dependencies": {
-    "foundation-sites": "~6.5.1",
+    "foundation-sites": "^6.6.0",
     "fitvids": "^2.0.0",
     "jquery": "^3.2.1",
-    "jquery-migrate": "^3.0.1",
     "motion-ui": "^2.0.3",
     "what-input": "^5.1.2"
   },
@@ -36,7 +35,7 @@
     "gulp-postcss": "^8.0.0",
     "gulp-sass": "^4.0.1",
     "gulp-sourcemaps": "^2.6.4",
-    "gulp-uglify": "^3.0.1",
+    "gulp-terser": "^1.2.0",
     "js-yaml": "^3.4.6",
     "rimraf": "^2.4.3",
     "vinyl-named": "^1.1.0",
