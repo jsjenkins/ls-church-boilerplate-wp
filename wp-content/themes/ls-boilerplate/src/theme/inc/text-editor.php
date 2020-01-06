@@ -1,12 +1,20 @@
-<?php 
-// Text Editor Cusomtizations
+<?php // Text Editor Customizations
 
 // Change formats hover style
 function fix_formats_hover() {
   echo '<style>
-    .wp-admin .mce-menu .mce-menu-item-normal.mce-active, .wp-admin .mce-menu .mce-menu-item-preview.mce-active, .wp-admin .mce-menu .mce-menu-item.mce-selected, .wp-admin .mce-menu .mce-menu-item:focus, .wp-admin .mce-menu .mce-menu-item:hover {
-        background-color: #ebebeb;
-        color: #333;
+    .mce-menu .mce-menu-item.mce-selected, .wp-admin .mce-menu .mce-menu-item:focus, .wp-admin .mce-menu .mce-menu-item:hover {
+        background-color: #ebebeb !important;
+        color: inherit !important;
+    }
+
+    .mce-menu .mce-menu-item.mce-selected .mce-ico {
+        color: #333 !important;
+    }
+
+    .mce-menu .mce-menu-item.mce-active.mce-menu-item-normal, .mce-menu .mce-menu-item.mce-active.mce-menu-item-preview {
+        background: #dcdcdc !important;
+        color: inherit !important;
     }
 
     .wp-list-table.fixed.tags {
@@ -32,36 +40,46 @@ function custom_format_button( $buttons ) {
 }
 add_filter( 'mce_buttons', 'custom_format_button' );
 
+// Add font to admin
+/* function add_admin_font() {
+    wp_enqueue_style( 'admin-font', '' );
+}
+add_action( 'admin_enqueue_scripts', 'add_admin_font' ); */
 
 // Define custom formats
 function add_custom_formats( $init_array ) {  
     $style_formats = array(
             array(
-                'title' => 'Paragraph',
-                'block' => 'p'
-                ),
+                'title' => 'Body',
+                'items' => array(
+                    array(
+                        'title' => 'Paragraph',
+                        'block' => 'p'
+                    ),
+                )
+            ),
             array(
                 'title' => 'Headers',
                 'items' => array(
-                array(
-                    'title' => 'Heading 2',
-                    'block' => 'h2'
+                    array(
+                        'title' => 'Heading 2',
+                        'block' => 'h2'
                     ),
-                array(
-                    'title' => 'Heading 3',
-                    'block' => 'h3'
+                    array(
+                        'title' => 'Heading 3',
+                        'block' => 'h3'
                     ),
-                array(
-                    'title' => 'Heading 4',
-                    'block' => 'h4'
+                    array(
+                        'title' => 'Heading 4',
+                        'block' => 'h4'
                     ),
-                array(
-                    'title' => 'Heading 5',
-                    'block' => 'h5'
+                    array(
+                        'title' => 'Heading 5',
+                        'block' => 'h5'
                     ),
-                array(
-                    'title' => 'Heading 6',
-                    'block' => 'h6'
+                    array(
+                        'title' => 'Heading 6',
+                        'block' => 'h6'
                     )
                 )
             ),
@@ -72,7 +90,7 @@ function add_custom_formats( $init_array ) {
                         'title' => 'Button',
                         'inline' => 'a',
                         'classes' => 'button'
-                        )
+                    )
                 )
             ),
         );
@@ -83,12 +101,6 @@ function add_custom_formats( $init_array ) {
 
 } 
 add_filter( 'tiny_mce_before_init', 'add_custom_formats' );
-
-function add_admin_font() {
-    wp_enqueue_style( 'admin-font', '' );
-}
-
-// add_action( 'admin_enqueue_scripts', 'add_admin_font' );
 
 function add_editor_styles() {
     add_editor_style( 'assets/admin-css/text-editor.css' );

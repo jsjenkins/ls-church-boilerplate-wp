@@ -1,4 +1,2 @@
 <?php 
 // Widget functions
-
-?>
