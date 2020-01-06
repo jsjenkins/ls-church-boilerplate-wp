@@ -20,11 +20,26 @@ if (function_exists('add_theme_support'))
 
     // Add Thumbnail Theme Support
     add_theme_support('post-thumbnails');
-    add_image_size('large', 1200, '', true); // Large Thumbnail
-    add_image_size('medium', 800, '', true); // Medium Thumbnail
-    add_image_size('small', 600, '', true); // Small Thumbnail
+
+    // Image sizes - original ratio
+    add_image_size('x-small', 400, '', true); // Small Thumbnail
+    add_image_size('small', 650, '', true); // Small Thumbnail
+    add_image_size('medium', 768, '', true); // Medium Thumbnail
+    add_image_size('large', 1024, '', true); // Large Thumbnail
+    add_image_size('x-large', 1200, '', true); // Large Thumbnail
+    
+    // Image sizes - square
     add_image_size('square', 600, 600, true);
     add_image_size('small-square', 300, 300, true);
+
+    // Remove medium_large thumbnail size
+    add_filter( 'intermediate_image_sizes', function( $sizes )
+    {
+        return array_filter( $sizes, function( $val )
+        {
+            return 'medium_large' !== $val; // Filter out 'medium_large'
+        } );
+    } );
 
     // Enables post and comment RSS feed links to head
     add_theme_support('automatic-feed-links');

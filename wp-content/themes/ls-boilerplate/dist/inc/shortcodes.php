@@ -17,5 +17,3 @@ function button_shortcode($atts, $content = null) {
 }
 
 add_shortcode('button', 'button_shortcode');
-
-?>

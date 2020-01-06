@@ -13,6 +13,20 @@ function thumbnail_image_single( $size='medium' ) {
 	return $image;
 }
 
+// Get single featured image size URL
+function thumbnail_image_tag( $sizes='100vw', $thumbnail='x-large' ) {
+	if ( has_post_thumbnail() ) {
+		$thumb_id = get_post_thumbnail_id();
+		$image_url = wp_get_attachment_image_src( $thumb_id, $thumbnail, FALSE );
+		$image_url = $image_url[0];
+		echo '<img src="'.$image_url.'" srcset="'.wp_get_attachment_image_srcset($thumb_id, $thumbnail).'" sizes="'.$sizes.'">';
+	} else {
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 // Get featured image alt tag
 function thumbnail_alt() {
 	if ( has_post_thumbnail() ) {
@@ -63,6 +77,26 @@ function acf_image_single( $variable_name, $size='medium', $sub=FALSE, $options=
 	}
 
 	return $image;
+}
+
+// Get single featured image size URL
+function acf_image_tag( $variable_name, $sizes='100vw', $thumbnail='x-large', $sub=FALSE, $options='' ) {
+	if( $sub ) {
+		$variable_image = get_sub_field($variable_name);
+	} else {
+		$variable_image = get_field($variable_name, $options);
+	}
+
+	if( $variable_image ) {
+		$thumb_id = $variable_image['ID'];
+		$image_url = wp_get_attachment_image_src( $thumb_id, $thumbnail, FALSE );
+		$image_url = $image_url[0];
+		echo '<img src="'.$image_url.'" srcset="'.wp_get_attachment_image_srcset($thumb_id, $thumbnail).'" sizes="'.$sizes.'">';
+	} else {
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 // Get full array of ACF image URLs
