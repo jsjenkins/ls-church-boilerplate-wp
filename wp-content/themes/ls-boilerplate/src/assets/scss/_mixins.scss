@@ -1,0 +1,76 @@
+// Clean a list
+@mixin clean-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+// Vertical padding
+@mixin vertical-padding( $value:1, $top:true, $bottom:true ) {
+  @if $top {
+    padding-top: map-get($grid-row-gutter, 'small')*$value;
+    @include breakpoint(medium) {
+      padding-top: map-get($grid-row-gutter, 'medium')*$value;
+    }
+    @include breakpoint(large) {
+      padding-top: map-get($grid-row-gutter, 'large')*$value;
+    }
+  }
+
+  @if $bottom {
+    padding-bottom: map-get($grid-row-gutter, 'small')*$value;
+    @include breakpoint(medium) {
+      padding-bottom: map-get($grid-row-gutter, 'medium')*$value;
+    }
+    @include breakpoint(large) {
+      padding-bottom: map-get($grid-row-gutter, 'large')*$value;
+    }
+  }
+}
+
+@mixin deduct-padding( $value:1 ) {
+  margin-bottom: map-get($grid-row-gutter, 'small')*-$value;
+  @include breakpoint(medium) {
+    margin-bottom: map-get($grid-row-gutter, 'medium')*-$value;
+  }
+  @include breakpoint(large) {
+    margin-bottom: map-get($grid-row-gutter, 'large')*-$value;
+  }
+}
+
+// Horizontal padding
+@mixin horizontal-padding( $value:1, $left:true, $right:true ) {
+  @if $left {
+    padding-left: map-get($grid-column-gutter, 'small')*$value;
+    @include breakpoint(medium) {
+      padding-left: map-get($grid-column-gutter, 'medium')*$value;
+    }
+    @include breakpoint(large) {
+      padding-left: map-get($grid-column-gutter, 'large')*$value;
+    }
+  }
+
+  @if $right {
+    padding-right: map-get($grid-column-gutter, 'small')*$value;
+    @include breakpoint(medium) {
+      padding-right: map-get($grid-column-gutter, 'medium')*$value;
+    }
+    @include breakpoint(large) {
+      padding-right: map-get($grid-column-gutter, 'large')*$value;
+    }
+  }
+}
+
+// Remove last child bottom margin
+@mixin clean-last-child {
+  &>*:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Make background image cover container
+@mixin background-cover {
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
