@@ -1,5 +1,3 @@
-<!-- pagination -->
 <div class="pagination">
-	<?php html5wp_pagination(); ?>
+	<?php ls_boilerplate_pagination(); ?>
 </div>
-<!-- /pagination -->

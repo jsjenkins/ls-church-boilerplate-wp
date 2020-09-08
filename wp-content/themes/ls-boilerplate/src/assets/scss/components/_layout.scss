@@ -1,0 +1,81 @@
+// Page sections
+.page-section {
+	@include vertical-padding;
+
+	// Transparent background
+	&.transparent-bg {
+		background-color: inherit;
+		&+& {
+			padding-top: 0;
+		}
+	}
+
+	// White background
+	&.white-bg {
+		background-color: $white;
+		&+& {
+			padding-top: 0;
+		}
+	}
+
+	// Intro section
+	.intro-section { 
+		@include vertical-padding( .5, false, true );
+		.cell{
+			@include clean-last-child;
+		}
+	}
+}
+
+// Pagination
+.pagination {
+	display: flex;
+	justify-content: space-between;
+	text-align: center;
+	@include breakpoint(medium) {
+		display: block;
+		position: relative;
+	}
+	.page-numbers {
+		display: none;
+		text-align: center;
+		text-decoration: none;
+		border: 2px solid $primary-color;
+		width: 32px;
+		height: 32px;
+		line-height: 28px;
+		@include breakpoint(medium) {
+			display: inline-block;
+		}
+		&.dots,
+		&.current {
+			border: none;
+		}
+		&.dots {
+			width: auto;
+			padding: 0 5px;
+		}
+		&.next {
+			display: inline-block;
+			width: auto;
+			padding: 0 10px;
+			background-color: $primary-color;
+			color: $white;
+			@include breakpoint(medium) {
+				position: absolute;
+				right: 0;
+			}
+		}
+		&.prev {
+			display: inline-block;
+			width: auto;
+			padding: 0 10px;
+			background-color: $primary-color;
+			color: $white;
+			@include breakpoint(medium) {
+				position: absolute;
+				left: 0;
+			}
+		}
+	}
+}

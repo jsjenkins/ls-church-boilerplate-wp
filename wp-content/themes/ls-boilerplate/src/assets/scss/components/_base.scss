@@ -1,0 +1,42 @@
+// Body font sizes
+body {
+	@include breakpoint(medium) {
+		font-size: $medium-font-size;
+	}
+	@include breakpoint(large) {
+		font-size: $large-font-size;
+	}
+}
+
+// Vertical center class
+.vertical-center {
+	align-items: center;
+}
+
+// Reverse columns for mobile
+.reverse-mobile {
+	@include breakpoint(small) {
+		&>.cell:first-child {
+			order: 2;
+		}
+		&>.cell:last-child {
+			order: 1;
+		}
+	}
+	@include breakpoint(medium) {
+		&>.cell:first-child {
+			order: 1;
+		}
+		&>.cell:last-child {
+			order: 2;
+		}
+	}
+}
+
+// Text button
+.text-button {
+	text-transform: uppercase;
+	color: $primary-color;
+	font-weight: bold;
+	text-decoration: underline;
+}

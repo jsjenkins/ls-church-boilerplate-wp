@@ -2,13 +2,17 @@
 
 <?php if (have_posts()): while (have_posts()) : the_post(); ?>
 	<main role="main" aria-label="Content">
-		<div class="grid-container">
-			<div class="grid-x grid-padding-x align-center">
-				<div class="large-9 cell">
-					<?php the_content(); ?>
+		<?php if($post->post_content != '') { ?>
+			<div class="page-section transparent-bg">
+				<div class="grid-container">
+					<div class="grid-x grid-padding-x align-center">
+						<div class="large-9 cell">
+							<?php the_content(); ?>
+						</div>
+					</div>
 				</div>
 			</div>
-		</div>
+		<?php } ?>
 	</main>
 
 <?php endwhile; ?>

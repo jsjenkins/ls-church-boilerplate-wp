@@ -65,7 +65,9 @@
 // 1. Global
 // ---------
 
-$global-font-size: 100%;
+$global-font-size: rem-calc(14px);
+$medium-font-size: rem-calc(15px);
+$large-font-size: rem-calc(16px);
 $global-width: rem-calc(1200);
 $global-lineheight: 1.5;
 $body-background: $white;
@@ -129,6 +131,27 @@ $grid-column-align-edge: true;
 $grid-column-alias: 'columns';
 $block-grid-max: 8;
 
+// 3b. Xy Grid
+// -----------
+
+$xy-grid: true;
+$grid-container: $global-width;
+$grid-columns: 12;
+$grid-margin-gutters: (
+  small: 25px,
+  medium: 35px,
+  large: 40px
+);
+$grid-vertical-gutters: (
+  small: 40px,
+  medium: 50px,
+  large: 60px
+);
+$grid-padding-gutters: $grid-margin-gutters;
+$grid-container-padding: $grid-padding-gutters;
+$grid-container-max: $global-width;
+$xy-block-grid-max: 8;
+
 // 4. Base Typography
 // ------------------
 
@@ -174,8 +197,8 @@ $paragraph-text-rendering: optimizeLegibility;
 $enable-code-inline: true;
 $anchor-color: $primary-color;
 $anchor-color-hover: scale-color($anchor-color, $lightness: -14%);
-$anchor-text-decoration: none;
-$anchor-text-decoration-hover: none;
+$anchor-text-decoration: underline;
+$anchor-text-decoration-hover: underline;
 $hr-width: $global-width;
 $hr-border: 1px solid $medium-gray;
 $hr-margin: rem-calc(20) auto;
@@ -879,19 +902,4 @@ $topbar-submenu-background: $topbar-background;
 $topbar-title-spacing: 0.5rem 1rem 0.5rem 0;
 $topbar-input-width: 200px;
 $topbar-unstack-breakpoint: medium;
-
-// 56. Xy Grid
-// -----------
-
-$xy-grid: true;
-$grid-container: $global-width;
-$grid-columns: 12;
-$grid-margin-gutters: (
-  small: 20px,
-  medium: 30px
-);
-$grid-padding-gutters: $grid-margin-gutters;
-$grid-container-padding: $grid-padding-gutters;
-$grid-container-max: $global-width;
-$xy-block-grid-max: 8;
 

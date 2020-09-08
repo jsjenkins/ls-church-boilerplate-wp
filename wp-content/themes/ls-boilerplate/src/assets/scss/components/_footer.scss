@@ -1,0 +1,48 @@
+footer.footer {
+	background-color: $light-gray;
+	.footer-content {
+		@include vertical-padding(1);
+	}
+	.copyright {
+		background-color: $white;
+		font-size: rem-calc(14);
+		text-align: center;
+		padding: 10px 0;
+		@include breakpoint(medium) {
+			text-align: left;
+		}
+		p {
+			margin-bottom: 0;
+			@include breakpoint(medium) {
+				display: inline-block;
+			}
+		}
+		ul {
+			@include clean-list;
+			@include breakpoint(medium) {
+				display: inline-block;
+			}
+			li {
+				display: inline-block;
+				a {
+					display: block;
+					padding-right: 6px;
+					padding-left: 2px;
+					border-right: 1px solid $black;
+					line-height: 1;
+				}
+				&:first-child a {
+					padding-left: 0;
+					@include breakpoint(medium) {
+						padding-left: 6px;
+						border-left: 1px solid $black;
+					}
+				}
+				&:last-child a {
+					padding-right: 0;
+					border-right: none;
+				}
+			}
+		}
+	}
+}
