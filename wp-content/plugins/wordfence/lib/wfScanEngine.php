@@ -789,27 +789,107 @@ class wfScanEngine {
 			sleep(2);
 		}
 	}
-	private function scan_knownFiles_init(){
-		$baseWPStuff = array( '.htaccess', 'index.php', 'license.txt', 'readme.html', 'wp-activate.php', 'wp-admin', 'wp-app.php', 'wp-blog-header.php', 'wp-comments-post.php', 'wp-config-sample.php', 'wp-content', 'wp-cron.php', 'wp-includes', 'wp-links-opml.php', 'wp-load.php', 'wp-login.php', 'wp-mail.php', 'wp-pass.php', 'wp-register.php', 'wp-settings.php', 'wp-signup.php', 'wp-trackback.php', 'xmlrpc.php');
-		$baseContents = scandir(ABSPATH);
-		if(! is_array($baseContents)){
-			throw new Exception("Wordfence could not read the contents of your base WordPress directory. This usually indicates your permissions are so strict that your web server can't read your WordPress directory.");
-		}
-		
-		$includeInKnownFilesScan = array();
-		$scanOutside = $this->scanController->scanOutsideWordPress();
-		if ($scanOutside) {
-			wordfence::status(2, 'info', "Including files that are outside the WordPress installation in the scan.");
-			$includeInKnownFilesScan[] = ''; //Ends up as a literal ABSPATH
-		}
-		else {
+	private function _scannedSkippedPaths() {
+		static $_cache = null;
+		if ($_cache === null) {
+			$base_abspath_relative = array('.htaccess', 'index.php', 'license.txt', 'readme.html', 'wp-activate.php', 'wp-admin', 'wp-app.php', 'wp-blog-header.php', 'wp-comments-post.php', 'wp-config-sample.php', 'wp-content', 'wp-cron.php', 'wp-includes', 'wp-links-opml.php', 'wp-load.php', 'wp-login.php', 'wp-mail.php', 'wp-pass.php', 'wp-register.php', 'wp-settings.php', 'wp-signup.php', 'wp-trackback.php', 'xmlrpc.php', '.well-known', 'cgi-bin');
+			$base_absolute = array();
+			if (defined('WP_CONTENT_DIR') && strlen(WP_CONTENT_DIR)) { $base_absolute[] = WP_CONTENT_DIR; }
+			if (defined('WP_PLUGIN_DIR') && strlen(WP_PLUGIN_DIR)) { $base_absolute[] = WP_PLUGIN_DIR; }
+			if (defined('UPLOADS') && strlen(UPLOADS)) { $base_absolute[] = ABSPATH . UPLOADS; /* UPLOADS is relative to ABSPATH unlike the others */ }
+			$baseContents = scandir(ABSPATH);
+			if (!is_array($baseContents)) {
+				throw new Exception("Wordfence could not read the contents of your base WordPress directory. This usually indicates your permissions are so strict that your web server can't read your WordPress directory.");
+			}
+			
+			$scanOutside = $this->scanController->scanOutsideWordPress();
+			if ($scanOutside) {
+				$_cache = array('scanned' => array_merge(array(ABSPATH), $base_absolute), 'skipped' => array());
+				return $_cache;
+			}
+			
+			$scanned = array();
+			$skipped = array();
 			foreach ($baseContents as $file) { //Only include base files less than a meg that are files.
-				if($file == '.' || $file == '..'){ continue; }
+				if ($file == '.' || $file == '..') { continue; }
 				$fullFile = rtrim(ABSPATH, '/') . '/' . $file;
-				if (in_array($file, $baseWPStuff) || (@is_file($fullFile) && @is_readable($fullFile) && (!wfUtils::fileTooBig($fullFile)))) {
-					$includeInKnownFilesScan[] = $file;
+				if (!wfUtils::fileTooBig($fullFile)) { //Silently ignore files that are too large for the purposes of inclusion in the scan issue
+					if (in_array($file, $base_abspath_relative) || in_array($fullFile, $base_absolute) || (@is_file($fullFile) && @is_readable($fullFile))) {
+						$scanned[] = realpath($fullFile);
+					}
+					else {
+						$skipped[] = $fullFile;
+					}
 				}
 			}
+			foreach ($base_absolute as $fullFile) {
+				$realFile = realpath($fullFile);
+				if ($realFile && !in_array($realFile, $scanned)) {
+					$scanned[] = $realFile;
+				}
+			}
+			$_cache = array('scanned' => $scanned, 'skipped' => $skipped);
+		}
+		return $_cache;
+	}
+	private function scan_checkSkippedFiles() {
+		$haveIssues = wfIssues::STATUS_SECURE;
+		$status = wfIssues::statusStart("Checking for paths skipped due to scan settings");
+		$this->scanController->startStage(wfScanner::STAGE_SERVER_STATE);
+		
+		$paths = $this->_scannedSkippedPaths();
+		if (!empty($paths['skipped'])) {
+			$skippedList = '';
+			foreach ($paths['skipped'] as $index => $fullPath) {
+				$path = esc_html($fullPath);
+				if (strpos($fullPath, ABSPATH) === 0) {
+					$path = '~/' . esc_html(substr($fullPath, strlen(ABSPATH)));
+				}
+				
+				if ($index >= 10) {
+					$skippedList .= sprintf(__(', and %d more.', 'wordfence'), count($paths['skipped']) - 10);
+					break;
+				}
+				
+				if (!empty($skippedList)) {
+					if (count($paths['skipped']) == 2) {
+						$skippedList .= ' and ';
+					}
+					else if ($index == count($paths['skipped']) - 1) {
+						$skippedList .= ', and ';
+					}
+					else {
+						$skippedList .= ', ';
+					}
+				}
+				
+				$skippedList .= $path;
+			}
+			
+			$c = count($paths['skipped']);
+			$key = "skippedPaths";
+			$added = $this->addIssue(
+				'skippedPaths',
+				wfIssues::SEVERITY_LOW,
+				$key,
+				$key,
+				sprintf($c == 1 ? __('%d path was skipped for the malware scan due to scan settings', 'wordfence') : __('%d paths were skipped for the malware scan due to scan settings', 'wordfence'), $c),
+				sprintf($c == 1 ? __('The option "Scan files outside your WordPress installation" is off by default, which means %d path and its file(s) will not be scanned for malware or unauthorized changes. To continue skipping this path, you may ignore this issue. Or to start scanning it, enable the option and subsequent scans will include it. Some paths may not be necessary to scan, so this is optional. <a href="%s" target="_blank" rel="noopener noreferrer">Learn More</a><br><br>The path skipped is %s', 'wordfence') : __('The option "Scan files outside your WordPress installation" is off by default, which means %d paths and their file(s) will not be scanned for malware or unauthorized changes. To continue skipping these paths, you may ignore this issue. Or to start scanning them, enable the option and subsequent scans will include them. Some paths may not be necessary to scan, so this is optional. <a href="%s" target="_blank" rel="noopener noreferrer">Learn More</a><br><br>The paths skipped are %s', 'wordfence'), $c, wfSupportController::esc_supportURL(wfSupportController::ITEM_SCAN_RESULT_SKIPPED_PATHS), $skippedList),
+				array()
+			);
+			
+			if ($added == wfIssues::ISSUE_ADDED || $added == wfIssues::ISSUE_UPDATED) { $haveIssues = wfIssues::STATUS_PROBLEM; }
+			else if ($haveIssues != wfIssues::STATUS_PROBLEM && ($added == wfIssues::ISSUE_IGNOREP || $added == wfIssues::ISSUE_IGNOREC)) { $haveIssues = wfIssues::STATUS_IGNORED; }
+		}
+		
+		wfIssues::statusEnd($status, $haveIssues);
+		$this->scanController->completeStage(wfScanner::STAGE_SERVER_STATE, $haveIssues);
+	}
+	private function scan_knownFiles_init(){
+		$paths = $this->_scannedSkippedPaths();
+		$includeInKnownFilesScan = $paths['scanned'];
+		if ($this->scanController->scanOutsideWordPress()) {
+			wordfence::status(2, 'info', "Including files that are outside the WordPress installation in the scan.");
 		}
 
 		$this->status(2, 'info', "Getting plugin list from WordPress");
@@ -1638,7 +1718,7 @@ class wfScanEngine {
 							$longMsg .= ' It has unpatched security issues and may have compatibility problems with the current version of WordPress.';
 						}
 						else {
-							$longMsg .= ' It may have compatibility problems with the current version of WordPress or unknown security issues.';
+							$longMsg .= ' Plugins can be removed from wordpress.org for various reasons. This can include benign issues like a plugin author discontinuing development or moving the plugin distribution to their own site, but some might also be due to security issues. In any case, future updates may or may not be available, so it is worth investigating the cause and deciding whether to temporarily or permanently replace or remove the plugin.';
 						}
 						$longMsg .= ' <a href="' . wfSupportController::esc_supportURL(wfSupportController::ITEM_SCAN_RESULT_PLUGIN_ABANDONED) . '" target="_blank" rel="noopener noreferrer">Get more information.</a>';
 						$added = $this->addIssue('wfPluginAbandoned', $severity, $key, $key, $shortMsg, $longMsg, $statusArray);
@@ -1672,7 +1752,7 @@ class wfScanEngine {
 									$longMsg = 'It has unpatched security issues and may have compatibility problems with the current version of WordPress.';
 								}
 								else {
-									$longMsg = 'It may have compatibility problems with the current version of WordPress or unknown security issues.';
+									$longMsg = 'Plugins can be removed from wordpress.org for various reasons. This can include benign issues like a plugin author discontinuing development or moving the plugin distribution to their own site, but some might also be due to security issues. In any case, future updates may or may not be available, so it is worth investigating the cause and deciding whether to temporarily or permanently replace or remove the plugin.';
 								}
 								$longMsg .= ' <a href="' . wfSupportController::esc_supportURL(wfSupportController::ITEM_SCAN_RESULT_PLUGIN_REMOVED) . '" target="_blank" rel="noopener noreferrer">Get more information.</a>';
 								$added = $this->addIssue('wfPluginRemoved', wfIssues::SEVERITY_CRITICAL, $key, $key, $shortMsg, $longMsg, $pluginData);
@@ -1721,19 +1801,56 @@ class wfScanEngine {
 		$haveIssues = wfIssues::STATUS_SECURE;
 
 		$adminUsers = new wfAdminUserMonitor();
-		if ($adminUsers->isEnabled() && $suspiciousAdmins = $adminUsers->checkNewAdmins()) {
-			foreach ($suspiciousAdmins as $userID) {
-				$this->scanController->incrementSummaryItem(wfScanner::SUMMARY_SCANNED_USERS);
-				$user = new WP_User($userID);
+		if ($adminUsers->isEnabled()) {
+			try {
+				$response = $this->api->call('suspicious_admin_usernames');
+				if (is_array($response) && isset($response['ok']) && wfUtils::truthyToBoolean($response['ok']) && !empty($response['patterns'])) {
+					wfConfig::set_ser('suspiciousAdminUsernames', $response['patterns']);
+				}
+			} catch (Exception $e) {
+				// Let the rest of the scan continue
+			}
+
+			$suspiciousAdmins = $adminUsers->checkNewAdmins();
+			if (is_array($suspiciousAdmins)) {
+				foreach ($suspiciousAdmins as $userID) {
+					$this->scanController->incrementSummaryItem(wfScanner::SUMMARY_SCANNED_USERS);
+					$user = new WP_User($userID);
+					$key = 'suspiciousAdminUsers' . $userID;
+					$added = $this->addIssue('suspiciousAdminUsers', wfIssues::SEVERITY_HIGH, $key, $key,
+						sprintf(__("An admin user with the username %s was created outside of WordPress.", 'wordfence'), esc_html($user->user_login)),
+						sprintf(__("An admin user with the username %s was created outside of WordPress. It's possible a plugin could have created the account, but if you do not recognize the user, we suggest you remove it.", 'wordfence'), esc_html($user->user_login)),
+						array(
+							'userID' => $userID,
+						));
+					if ($added == wfIssues::ISSUE_ADDED || $added == wfIssues::ISSUE_UPDATED) { $haveIssues = wfIssues::STATUS_PROBLEM; }
+					else if ($haveIssues != wfIssues::STATUS_PROBLEM && ($added == wfIssues::ISSUE_IGNOREP || $added == wfIssues::ISSUE_IGNOREC)) { $haveIssues = wfIssues::STATUS_IGNORED; }
+				}
+			}
+
+			$admins = $adminUsers->getCurrentAdmins();
+			/**
+			 * @var WP_User $adminUser
+			 */
+			foreach ($admins as $userID => $adminUser) {
+				$added = false;
 				$key = 'suspiciousAdminUsers' . $userID;
-				$added = $this->addIssue('suspiciousAdminUsers', wfIssues::SEVERITY_HIGH, $key, $key,
-					"An admin user with the username " . esc_html($user->user_login) . " was created outside of WordPress.",
-					"An admin user with the username " . esc_html($user->user_login) . " was created outside of WordPress. It's
-				possible a plugin could have created the account, but if you do not recognize the user, we suggest you remove
-				it.",
-					array(
-						'userID' => $userID,
-					));
+
+				// Check against user name list here.
+				$suspiciousAdminUsernames = wfConfig::get_ser('suspiciousAdminUsernames');
+				if (is_array($suspiciousAdminUsernames)) {
+					foreach ($suspiciousAdminUsernames as $usernamePattern) {
+						if (preg_match($usernamePattern, $adminUser->user_login)) {
+							$added = $this->addIssue('suspiciousAdminUsers', wfIssues::SEVERITY_HIGH, $key, $key,
+								sprintf(__("An admin user with a suspicious username %s was found.", 'wordfence'), esc_html($adminUser->user_login)),
+								sprintf(__("An admin user with a suspicious username %s was found. Administrators accounts with usernames similar to this are commonly seen created by hackers. It's possible a plugin could have created the account, but if you do not recognize the user, we suggest you remove it.", 'wordfence'), esc_html($adminUser->user_login)),
+								array(
+									'userID' => $userID,
+								));
+						}
+					}
+				}
+
 				if ($added == wfIssues::ISSUE_ADDED || $added == wfIssues::ISSUE_UPDATED) { $haveIssues = wfIssues::STATUS_PROBLEM; }
 				else if ($haveIssues != wfIssues::STATUS_PROBLEM && ($added == wfIssues::ISSUE_IGNOREP || $added == wfIssues::ISSUE_IGNOREC)) { $haveIssues = wfIssues::STATUS_IGNORED; }
 			}

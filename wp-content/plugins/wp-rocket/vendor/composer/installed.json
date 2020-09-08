@@ -1,45 +1,5 @@
 [
     {
-        "name": "a5hleyrich/wp-background-processing",
-        "version": "v1.3",
-        "version_normalized": "1.3.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/Tabrisrp/wp-background-processing.git",
-            "reference": "3fb239ecb5261f7eeff76d430d54028d297c176c"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/Tabrisrp/wp-background-processing/zipball/3fb239ecb5261f7eeff76d430d54028d297c176c",
-            "reference": "3fb239ecb5261f7eeff76d430d54028d297c176c",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2"
-        },
-        "time": "2018-10-23T18:30:25+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "classes/"
-            ]
-        },
-        "license": [
-            "GPLv2+"
-        ],
-        "authors": [
-            {
-                "name": "Ashley Rich",
-                "email": "hello@ashleyrich.com"
-            }
-        ],
-        "description": "WP Background Processing can be used to fire off non-blocking asynchronous requests or as a background processing tool, allowing you to queue tasks.",
-        "support": {
-            "source": "https://github.com/Tabrisrp/wp-background-processing/tree/v1.3"
-        }
-    },
-    {
         "name": "composer/installers",
         "version": "v1.7.0",
         "version_normalized": "1.7.0.0",
@@ -194,131 +154,22 @@
             "MIT"
         ],
         "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
-        "homepage": "https://github.com/container-interop/container-interop"
-    },
-    {
-        "name": "jamesryanbell/cloudflare",
-        "version": "1.11.1",
-        "version_normalized": "1.11.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/jamesryanbell/cloudflare.git",
-            "reference": "75e93bb822619d8ddb8b1843588caa2fad739491"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/jamesryanbell/cloudflare/zipball/75e93bb822619d8ddb8b1843588caa2fad739491",
-            "reference": "75e93bb822619d8ddb8b1843588caa2fad739491",
-            "shasum": ""
-        },
-        "require-dev": {
-            "phpunit/phpunit": "< 6",
-            "satooshi/php-coveralls": "dev-master"
-        },
-        "time": "2017-08-04T19:01:02+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Cloudflare\\": "src/CloudFlare"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "James Bell",
-                "email": "james@james-bell.co.uk"
-            }
-        ],
-        "description": "CloudFlare API - PHP",
-        "keywords": [
-            "api",
-            "cloudflare"
-        ]
-    },
-    {
-        "name": "league/container",
-        "version": "2.4.1",
-        "version_normalized": "2.4.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/thephpleague/container.git",
-            "reference": "43f35abd03a12977a60ffd7095efd6a7808488c0"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/thephpleague/container/zipball/43f35abd03a12977a60ffd7095efd6a7808488c0",
-            "reference": "43f35abd03a12977a60ffd7095efd6a7808488c0",
-            "shasum": ""
-        },
-        "require": {
-            "container-interop/container-interop": "^1.2",
-            "php": "^5.4.0 || ^7.0"
-        },
-        "provide": {
-            "container-interop/container-interop-implementation": "^1.2",
-            "psr/container-implementation": "^1.0"
-        },
-        "replace": {
-            "orno/di": "~2.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "4.*"
-        },
-        "time": "2017-05-10T09:20:27+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-2.x": "2.x-dev",
-                "dev-1.x": "1.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "League\\Container\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Phil Bennett",
-                "email": "philipobenito@gmail.com",
-                "homepage": "http://www.philipobenito.com",
-                "role": "Developer"
-            }
-        ],
-        "description": "A fast and intuitive dependency injection container.",
-        "homepage": "https://github.com/thephpleague/container",
-        "keywords": [
-            "container",
-            "dependency",
-            "di",
-            "injection",
-            "league",
-            "provider",
-            "service"
-        ]
+        "homepage": "https://github.com/container-interop/container-interop",
+        "abandoned": "psr/container"
     },
     {
         "name": "matthiasmullie/minify",
-        "version": "1.3.61",
-        "version_normalized": "1.3.61.0",
+        "version": "1.3.63",
+        "version_normalized": "1.3.63.0",
         "source": {
             "type": "git",
             "url": "https://github.com/matthiasmullie/minify.git",
-            "reference": "d5acb8ce5b6acb7d11bafe97cecc533f6e4fd751"
+            "reference": "9ba1b459828adc13430f4dd6c49dae4950dc4117"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/matthiasmullie/minify/zipball/d5acb8ce5b6acb7d11bafe97cecc533f6e4fd751",
-            "reference": "d5acb8ce5b6acb7d11bafe97cecc533f6e4fd751",
+            "url": "https://api.github.com/repos/matthiasmullie/minify/zipball/9ba1b459828adc13430f4dd6c49dae4950dc4117",
+            "reference": "9ba1b459828adc13430f4dd6c49dae4950dc4117",
             "shasum": ""
         },
         "require": {
@@ -334,7 +185,7 @@
         "suggest": {
             "psr/cache-implementation": "Cache implementation to use with Minify::cache"
         },
-        "time": "2018-11-26T23:10:39+00:00",
+        "time": "2020-01-21T20:21:08+00:00",
         "bin": [
             "bin/minifycss",
             "bin/minifyjs"
@@ -370,17 +221,17 @@
     },
     {
         "name": "matthiasmullie/path-converter",
-        "version": "1.1.2",
-        "version_normalized": "1.1.2.0",
+        "version": "1.1.3",
+        "version_normalized": "1.1.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/matthiasmullie/path-converter.git",
-            "reference": "5e4b121c8b9f97c80835c1d878b0812ba1d607c9"
+            "reference": "e7d13b2c7e2f2268e1424aaed02085518afa02d9"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/matthiasmullie/path-converter/zipball/5e4b121c8b9f97c80835c1d878b0812ba1d607c9",
-            "reference": "5e4b121c8b9f97c80835c1d878b0812ba1d607c9",
+            "url": "https://api.github.com/repos/matthiasmullie/path-converter/zipball/e7d13b2c7e2f2268e1424aaed02085518afa02d9",
+            "reference": "e7d13b2c7e2f2268e1424aaed02085518afa02d9",
             "shasum": ""
         },
         "require": {
@@ -390,7 +241,7 @@
         "require-dev": {
             "phpunit/phpunit": "~4.8"
         },
-        "time": "2018-10-25T15:19:41+00:00",
+        "time": "2019-02-05T23:41:09+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -421,17 +272,17 @@
     },
     {
         "name": "monolog/monolog",
-        "version": "1.25.1",
-        "version_normalized": "1.25.1.0",
+        "version": "1.25.5",
+        "version_normalized": "1.25.5.0",
         "source": {
             "type": "git",
             "url": "https://github.com/Seldaek/monolog.git",
-            "reference": "70e65a5470a42cfec1a7da00d30edb6e617e8dcf"
+            "reference": "1817faadd1846cd08be9a49e905dc68823bc38c0"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/Seldaek/monolog/zipball/70e65a5470a42cfec1a7da00d30edb6e617e8dcf",
-            "reference": "70e65a5470a42cfec1a7da00d30edb6e617e8dcf",
+            "url": "https://api.github.com/repos/Seldaek/monolog/zipball/1817faadd1846cd08be9a49e905dc68823bc38c0",
+            "reference": "1817faadd1846cd08be9a49e905dc68823bc38c0",
             "shasum": ""
         },
         "require": {
@@ -445,11 +296,10 @@
             "aws/aws-sdk-php": "^2.4.9 || ^3.0",
             "doctrine/couchdb": "~1.0@dev",
             "graylog2/gelf-php": "~1.0",
-            "jakub-onderka/php-parallel-lint": "0.9",
             "php-amqplib/php-amqplib": "~2.4",
             "php-console/php-console": "^3.1.3",
+            "php-parallel-lint/php-parallel-lint": "^1.0",
             "phpunit/phpunit": "~4.5",
-            "phpunit/phpunit-mock-objects": "2.3.0",
             "ruflin/elastica": ">=0.90 <3.0",
             "sentry/sentry": "^0.13",
             "swiftmailer/swiftmailer": "^5.3|^6.0"
@@ -467,7 +317,7 @@
             "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
             "sentry/sentry": "Allow sending log messages to a Sentry server"
         },
-        "time": "2019-09-06T13:49:17+00:00",
+        "time": "2020-07-23T08:35:51+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -552,23 +402,23 @@
     },
     {
         "name": "psr/log",
-        "version": "1.1.2",
-        "version_normalized": "1.1.2.0",
+        "version": "1.1.3",
+        "version_normalized": "1.1.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/php-fig/log.git",
-            "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801"
+            "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
-            "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
+            "url": "https://api.github.com/repos/php-fig/log/zipball/0f73288fd15629204f9d42b7055f72dacbe811fc",
+            "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2019-11-01T11:05:21+00:00",
+        "time": "2020-03-23T09:12:05+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -600,18 +450,64 @@
         ]
     },
     {
-        "name": "wp-media/rocket-lazyload-common",
-        "version": "v2.5.4",
-        "version_normalized": "2.5.4.0",
+        "name": "wp-media/background-processing",
+        "version": "v1.3",
+        "version_normalized": "1.3.0.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/wp-media/rocket-lazyload-common.git",
-            "reference": "e5ad49418784776e54d181791522c0fa6bf172a4"
+            "url": "https://github.com/wp-media/background-processing.git",
+            "reference": "6cacc6dd2411ae82b33d7cd33fb4f2104ebf9846"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/wp-media/rocket-lazyload-common/zipball/e5ad49418784776e54d181791522c0fa6bf172a4",
-            "reference": "e5ad49418784776e54d181791522c0fa6bf172a4",
+            "url": "https://api.github.com/repos/wp-media/background-processing/zipball/6cacc6dd2411ae82b33d7cd33fb4f2104ebf9846",
+            "reference": "6cacc6dd2411ae82b33d7cd33fb4f2104ebf9846",
+            "shasum": ""
+        },
+        "require-dev": {
+            "brain/monkey": "^2.0",
+            "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
+            "php": "^5.6 || ^7",
+            "phpcompatibility/phpcompatibility-wp": "^2.0",
+            "phpunit/phpunit": "^5.7 || ^7",
+            "wp-coding-standards/wpcs": "^2",
+            "wp-media/phpunit": "^1.0"
+        },
+        "time": "2020-02-21T20:04:18+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                ""
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-2.0+"
+        ],
+        "authors": [
+            {
+                "name": "WP Media",
+                "email": "contact@wp-media.me",
+                "homepage": "https://wp-media.me"
+            }
+        ],
+        "description": "Async & Background Tasks Processing",
+        "homepage": "https://github.com/wp-media/background-processing"
+    },
+    {
+        "name": "wp-media/rocket-lazyload-common",
+        "version": "v2.5.12",
+        "version_normalized": "2.5.12.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/wp-media/rocket-lazyload-common.git",
+            "reference": "09bdc9a550b8bd1197c155a98e17c45adcb190af"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/wp-media/rocket-lazyload-common/zipball/09bdc9a550b8bd1197c155a98e17c45adcb190af",
+            "reference": "09bdc9a550b8bd1197c155a98e17c45adcb190af",
             "shasum": ""
         },
         "require": {
@@ -629,7 +525,7 @@
             "symfony/yaml": "2.8.*",
             "wp-coding-standards/wpcs": "^2.0.0"
         },
-        "time": "2019-10-28T15:10:39+00:00",
+        "time": "2020-07-10T18:41:12+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

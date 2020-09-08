@@ -20,6 +20,7 @@ else if (wfConfig::get('touppPromptNeeded')) {
 	echo wfView::create('gdpr/banner')->render();
 }
 ?>
+<div id="wordfenceMode_scan"></div>
 <div class="wrap wordfence">
 	<div class="wf-container-fluid">
 		<div class="wf-row">
@@ -250,6 +251,7 @@ echo wfView::create('scanner/issue-wfPluginRemoved')->render();
 echo wfView::create('scanner/issue-wfPluginAbandoned')->render();
 echo wfView::create('scanner/issue-wfPluginVulnerable')->render();
 echo wfView::create('scanner/issue-file')->render();
+echo wfView::create('scanner/issue-skippedPaths')->render();
 echo wfView::create('scanner/issue-knownfile')->render();
 echo wfView::create('scanner/issue-configReadable')->render();
 echo wfView::create('scanner/issue-publiclyAccessible')->render();

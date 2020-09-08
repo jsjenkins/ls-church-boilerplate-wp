@@ -2,28 +2,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$current_theme = wp_get_theme();
+$current_theme = wp_get_theme(); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
 
 if ( 'Avada' === $current_theme->get( 'Name' ) ) {
 	// When Avada theme purge its own cache.
 	add_action( 'avada_clear_dynamic_css_cache',  'rocket_clean_domain' );
-
-	/**
-	 * Exclude fusion styles from cache busting to prevent cache dir issues
-	 *
-	 * @author Remy Perona
-	 *
-	 * @param array $excluded_files An array of excluded files.
-	 * @return array
-	 */
-	function rocket_exclude_avada_dynamic_css( $excluded_files ) {
-		$upload_dir = wp_upload_dir();
-
-		$excluded_files[] = rocket_clean_exclude_file( $upload_dir['baseurl'] . '/fusion-styles/(.*)' );
-
-		return $excluded_files;
-	}
-	add_filter( 'rocket_exclude_cache_busting', 'rocket_exclude_avada_dynamic_css' );
 
 	/**
 	 * Deactivate WP Rocket lazyload if Avada lazyload is enabled

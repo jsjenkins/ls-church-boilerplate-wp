@@ -25,7 +25,7 @@ function rocket_upgrader() {
 	if ( did_action( 'wp_rocket_first_install' ) || did_action( 'wp_rocket_upgrade' ) ) {
 		flush_rocket_htaccess();
 
-		rocket_renew_all_boxes( 0, array( 'rocket_warning_plugin_modification' ) );
+		rocket_renew_all_boxes( 0, [ 'rocket_warning_plugin_modification' ] );
 
 		$options            = get_option( WP_ROCKET_SLUG ); // do not use get_rocket_option() here.
 		$options['version'] = WP_ROCKET_VERSION;
@@ -38,8 +38,9 @@ function rocket_upgrader() {
 		update_option( WP_ROCKET_SLUG, $options );
 	}
 
-	if ( ! rocket_valid_key() && current_user_can( 'rocket_manage_options' ) &&
-		( isset( $_GET['page'] ) && 'wprocket' === $_GET['page'] ) ) {
+	$page = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_STRING );
+
+	if ( ! rocket_valid_key() && current_user_can( 'rocket_manage_options' ) && 'wprocket' === $page ) {
 		add_action( 'admin_notices', 'rocket_need_api_key' );
 	}
 }
@@ -153,7 +154,7 @@ function rocket_first_install() {
 
 	// Create Option.
 	add_option(
-		WP_ROCKET_SLUG,
+		rocket_get_constant( 'WP_ROCKET_SLUG' ),
 		/**
 		 * Filters the default rocket options array
 		 *
@@ -201,8 +202,8 @@ function rocket_first_install() {
 				'sitemap_preload'             => 0,
 				'sitemap_preload_url_crawl'   => '500000',
 				'sitemaps'                    => [],
-				'remove_query_strings'        => 0,
 				'dns_prefetch'                => 0,
+				'preload_fonts'               => [],
 				'database_revisions'          => 0,
 				'database_auto_drafts'        => 0,
 				'database_trashed_posts'      => 0,
@@ -253,8 +254,6 @@ add_action( 'wp_rocket_first_install', 'rocket_first_install' );
  */
 function rocket_new_upgrade( $wp_rocket_version, $actual_version ) {
 	if ( version_compare( $actual_version, '2.4.1', '<' ) ) {
-		// Regenerate advanced-cache.php file.
-		rocket_generate_advanced_cache_file();
 		delete_transient( 'rocket_ask_for_update' );
 	}
 
@@ -268,17 +267,6 @@ function rocket_new_upgrade( $wp_rocket_version, $actual_version ) {
 		}
 
 		update_option( WP_ROCKET_SLUG, $options );
-
-		// Regenerate advanced-cache.php file.
-		rocket_generate_advanced_cache_file();
-	}
-
-	if ( version_compare( $actual_version, '2.7', '<' ) ) {
-		// Regenerate advanced-cache.php file.
-		rocket_generate_advanced_cache_file();
-
-		// Regenerate config file.
-		rocket_generate_config_file();
 	}
 
 	if ( version_compare( $actual_version, '2.8', '<' ) ) {
@@ -330,26 +318,7 @@ function rocket_new_upgrade( $wp_rocket_version, $actual_version ) {
 	}
 
 	if ( version_compare( $actual_version, '2.11', '<' ) ) {
-		rocket_clean_domain();
 		rocket_clean_minify();
-		rocket_clean_cache_busting();
-		rocket_generate_advanced_cache_file();
-	}
-
-	if ( version_compare( $actual_version, '3.0.3', '<' ) ) {
-		if ( rocket_is_ssl_website() ) {
-			update_rocket_option( 'cache_ssl', 1 );
-		}
-
-		rocket_generate_config_file();
-	}
-
-	if ( version_compare( $actual_version, '3.1.1', '<' ) ) {
-		rocket_generate_config_file();
-	}
-
-	if ( version_compare( $actual_version, '3.1.4', '<' ) ) {
-		rocket_generate_advanced_cache_file();
 	}
 
 	if ( version_compare( $actual_version, '3.2', '<' ) ) {
@@ -365,7 +334,6 @@ function rocket_new_upgrade( $wp_rocket_version, $actual_version ) {
 
 		update_option( WP_ROCKET_SLUG, $options );
 		rocket_generate_config_file();
-		rocket_generate_advanced_cache_file();
 
 		// Create a .htaccess file in the log folder.
 		$handler = Logger::get_stream_handler();
@@ -384,40 +352,7 @@ function rocket_new_upgrade( $wp_rocket_version, $actual_version ) {
 	}
 
 	if ( version_compare( $actual_version, '3.2.0.1', '<' ) ) {
-		flush_rocket_htaccess();
 		wp_safe_remote_get( esc_url( home_url() ) );
-	}
-
-	if ( version_compare( $actual_version, '3.2.1', '<' ) ) {
-		flush_rocket_htaccess();
-		rocket_generate_config_file();
-		rocket_clean_domain();
-	}
-
-	if ( version_compare( $actual_version, '3.2.1.1', '<' ) ) {
-		rocket_generate_config_file();
-	}
-
-	if ( version_compare( $actual_version, '3.2.2', '<' ) ) {
-		flush_rocket_htaccess();
-	}
-
-	if ( version_compare( $actual_version, '3.2.4', '<' ) ) {
-		flush_rocket_htaccess();
-		rocket_generate_config_file();
-	}
-
-	if ( version_compare( $actual_version, '3.3', '<' ) ) {
-		rocket_generate_advanced_cache_file();
-		rocket_generate_config_file();
-		rocket_clean_domain();
-	}
-
-	if ( version_compare( $actual_version, '3.3.2', '<' ) ) {
-		rocket_generate_advanced_cache_file();
-		flush_rocket_htaccess();
-		rocket_generate_config_file();
-		rocket_clean_domain();
 	}
 
 	if ( version_compare( $actual_version, '3.3.6', '<' ) ) {
@@ -440,11 +375,16 @@ function rocket_new_upgrade( $wp_rocket_version, $actual_version ) {
 
 	if ( version_compare( $actual_version, '3.4', '<' ) ) {
 		wp_clear_scheduled_hook( 'rocket_purge_time_event' );
-		rocket_clean_domain();
 	}
 
-	if ( version_compare( $actual_version, '3.4.0.1', '<' ) ) {
-		( new WP_Rocket\Subscriber\Plugin\Capabilities_Subscriber() )->add_rocket_capabilities();
+	if ( version_compare( $actual_version, '3.6', '<' ) ) {
+		rocket_clean_cache_busting();
+		rocket_clean_domain();
+		rocket_generate_advanced_cache_file();
+	}
+
+	if ( version_compare( $actual_version, '3.6.1', '<' ) ) {
+		rocket_generate_config_file();
 	}
 }
 add_action( 'wp_rocket_upgrade', 'rocket_new_upgrade', 10, 2 );

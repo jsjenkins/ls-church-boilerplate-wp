@@ -35,7 +35,7 @@ $extensions = [
 			'buyUrl'        => WPSEO_Shortlinker::get( 'https://yoa.st/zt' ),
 			'infoUrl'       => WPSEO_Shortlinker::get( 'https://yoa.st/zs' ),
 			'title'         => 'Local SEO',
-			'display_title' => 'Stop losing customers to other local businesses',
+			'display_title' => __( 'Stop losing customers to other local businesses', 'wordpress-seo' ),
 			'desc'          => __( 'Rank better locally and in Google Maps, without breaking a sweat!', 'wordpress-seo' ),
 			'image'         => plugins_url( 'images/local_plugin_assistant.svg?v=' . WPSEO_VERSION, WPSEO_FILE ),
 			'benefits'      => [
@@ -51,7 +51,7 @@ $extensions = [
 			'buyUrl'        => WPSEO_Shortlinker::get( 'https://yoa.st/zx/' ),
 			'infoUrl'       => WPSEO_Shortlinker::get( 'https://yoa.st/zw/' ),
 			'title'         => 'Video SEO',
-			'display_title' => 'Start ranking better for your videos',
+			'display_title' => __( 'Start ranking better for your videos', 'wordpress-seo' ),
 			'desc'          => __( 'Optimize your videos to show them off in search results and get more clicks!', 'wordpress-seo' ),
 			'image'         => plugins_url( 'images/video_plugin_assistant.svg?v=' . WPSEO_VERSION, WPSEO_FILE ),
 			'benefits'      => [
@@ -66,7 +66,7 @@ $extensions = [
 			'buyUrl'        => WPSEO_Shortlinker::get( 'https://yoa.st/zv/' ),
 			'infoUrl'       => WPSEO_Shortlinker::get( 'https://yoa.st/zu/' ),
 			'title'         => 'News SEO',
-			'display_title' => 'Everything you need for Google News',
+			'display_title' => __( 'Everything you need for Google News', 'wordpress-seo' ),
 			'desc'          => __( 'Are you in Google News? Increase your traffic from Google News by optimizing for it!', 'wordpress-seo' ),
 			'image'         => plugins_url( 'images/news_plugin_assistant.svg?v=' . WPSEO_VERSION, WPSEO_FILE ),
 			'benefits'      => [
@@ -85,7 +85,7 @@ if ( WPSEO_Utils::is_woocommerce_active() ) {
 			'buyUrl'        => WPSEO_Shortlinker::get( 'https://yoa.st/zr' ),
 			'infoUrl'       => WPSEO_Shortlinker::get( 'https://yoa.st/zq' ),
 			'title'         => 'Yoast WooCommerce SEO',
-			'display_title' => 'Make your products stand out in Google',
+			'display_title' => __( 'Make your products stand out in Google', 'wordpress-seo' ),
 			/* translators: %1$s expands to Yoast SEO */
 			'desc'          => sprintf( __( 'Seamlessly integrate WooCommerce with %1$s and get extra features!', 'wordpress-seo' ), 'Yoast SEO' ),
 			'image'         => plugins_url( 'images/woo_plugin_assistant.svg?v=' . WPSEO_VERSION, WPSEO_FILE ),
@@ -158,7 +158,7 @@ $new_tab_message         = sprintf(
 				<?php if ( $has_valid_premium_subscription ) : ?>
 					<div class="yoast-button yoast-button--noarrow yoast-button--extension yoast-button--extension-activated"><?php esc_html_e( 'Activated', 'wordpress-seo' ); ?></div>
 					<a target="_blank" href="<?php WPSEO_Shortlinker::show( 'https://yoa.st/13k' ); ?>"
-					   class="yoast-link--license">
+						class="yoast-link--license">
 						<?php
 						printf(
 							/* translators: %s expands to the extension title */
@@ -173,7 +173,7 @@ $new_tab_message         = sprintf(
 				<?php else : ?>
 					<div class="yoast-button yoast-button--noarrow yoast-button--extension yoast-button--extension-not-activated"><?php esc_html_e( 'Not activated', 'wordpress-seo' ); ?></div>
 					<a target="_blank" href="<?php WPSEO_Shortlinker::show( 'https://yoa.st/13i' ); ?>"
-					   class="yoast-link--license">
+						class="yoast-link--license">
 						<?php
 						printf(
 							/* translators: %s expands to the extension title */
@@ -190,7 +190,7 @@ $new_tab_message         = sprintf(
 			<?php else : ?>
 
 				<a target="_blank" href="<?php echo esc_url( $premium_extension->get_buy_url() ); ?>"
-				   class="yoast-button-upsell">
+					class="yoast-button-upsell">
 					<?php
 					printf(
 						/* translators: $s expands to Yoast SEO Premium */
@@ -205,7 +205,7 @@ $new_tab_message         = sprintf(
 				</a>
 
 				<a target="_blank" href="<?php echo esc_url( $premium_extension->get_info_url() ); ?>"
-				   class="yoast-link--more-info">
+					class="yoast-link--more-info">
 					<?php
 					printf(
 						/* translators: Text between 1: and 2: will only be shown to screen readers. 3: expands to the product name. */
@@ -264,7 +264,7 @@ $new_tab_message         = sprintf(
 							<?php if ( $addon_manager->has_valid_subscription( $slug ) ) : ?>
 								<div class="yoast-button yoast-button--noarrow yoast-button--extension yoast-button--extension-activated"><?php esc_html_e( 'Activated', 'wordpress-seo' ); ?></div>
 								<a target="_blank" href="<?php WPSEO_Shortlinker::show( 'https://yoa.st/13k' ); ?>"
-								   class="yoast-link--license">
+									class="yoast-link--license">
 									<?php
 									printf(
 										/* translators: %s expands to the extension title */
@@ -279,7 +279,7 @@ $new_tab_message         = sprintf(
 							<?php else : ?>
 								<div class="yoast-button yoast-button--noarrow  yoast-button--extension yoast-button--extension-not-activated"><?php esc_html_e( 'Not activated', 'wordpress-seo' ); ?></div>
 								<a target="_blank" href="<?php WPSEO_Shortlinker::show( 'https://yoa.st/13i' ); ?>"
-								   class="yoast-link--license">
+									class="yoast-link--license">
 									<?php
 									printf(
 										/* translators: %s expands to the extension title */
@@ -294,7 +294,7 @@ $new_tab_message         = sprintf(
 							<?php endif; ?>
 						<?php else : ?>
 							<a target="_blank" class="yoast-button-upsell"
-							   href="<?php echo esc_url( $extension->get_buy_url() ); ?>">
+								href="<?php echo esc_url( $extension->get_buy_url() ); ?>">
 								<?php
 								printf(
 									/* translators: %s expands to the product name */
@@ -309,7 +309,7 @@ $new_tab_message         = sprintf(
 							</a>
 
 							<a target="_blank" class="yoast-link--more-info"
-							   href="<?php echo esc_url( $extension->get_info_url() ); ?>">
+								href="<?php echo esc_url( $extension->get_info_url() ); ?>">
 								<?php
 								printf(
 									/* translators: Text between 1: and 2: will only be shown to screen readers. 3: expands to the product name. */
