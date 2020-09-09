@@ -25,6 +25,12 @@
 				<div class="accessibility-nav">
 					<a href="#main-content" class="skip-link">Skip to Main Content</a>
 				</div>
+				<?php if( get_field('alert_toggle', 'options') ) { ?>
+					<div class="alert-bar">
+						<button class="close-button" data-close>&times;</button>
+						<?php the_field('alert_copy', 'options'); ?>
+					</div>
+				<?php } ?>
 				<div class="grid-container" id="main-navigation">
 					<div class="grid-x vertical-center">
 						<div class="cell auto">

@@ -19,6 +19,25 @@
 	color: $primary-color;
 }
 
+// Sitewide alert
+.alert-bar {
+	@include white-text;
+	background-color: $primary-color;
+	padding: 10px 50px 10px 25px;
+	position: relative;
+	z-index: 5;
+	p {
+		margin-bottom: 0;
+	}
+	a {
+		color: $white;
+	}
+	.close-button {
+		color: $white;
+		top: 0.3rem;
+	}
+}
+
 // Header logo
 header.header .logo {
 	max-width: 200px;

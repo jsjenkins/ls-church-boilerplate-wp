@@ -13,6 +13,8 @@
 				</div>
 			</div>
 		<?php } ?>
+
+		<?php get_template_part('partials/page', 'builder'); ?>
 	</main>
 
 <?php endwhile; ?>

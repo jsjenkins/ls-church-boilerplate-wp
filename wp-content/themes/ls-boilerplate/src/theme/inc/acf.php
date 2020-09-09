@@ -42,10 +42,20 @@ function acf_modify_styles() {
             height: 300px;
         }
         .acf-flexible-content .layout {
-            border: 3px solid #E1E1E1;
+            border: 1px solid #ccd0d4;
+            margin-top: 35px;
         }
         .acf-flexible-content .layout .acf-fc-layout-handle {
-            background-color: #E1E1E1;
+            background-color: #f7f7f7;
+        }
+        .acf-flexible-content .layout .acf-fc-layout-handle .acf-fc-layout-order {
+            color: #ffffff;
+            background-color: #555d66;
+            font-weight: bold;
+        }
+        .acf-flexible-content .layout .acf-fc-layout-controls .acf-icon {
+            background-color: #ffffff;
+            border: 1px solid #ccd0d4;
         }
     </style>
     <?php    

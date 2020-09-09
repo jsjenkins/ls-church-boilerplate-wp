@@ -39,4 +39,8 @@ $(document).ready(function() {
 		}
 	});
 
+	$('.alert-bar .close-button').click( function(){
+        $(this).parent().slideUp('fast');
+    });
+
 });

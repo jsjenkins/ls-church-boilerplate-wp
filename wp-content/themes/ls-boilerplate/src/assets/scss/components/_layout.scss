@@ -18,6 +18,14 @@
 		}
 	}
 
+	// Light grey background
+	&.light-grey-bg {
+		background-color: $light-gray;
+		&+& {
+			padding-top: 0;
+		}
+	}
+
 	// Intro section
 	.intro-section { 
 		@include vertical-padding( .5, false, true );

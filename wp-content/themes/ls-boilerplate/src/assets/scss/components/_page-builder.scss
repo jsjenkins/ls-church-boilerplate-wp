@@ -1,0 +1,137 @@
+// One Column
+.page-section.one-column {
+	.cell {
+		@include clean-last-child;
+	}
+}
+
+// Two Column
+.page-section.two-column {
+	.two-column-content {
+		&>.cell {
+			@include clean-last-child;
+			&:first-child {
+				@include vertical-padding(.75, false, true);
+				@include breakpoint(medium) {
+					padding-bottom: 0;
+				}
+			}
+			img+* {
+				padding-top: 15px;
+			}
+		}
+		&.reverse-mobile {
+			&>.cell:first-child {
+				padding-bottom: 0;
+			}
+			&>.cell:last-child {
+				@include vertical-padding(.75, false, true);
+				@include breakpoint(medium) {
+					padding-bottom: 0;
+				}
+			}
+		}
+	}
+}
+
+// Content Blocks
+.page-section.content-blocks {
+	.content-blocks-container {
+		@include deduct-padding(.75);
+		.cell {
+			@include vertical-padding(.75, false, true);
+			@include clean-last-child;
+			.content-blocks-image.circle {
+				text-align: center;
+				img {
+					border-radius: 100%;
+					width: 275px;
+				}
+			}
+			.content-blocks-image.icon {
+				text-align: center;
+				img {
+					border-radius: 100%;
+					width: 100px;
+				}
+			}
+			.content-blocks-image+* {
+				padding-top: 15px;
+			}
+		}
+	}
+}
+
+// CTA
+.page-section.cta {
+	.cta-container {
+		@include horizontal-padding(1);
+		@include vertical-padding(.5);
+		background-color: $primary-color;
+		@include breakpoint(medium) {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+		.cta-copy {
+			@include clean-last-child;
+			@include white-text;
+			margin-bottom: 15px;
+			@include breakpoint(medium) {
+				margin-bottom: 0;
+				@include horizontal-padding(1, false, true);
+			}
+		}
+		.cta-button {
+			.button.hollow {
+				border-color: $white;
+				color: $white;
+				margin-bottom: 0;
+			}
+		}
+	}
+	.white-bg+&,
+	.transparent-bg+& {
+		padding-top: 0;
+	}
+}
+
+// Image overlay
+.page-section.image-overlay {
+	padding-top: 0;
+	position: relative;
+	@include breakpoint(medium) {
+		@include vertical-padding(2);
+		.grid-x.center {
+			justify-content: center;
+		}
+		.grid-x.right {
+			justify-content: flex-end;
+		}
+	}
+	.image-bg {
+		height: 225px;
+		background-size: cover;
+		background-position: center center;
+		@include breakpoint(medium) {
+			position: absolute;
+			z-index: 1;
+			height: auto;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		}
+	}
+	.cell {
+		@include vertical-padding(.5);
+		@include horizontal-padding(1);
+		@include clean-last-child;
+		margin-top: -40px;
+		background-color: $white;
+		@include breakpoint(medium) {
+			z-index: 2;
+			margin-top: 0;
+		}
+	}
+}
