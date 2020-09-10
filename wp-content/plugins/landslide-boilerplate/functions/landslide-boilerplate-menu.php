@@ -34,6 +34,8 @@ add_filter('menu_order', 'custom_menu_order');
 // Remove pages from admin menu
 function remove_pages_from_menu() {
 
+    remove_menu_page( 'edit-comments.php');
+
     $current_user = wp_get_current_user();
     if( $current_user->user_login != 'landslide' ) {
         remove_menu_page( 'edit.php?post_type=acf-field-group');
@@ -42,15 +44,33 @@ function remove_pages_from_menu() {
 }
 add_action( 'admin_menu', 'remove_pages_from_menu' );
 
+// Remove ACF editing rights
+add_filter('acf/settings/show_admin', 'ls_acf_show_admin');
+function ls_acf_show_admin($show) {
+    $admins = array( 
+        'landslide'
+    );
+
+    $current_user = wp_get_current_user();
+
+    return (in_array($current_user->user_login, $admins));
+}
+
 // Add ACF options page
 if( function_exists('acf_add_options_page') ) {
-    
+
     acf_add_options_page(array(
         'page_title'    => 'Theme Settings',
         'menu_title'    => 'Theme Settings',
         'menu_slug'     => 'theme-settings',
         'capability'    => 'edit_posts',
         'redirect'      => false
+    ));
+
+    acf_add_options_sub_page(array(
+        'page_title'    => 'General Information',
+        'menu_title'    => 'General Info',
+        'parent_slug'   => 'theme-settings',
     ));
 
     acf_add_options_sub_page(array(
