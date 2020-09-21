@@ -75,6 +75,13 @@ nav.main-nav {
 					padding-right: 0;
 				}
 			}
+			&.nav-button {
+				&>a {
+					background-color: $primary-color;
+					color: $white;
+					padding: 10px 20px;
+				}
+			}
 			&.menu-item-has-children>a {
 				&::after {
 					content: '';

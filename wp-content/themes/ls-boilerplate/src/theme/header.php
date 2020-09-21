@@ -36,7 +36,12 @@
 						<div class="cell auto">
 							<div class="logo">
 								<a href="<?php echo home_url(); ?>">
-									<img src="<?php echo get_image_directory(); ?>/logo.png" alt="" class="logo-img">
+									<?php $site_logo = get_field( 'site_logo');
+									if( $site_logo ) { ?>
+										<img src="<?php acf_image_single( 'site_logo', 'small', FALSE, 'options' ); ?>" alt="" class="logo-img" />
+									<?php } else { ?>
+										<img src="<?php echo get_image_directory(); ?>/logo.png" alt="" class="logo-img" />
+									<?php } ?>
 								</a>
 							</div>
 						</div>
