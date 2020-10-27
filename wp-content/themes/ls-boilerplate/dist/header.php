@@ -10,8 +10,12 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<?php wp_head(); ?>
+
+		<?php the_field('gtm_head', 'options'); ?>
 	</head>
 	<body <?php body_class(); ?>>
+		<?php the_field('gtm_body', 'options'); ?>
+
 		<div class="off-canvas position-right" id="offCanvas" data-off-canvas data-trap-focus="true">
 			<ul class="off-canvas-navigation">
 	        	<?php display_simple_navigation('mobile-nav'); ?>
@@ -36,9 +40,9 @@
 						<div class="cell auto">
 							<div class="logo">
 								<a href="<?php echo home_url(); ?>">
-									<?php $site_logo = get_field( 'site_logo');
+									<?php $site_logo = get_field( 'site_logo', 'options');
 									if( $site_logo ) { ?>
-										<img src="<?php acf_image_single( 'site_logo', 'small', FALSE, 'options' ); ?>" alt="" class="logo-img" />
+										<img src="<?php echo acf_image_single( 'site_logo', 'small', FALSE, 'options' ); ?>" alt="" class="logo-img" />
 									<?php } else { ?>
 										<img src="<?php echo get_image_directory(); ?>/logo.png" alt="" class="logo-img" />
 									<?php } ?>
