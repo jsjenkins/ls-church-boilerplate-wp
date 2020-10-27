@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3b5d75f6361b4187dacf5b8e4c8a5345",
+    "content-hash": "a073f2662a7aca6515c1baf3277f5187",
     "packages": [
         {
             "name": "composer/installers",
@@ -152,16 +152,16 @@
         },
         {
             "name": "landslidecreative/gravityforms",
-            "version": "2.4.20.3",
+            "version": "2.4.21.3",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jsjenkins/gravityforms.git",
-                "reference": "5ca5afc001a7cf44788380f0fab34ed90c75a0f4"
+                "reference": "5f5e881d483690606c9b63d691a77f6fa1f18df3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsjenkins/gravityforms/zipball/5ca5afc001a7cf44788380f0fab34ed90c75a0f4",
-                "reference": "5ca5afc001a7cf44788380f0fab34ed90c75a0f4",
+                "url": "https://api.github.com/repos/jsjenkins/gravityforms/zipball/5f5e881d483690606c9b63d691a77f6fa1f18df3",
+                "reference": "5f5e881d483690606c9b63d691a77f6fa1f18df3",
                 "shasum": ""
             },
             "require": {
@@ -169,23 +169,23 @@
             },
             "type": "wordpress-plugin",
             "support": {
-                "source": "https://github.com/jsjenkins/gravityforms/tree/2.4.20.3",
+                "source": "https://github.com/jsjenkins/gravityforms/tree/2.4.21.3",
                 "issues": "https://github.com/jsjenkins/gravityforms/issues"
             },
-            "time": "2020-09-03T16:06:11+00:00"
+            "time": "2020-10-27T19:45:25+00:00"
         },
         {
             "name": "landslidecreative/wp-migrate-db-pro",
-            "version": "1.9.12",
+            "version": "1.9.13",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jsjenkins/wp-migrate-db-pro.git",
-                "reference": "9c3572fd5be2ce96c1a0a4a1e6a9fe5da5ad7cf2"
+                "reference": "27bf4d9ac3be583e9de689fbc86c98511b923279"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsjenkins/wp-migrate-db-pro/zipball/9c3572fd5be2ce96c1a0a4a1e6a9fe5da5ad7cf2",
-                "reference": "9c3572fd5be2ce96c1a0a4a1e6a9fe5da5ad7cf2",
+                "url": "https://api.github.com/repos/jsjenkins/wp-migrate-db-pro/zipball/27bf4d9ac3be583e9de689fbc86c98511b923279",
+                "reference": "27bf4d9ac3be583e9de689fbc86c98511b923279",
                 "shasum": ""
             },
             "require": {
@@ -193,23 +193,23 @@
             },
             "type": "wordpress-plugin",
             "support": {
-                "source": "https://github.com/jsjenkins/wp-migrate-db-pro/tree/1.9.12",
+                "source": "https://github.com/jsjenkins/wp-migrate-db-pro/tree/1.9.13",
                 "issues": "https://github.com/jsjenkins/wp-migrate-db-pro/issues"
             },
-            "time": "2020-08-27T17:10:44+00:00"
+            "time": "2020-10-27T19:47:59+00:00"
         },
         {
             "name": "landslidecreative/wp-rocket",
-            "version": "3.6.4",
+            "version": "3.7.4",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jsjenkins/wp-rocket.git",
-                "reference": "8da04f84a5e5d5ae69af0cb5bb727ee7a20c0a5c"
+                "reference": "19f93564809f93995414a012ba753989cfb81eb7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsjenkins/wp-rocket/zipball/8da04f84a5e5d5ae69af0cb5bb727ee7a20c0a5c",
-                "reference": "8da04f84a5e5d5ae69af0cb5bb727ee7a20c0a5c",
+                "url": "https://api.github.com/repos/jsjenkins/wp-rocket/zipball/19f93564809f93995414a012ba753989cfb81eb7",
+                "reference": "19f93564809f93995414a012ba753989cfb81eb7",
                 "shasum": ""
             },
             "require": {
@@ -217,10 +217,10 @@
             },
             "type": "wordpress-plugin",
             "support": {
-                "source": "https://github.com/jsjenkins/wp-rocket/tree/3.6.4",
+                "source": "https://github.com/jsjenkins/wp-rocket/tree/3.7.4",
                 "issues": "https://github.com/jsjenkins/wp-rocket/issues"
             },
-            "time": "2020-08-27T17:16:10+00:00"
+            "time": "2020-10-27T19:50:23+00:00"
         },
         {
             "name": "wpackagist-plugin/classic-editor",
@@ -242,15 +242,15 @@
         },
         {
             "name": "wpackagist-plugin/imagify",
-            "version": "1.9.10",
+            "version": "1.9.11",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/imagify/",
-                "reference": "tags/1.9.10"
+                "reference": "tags/1.9.11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/imagify.1.9.10.zip"
+                "url": "https://downloads.wordpress.org/plugin/imagify.1.9.11.zip"
             },
             "require": {
                 "composer/installers": "~1.0"
@@ -278,15 +278,15 @@
         },
         {
             "name": "wpackagist-plugin/wordfence",
-            "version": "7.4.11",
+            "version": "7.4.12",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/wordfence/",
-                "reference": "tags/7.4.11"
+                "reference": "tags/7.4.12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordfence.7.4.11.zip"
+                "url": "https://downloads.wordpress.org/plugin/wordfence.7.4.12.zip"
             },
             "require": {
                 "composer/installers": "~1.0"
@@ -296,15 +296,15 @@
         },
         {
             "name": "wpackagist-plugin/wordpress-seo",
-            "version": "14.9",
+            "version": "15.2",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/wordpress-seo/",
-                "reference": "tags/14.9"
+                "reference": "tags/15.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.14.9.zip"
+                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.15.2.zip"
             },
             "require": {
                 "composer/installers": "~1.0"
