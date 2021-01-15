@@ -53,7 +53,7 @@ function ls_boilerplate_header_scripts()
         wp_deregister_script( 'jquery' );
 
         // Add theme scripts
-        wp_register_script('jquery', get_template_directory_uri() . '/assets/js/app.js', array(), '1.0.0', true);
+        wp_register_script('jquery', get_template_directory_uri() . '/assets/js/app.js', array(), '1.0.0', false);
         wp_enqueue_script('jquery');
         
     }

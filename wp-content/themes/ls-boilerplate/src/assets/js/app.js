@@ -10,10 +10,11 @@ require('foundation-sites');
 //import './lib/foundation-explicit-pieces';
 
 require('./lib/jquery.fitVids.js');
-
-$(document).foundation();
+require('./lib/jquery.matchHeight.js');
 
 $(document).ready(function() {
+
+	$(document).foundation();
 
 	$('body').fitVids({
 		customSelector: 'iframe[src*="facebook"], iframe[src^="https://livestream.com"]'
