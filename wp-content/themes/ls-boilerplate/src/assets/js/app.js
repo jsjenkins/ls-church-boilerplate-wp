@@ -3,7 +3,7 @@ import 'what-input';
 
 window.$ = window.jQuery = $;
 
-require('foundation-sites');
+// require('foundation-sites');
 
 // If you want to pick and choose which modules to include, comment out the above and uncomment
 // the line below

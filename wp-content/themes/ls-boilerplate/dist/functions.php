@@ -300,6 +300,17 @@ remove_filter('the_excerpt', 'wpautop'); // Remove <p> tags from Excerpt altoget
     Custom Functions
 \*------------------------------------*/
 
+// Remove extraneous dashboard widgets
+add_action('admin_init', 'ls_remove_dashboard_widgets');
+function ls_remove_dashboard_widgets()
+{
+    remove_meta_box('dashboard_primary', 'dashboard', 'side');
+    remove_meta_box('dashboard_quick_press', 'dashboard', 'side');
+    remove_meta_box('dashboard_activity', 'dashboard', 'normal');
+    remove_meta_box('dashboard_site_health', 'dashboard', 'normal');
+    remove_action('admin_notices', 'update_nag');
+}
+
 function get_image_directory() 
 {
     $image_directory = get_template_directory_uri()."/assets/img";
