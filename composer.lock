@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e89dab89b59fcbdc3e2483465d8550b6",
+    "content-hash": "dedcaa32c6fb07545cabc50563cd1a7a",
     "packages": [
         {
             "name": "composer/installers",
@@ -152,16 +152,16 @@
         },
         {
             "name": "landslidecreative/gravityforms",
-            "version": "2.4.23",
+            "version": "2.5.0.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jsjenkins/gravityforms.git",
-                "reference": "69b09cb5237fc03374b3c5e5aa82e7a22448f58f"
+                "reference": "60b7b2127008a9d3d19b3b610355865bb6c45361"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsjenkins/gravityforms/zipball/69b09cb5237fc03374b3c5e5aa82e7a22448f58f",
-                "reference": "69b09cb5237fc03374b3c5e5aa82e7a22448f58f",
+                "url": "https://api.github.com/repos/jsjenkins/gravityforms/zipball/60b7b2127008a9d3d19b3b610355865bb6c45361",
+                "reference": "60b7b2127008a9d3d19b3b610355865bb6c45361",
                 "shasum": ""
             },
             "require": {
@@ -169,23 +169,23 @@
             },
             "type": "wordpress-plugin",
             "support": {
-                "source": "https://github.com/jsjenkins/gravityforms/tree/2.4.23",
+                "source": "https://github.com/jsjenkins/gravityforms/tree/2.5.0.1",
                 "issues": "https://github.com/jsjenkins/gravityforms/issues"
             },
-            "time": "2021-03-09T17:30:09+00:00"
+            "time": "2021-05-06T19:07:37+00:00"
         },
         {
             "name": "landslidecreative/wp-migrate-db-pro",
-            "version": "1.9.13",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jsjenkins/wp-migrate-db-pro.git",
-                "reference": "27bf4d9ac3be583e9de689fbc86c98511b923279"
+                "reference": "3ceda95165a512bb7e9a243e5f971d88d67661ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsjenkins/wp-migrate-db-pro/zipball/27bf4d9ac3be583e9de689fbc86c98511b923279",
-                "reference": "27bf4d9ac3be583e9de689fbc86c98511b923279",
+                "url": "https://api.github.com/repos/jsjenkins/wp-migrate-db-pro/zipball/3ceda95165a512bb7e9a243e5f971d88d67661ea",
+                "reference": "3ceda95165a512bb7e9a243e5f971d88d67661ea",
                 "shasum": ""
             },
             "require": {
@@ -193,10 +193,10 @@
             },
             "type": "wordpress-plugin",
             "support": {
-                "source": "https://github.com/jsjenkins/wp-migrate-db-pro/tree/1.9.13",
+                "source": "https://github.com/jsjenkins/wp-migrate-db-pro/tree/master",
                 "issues": "https://github.com/jsjenkins/wp-migrate-db-pro/issues"
             },
-            "time": "2020-10-27T19:47:59+00:00"
+            "time": "2021-04-30T15:19:31+00:00"
         },
         {
             "name": "landslidecreative/wp-rocket",
@@ -296,15 +296,15 @@
         },
         {
             "name": "wpackagist-plugin/wordpress-seo",
-            "version": "16.1.1",
+            "version": "16.2",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/wordpress-seo/",
-                "reference": "tags/16.1.1"
+                "reference": "tags/16.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.16.1.1.zip"
+                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.16.2.zip"
             },
             "require": {
                 "composer/installers": "~1.0"
