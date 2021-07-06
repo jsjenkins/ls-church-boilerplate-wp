@@ -308,7 +308,6 @@ function ls_remove_dashboard_widgets()
     remove_meta_box('dashboard_quick_press', 'dashboard', 'side');
     remove_meta_box('dashboard_activity', 'dashboard', 'normal');
     remove_meta_box('dashboard_site_health', 'dashboard', 'normal');
-    remove_action('admin_notices', 'update_nag');
 }
 
 function get_image_directory() 
