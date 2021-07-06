@@ -144,11 +144,9 @@ function getFieldById( fieldId ) {
 function getOptionsFromSelect( field, value ) {
 	var options = [];
 
-	var emptyLabel = 'Empty (no choices selected)';
+	var emptyLabel = gf_vars.emptyChoice;
 
-	if ( GetInputType( field ) === 'multiselect' ) {
-		emptyLabel = gf_vars.emptyChoice;
-	} else if ( field.placeholder ) {
+	if ( field.placeholder ) {
 		emptyLabel = field.placeholder;
 	}
 
@@ -165,7 +163,7 @@ function getOptionsFromSelect( field, value ) {
 		var config = {
 			label: choice.text,
 			value: choice.value,
-			selected: choice.value === value ? 'selected="selected"' : '',
+			selected: choice.value == value ? 'selected="selected"' : '',
 		};
 
 		options.push( config );
@@ -294,6 +292,17 @@ function isValidFlyoutClick( e ) {
 }
 
 /**
+ * Determine whether a given rule needs to present a text input for the value.
+ *
+ * @param {object} e The rule object.
+ *
+ * @return {boolean}
+ */
+function ruleNeedsTextValue( rule ) {
+	return ['contains', 'starts_with', 'ends_with', '<', '>' ].indexOf ( rule.operator ) !== -1;
+}
+
+/**
  * Class GFConditionalLogic
  *
  * A JS class encapsulating all of the logic and state for a conditional flyout.
@@ -364,6 +373,8 @@ GFConditionalLogic.prototype.renderFlyout = function() {
 	var html = gf_vars.conditionalLogic.views.flyout;
 
 	renderView( html, this.els.flyouts[ this.objectType ], config, true );
+
+	gform.tools.trigger( 'gform_render_simplebars' );
 };
 
 /**
@@ -629,10 +640,11 @@ GFConditionalLogic.prototype.renderSelect = function( rule, idx ) {
  */
 GFConditionalLogic.prototype.renderRuleValue = function( rule, idx ) {
 	var fieldValueOptions = this.renderValueOptions( rule, idx );
-	var isSelect = fieldValueOptions.length;
-	var html = '';
+	var isSelect          = fieldValueOptions.length;
+	var html              = '';
+	var needsTextInput    = ruleNeedsTextValue( rule );
 
-	if ( ! isSelect ) {
+	if ( ! isSelect || needsTextInput ) {
 		html = this.renderInput( rule, idx );
 	} else {
 		html = this.renderSelect( rule, idx );
@@ -664,7 +676,7 @@ GFConditionalLogic.prototype.renderRuleValue = function( rule, idx ) {
 GFConditionalLogic.prototype.renderRule = function( rule, idx ) {
 	var field = getFieldById( rule.fieldId );
 
-	if ( !field ) {
+	if ( ! field ) {
 		field = {
 			choices: '',
 		};
@@ -726,8 +738,11 @@ GFConditionalLogic.prototype.gatherElements = function() {
  * @returns {{value: string, operator: string, fieldId: number}}
  */
 GFConditionalLogic.prototype.getDefaultRule = function() {
+	var fieldId = GetFirstRuleField();
+	var field   = GetFieldById( fieldId );
+
 	return {
-		fieldId: GetFirstRuleField(),
+		fieldId: fieldId,
 		operator: 'is',
 		value: '',
 	};

@@ -169,11 +169,13 @@ class GF_Field_FileUpload extends GF_Field {
 		}
 		// File size.
 		$max_upload_size = $this->maxFileSize > 0 ? $this->maxFileSize * 1048576 : wp_max_upload_size();
-		$upload_rules_messages[] = esc_attr( sprintf( __( 'Max. file size: %s' ), GFCommon::format_file_size( $max_upload_size ) ) );
+		// translators: %s is replaced with a numeric string representing the maximum file size
+		$upload_rules_messages[] = esc_attr( sprintf( __( 'Max. file size: %s', 'gravityforms' ), GFCommon::format_file_size( $max_upload_size ) ) );
 		// No. of files.
 		$max_files = ( $multiple_files && $this->maxFiles > 0 ) ? $this->maxFiles : 0;
 		if ( $max_files ) {
-			$upload_rules_messages[] = esc_attr( sprintf( __( 'Max. files: %s' ), $max_files ) );
+			// translators: %s is replaced with a numeric string representing the maximum number of files
+			$upload_rules_messages[] = esc_attr( sprintf( __( 'Max. files: %s', 'gravityforms' ), $max_files ) );
 		}
 
 		$rules_messages = implode( ', ', $upload_rules_messages ) . '.';
@@ -313,8 +315,8 @@ class GF_Field_FileUpload extends GF_Field {
 				$delete_button_url   = GFCommon::get_base_url() . '/images/delete.png';
 				$preview .= "<div id='preview_file_{$file_index}' class='ginput_preview'>
 								<a href='{$file_url}' target='_blank' aria-label='{$view_file_text}'>{$display_file_url}</a>
-								<a href='{$file_url}' target='_blank' aria-label='{$download_file_text}'>
-								<img src='{$download_button_url}' alt='' style='margin-left:10px;'/></a><a href='javascript:void(0);' aria-label='{$delete_file_text}' onclick='DeleteFile({$lead_id},{$id},this);' onkeypress='DeleteFile({$lead_id},{$id},this);' ><img src='{$delete_button_url}' alt='' style='margin-left:10px;'/></a>
+								<a href='{$file_url}' target='_blank' aria-label='{$download_file_text}' class='ginput_preview_control gform-icon gform-icon--circle-arrow-down'></a>
+								<a href='javascript:void(0);' aria-label='{$delete_file_text}' onclick='DeleteFile({$lead_id},{$id},this);' onkeypress='DeleteFile({$lead_id},{$id},this);' class='ginput_preview_control gform-icon gform-icon--circle-delete'></a>
 							</div>";
 			}
 

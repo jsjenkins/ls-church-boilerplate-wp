@@ -1033,6 +1033,11 @@ class GFFormsModel {
 					$field->pageNumber = $page_number;
 				}
 
+				// Populate required cssClass property with empty string if not set to avoid JS errors when rendering.
+				if ( ! isset( $field->cssClass ) ) {
+					$field->cssClass = '';
+				}
+
 				$field->post_convert_field();
 			}
 		}
@@ -3500,6 +3505,11 @@ class GFFormsModel {
 		*/
 
 		$number_format = 'decimal_dot';
+
+		if ( GFCommon::is_numeric( $text, 'currency' ) ) {
+			$number_format = 'currency';
+		}
+
 		if ( GFCommon::is_numeric( $text, $number_format ) ) {
 			return GFCommon::clean_number( $text, $number_format );
 		}
@@ -3508,7 +3518,6 @@ class GFFormsModel {
 	}
 
 	public static function matches_operation( $val1, $val2, $operation ) {
-
 		$val1 = ! rgblank( $val1 ) ? strtolower( $val1 ) : '';
 		$val2 = ! rgblank( $val2 ) ? strtolower( $val2 ) : '';
 
@@ -5885,7 +5894,7 @@ class GFFormsModel {
 	 */
 	public static function get_lead_field_value( $lead, $field ) {
 
-		if ( empty( $lead ) ) {
+		if ( empty( $lead ) || ! is_array( $lead ) ) {
 			return null;
 		}
 
@@ -6618,7 +6627,7 @@ class GFFormsModel {
 	}
 
 	public static function is_html5_enabled() {
-		return get_option( 'rg_gforms_enable_html5', true );
+		return get_option( 'rg_gforms_enable_html5', false );
 	}
 
 	/**
