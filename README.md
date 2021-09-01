@@ -6,7 +6,7 @@ A Wordpress installation boilerplate for projects launched by [Landslide Creativ
 
 All Wordpress core files have been moved into the _/core/_ directory.
 
-The _wp-config.php_ files have been excluded from this repo, but can be downloaded [here](https://s3.amazonaws.com/landslide-dev/wp-config.zip). Place them in the _/core/_ directory and add your database information. On the staging server, remove the _wp-config-local.php_ file. On the production server, leave only _wp-config.php_.
+The _wp-config.php_ files have been excluded from this repo, but can be downloaded [here](https://landslide-dev.s3.amazonaws.com/wp-config.zip). Place them in the _/core/_ directory and add your database information. On the staging server, remove the _wp-config-local.php_ file. On the production server, leave only _wp-config.php_.
 
 ## Plugin Management
 
