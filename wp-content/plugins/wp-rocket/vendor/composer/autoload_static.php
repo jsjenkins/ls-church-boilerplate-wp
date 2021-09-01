@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit3081ef50171bac2f33cdadbe03afa20a
+class ComposerStaticInit0c96c57a96178224d56baf9930a9ab01
 {
     public static $prefixLengthsPsr4 = array (
         'W' => 
@@ -102,7 +102,6 @@ class ComposerStaticInit3081ef50171bac2f33cdadbe03afa20a
         'WP_Rocket\\Subscriber\\Plugin\\Information_Subscriber' => __DIR__ . '/../..' . '/inc/classes/subscriber/Plugin/class-information-subscriber.php',
         'WP_Rocket\\Subscriber\\Plugin\\Updater_Api_Common_Subscriber' => __DIR__ . '/../..' . '/inc/classes/subscriber/Plugin/class-updater-api-common-subscriber.php',
         'WP_Rocket\\Subscriber\\Plugin\\Updater_Subscriber' => __DIR__ . '/../..' . '/inc/classes/subscriber/Plugin/class-updater-subscriber.php',
-        'WP_Rocket\\Subscriber\\Third_Party\\Hostings\\Litespeed_Subscriber' => __DIR__ . '/../..' . '/inc/classes/subscriber/third-party/Hostings/class-litespeed-subscriber.php',
         'WP_Rocket\\Subscriber\\Third_Party\\Plugins\\Ecommerce\\BigCommerce_Subscriber' => __DIR__ . '/../..' . '/inc/classes/subscriber/third-party/plugins/ecommerce/class-bigcommerce-subscriber.php',
         'WP_Rocket\\Subscriber\\Third_Party\\Plugins\\Images\\Webp\\EWWW_Subscriber' => __DIR__ . '/../..' . '/inc/classes/subscriber/third-party/plugins/Images/Webp/class-ewww-subscriber.php',
         'WP_Rocket\\Subscriber\\Third_Party\\Plugins\\Images\\Webp\\Imagify_Subscriber' => __DIR__ . '/../..' . '/inc/classes/subscriber/third-party/plugins/Images/Webp/class-imagify-subscriber.php',
@@ -127,9 +126,9 @@ class ComposerStaticInit3081ef50171bac2f33cdadbe03afa20a
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit3081ef50171bac2f33cdadbe03afa20a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit3081ef50171bac2f33cdadbe03afa20a::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit3081ef50171bac2f33cdadbe03afa20a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit0c96c57a96178224d56baf9930a9ab01::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit0c96c57a96178224d56baf9930a9ab01::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit0c96c57a96178224d56baf9930a9ab01::$classMap;
 
         }, null, ClassLoader::class);
     }
