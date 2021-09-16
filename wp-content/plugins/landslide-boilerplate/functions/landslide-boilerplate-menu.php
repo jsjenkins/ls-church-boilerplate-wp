@@ -42,7 +42,7 @@ function remove_pages_from_menu() {
 
     $current_user = wp_get_current_user();
     
-    if( in_array($current_user->user_login, $admins) ) {
+    if( !in_array($current_user->user_login, $admins) ) {
         remove_menu_page( 'edit.php?post_type=acf-field-group');
         remove_menu_page( 'plugins.php');
     }

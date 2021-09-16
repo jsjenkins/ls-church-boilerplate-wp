@@ -46,6 +46,6 @@
           "wpackagist-plugin/wordfence" : "7.5.5",
           "landslidecreative/wp-migrate-db-pro" : "2.1.2",
           "landslidecreative/wp-rocket" : "3.9.2",
-          "wpackagist-plugin/wordpress-seo" : "17.0"
+          "wpackagist-plugin/wordpress-seo" : "17.1"
     }
 }
