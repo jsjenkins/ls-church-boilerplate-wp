@@ -156,3 +156,49 @@ function button_from_link( $variable_name, $sub=FALSE, $options='', $class=''  )
 
 	return TRUE;
 }
+
+// Display date(s)
+function ls_get_list_dates( $start, $end=NULL ) {
+	$date_string = '';
+
+	$start_date = DateTime::createFromFormat('Ymd G:i:s', $start);
+	if( $end ) {
+		$end_date = DateTime::createFromFormat('Ymd G:i:s', $end);
+	}
+	if( !$end || $start_date->format('Ymd')==$end_date->format('Ymd') ) {
+		$date_string .= $start_date->format('l, F j, Y');
+	} else {
+		$date_string .= $start_date->format('F j');
+		if( $start_date->format('Y') != $end_date->format('Y') ) {
+			$date_string .= $start_date->format(', Y');
+		}
+		$date_string .= ' - ';
+		if( $start_date->format('n') != $end_date->format('n') ) {
+			$date_string .= $end_date->format('F ');
+		}
+		$date_string .= $end_date->format('j');
+		$date_string .= $end_date->format(', Y');
+	}
+
+	return $date_string;
+}
+
+// Display time(s)
+function ls_get_times( $start, $end=NULL ) {
+	$date_string = '';
+
+	$start_date = DateTime::createFromFormat('Ymd G:i:s', $start);
+	if( $start==$end || !$end ) {
+		$date_string .= $start_date->format('g:i a');
+	} else {
+		$end_date = DateTime::createFromFormat('Ymd G:i:s', $end);
+		$date_string .= $start_date->format('g:i');
+		if( $start_date->format('a') != $end_date->format('a') ) {
+			$date_string .= $start_date->format(' a');
+		}
+		$date_string .= ' - ';		
+		$date_string .= $end_date->format('g:i a');
+	}
+
+	return $date_string;
+}
