@@ -19,7 +19,7 @@ const $ = plugins();
 const PRODUCTION = !!(yargs.argv.production);
 
 // Load settings from settings.yml
-const { PORT, LOCALHOST, PATHS } = loadConfig();
+const { PORT, LOCALHOST, SSL, PATHS } = loadConfig();
 
 function loadConfig() {
   let ymlFile = fs.readFileSync('config.yml', 'utf8');
