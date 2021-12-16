@@ -81,6 +81,8 @@ AND ANY CHANGES MADE HERE WILL BE OVERWRITTEN.
 
 }
 
+/* Media Queries */
+
 /* -----------------------------------------------------------------------------
  *
  * Mixins
@@ -199,8 +201,15 @@ AND ANY CHANGES MADE HERE WILL BE OVERWRITTEN.
 .gform_wrapper.gravity-theme .left_label .gfield_label, .gform_wrapper.gravity-theme .right_label .gfield_label {
 		width: 30%;
 		margin: 0;
-		padding: 0;
+		padding: 0
 	}
+
+@media (max-width: 640px) {
+
+	.gform_wrapper.gravity-theme .left_label .gfield_label, .gform_wrapper.gravity-theme .right_label .gfield_label {
+			width: 100%
+	}
+		}
 
 .gform_wrapper.gravity-theme .gform_fields.left_label fieldset, .gform_wrapper.gravity-theme .gform_fields.right_label fieldset {
 				clear: both;
@@ -208,23 +217,51 @@ AND ANY CHANGES MADE HERE WILL BE OVERWRITTEN.
 
 .gform_wrapper.gravity-theme .gform_fields.left_label fieldset .ginput_container, .gform_wrapper.gravity-theme .gform_fields.right_label fieldset .ginput_container {
 					float: left;
-					width: 70%;
+					width: 70%
 				}
+
+@media (max-width: 640px) {
+
+				.gform_wrapper.gravity-theme .gform_fields.left_label fieldset .ginput_container, .gform_wrapper.gravity-theme .gform_fields.right_label fieldset .ginput_container {
+						width: 100%
+				}
+					}
+
+@media (max-width: 640px) {
+
+				.gform_wrapper.gravity-theme .gform_fields.left_label fieldset > .ginput_complex, .gform_wrapper.gravity-theme .gform_fields.right_label fieldset > .ginput_complex {
+						width: 100%
+				}
+					}
 
 .gform_wrapper.gravity-theme .gform_fields.left_label legend.gfield_label, .gform_wrapper.gravity-theme .gform_fields.right_label legend.gfield_label {
 					display: block;
 					float: left;
 					padding-right: 1em;
-					width: 30%;
+					width: 30%
 				}
+
+@media (max-width: 640px) {
+
+				.gform_wrapper.gravity-theme .gform_fields.left_label legend.gfield_label, .gform_wrapper.gravity-theme .gform_fields.right_label legend.gfield_label {
+						width: 100%
+				}
+					}
 
 .gform_wrapper.gravity-theme .left_label .ginput_complex .ginput_container, .gform_wrapper.gravity-theme .right_label .ginput_complex .ginput_container {
 		width: auto;
 	}
 
 .gform_wrapper.gravity-theme .left_label div.gfield > div:not(.ui-resizable-handle):not(.gfield-admin-icons), .gform_wrapper.gravity-theme .right_label div.gfield > div:not(.ui-resizable-handle):not(.gfield-admin-icons) {
-		width: 70%;
+		width: 70%
 	}
+
+@media (max-width: 640px) {
+
+	.gform_wrapper.gravity-theme .left_label div.gfield > div:not(.ui-resizable-handle):not(.gfield-admin-icons), .gform_wrapper.gravity-theme .right_label div.gfield > div:not(.ui-resizable-handle):not(.gfield-admin-icons) {
+			width: 100%
+	}
+		}
 
 .gform_wrapper.gravity-theme .right_label .gfield_label {
 		text-align: right;
@@ -894,7 +931,24 @@ to no.
 		margin-bottom: 0;
 	}
 
-.gform_wrapper.gravity-theme .gfield_header_item:last-child, .gform_wrapper.gravity-theme .gfield_list_icons {
+.gform_wrapper.gravity-theme .gfield_header_item {
+		word-break: break-word;
+	}
+
+.gform_wrapper.gravity-theme .gfield_header_item, .gform_wrapper.gravity-theme .gfield_list_group_item {
+		flex-grow: 1;
+		width: 0;
+	}
+
+.gform_wrapper.gravity-theme .gfield_header_item + .gfield_header_item:not(.gfield_header_item--icons), .gform_wrapper.gravity-theme .gfield_list_group_item + .gfield_list_group_item {
+		margin-left: 2%;
+	}
+
+.gform_wrapper.gravity-theme .gfield_list_group_item input, .gform_wrapper.gravity-theme .gfield_list_group_item select {
+		width: 100%;
+	}
+
+.gform_wrapper.gravity-theme .gfield_header_item--icons, .gform_wrapper.gravity-theme .gfield_list_icons {
 		width: 48px;
 		flex: none;
 		display: flex;
@@ -914,30 +968,13 @@ to no.
 	}
 
 .gform_wrapper.gravity-theme .gfield_list_icons button:hover, .gform_wrapper.gravity-theme .gfield_list_icons button:focus {
-		opacity: 1.0;
+		opacity: 1;
 		outline: none;
 	}
 
 .gform_wrapper.gravity-theme .gfield_list_icons button.delete_list_item {
 		margin-left: 5px;
 		background-image: url('../images/list-remove.svg');
-	}
-
-.gform_wrapper.gravity-theme .gfield_header_item {
-		word-break: break-word;
-	}
-
-.gform_wrapper.gravity-theme .gfield_header_item, .gform_wrapper.gravity-theme .gfield_list_group_item {
-		flex-grow: 1;
-		width: 0;
-	}
-
-.gform_wrapper.gravity-theme .gfield_header_item + .gfield_header_item:not(:last-child), .gform_wrapper.gravity-theme .gfield_list_group_item + .gfield_list_group_item {
-		margin-left: 2%;
-	}
-
-.gform_wrapper.gravity-theme .gfield_list_group_item input, .gform_wrapper.gravity-theme .gfield_list_group_item select {
-		width: 100%;
 	}
 
 @media (max-width: 640px) {
@@ -979,11 +1016,28 @@ to no.
 			text-align: left;
 		}
 
-		.gform_wrapper.gravity-theme .gfield_header_item + .gfield_header_item:not(:last-child), .gform_wrapper.gravity-theme .gfield_list_group_item + .gfield_list_group_item {
+		.gform_wrapper.gravity-theme .gfield_header_item + .gfield_header_item:not(.gfield_header_item--icons), .gform_wrapper.gravity-theme .gfield_list_group_item + .gfield_list_group_item {
 			margin-left: 0;
 		}
-
 	}
+
+html[dir=rtl] .gform_wrapper.gravity-theme .gfield_header_item + .gfield_header_item:not(.gfield_header_item--icons), html[dir=rtl] .gform_wrapper.gravity-theme .gfield_list_group_item + .gfield_list_group_item {
+		margin-left: 0;
+		margin-right: 1rem
+	}
+
+@media (max-width: 640px) {
+	html[dir=rtl] .gform_wrapper.gravity-theme .gfield_header_item + .gfield_header_item:not(.gfield_header_item--icons), html[dir=rtl] .gform_wrapper.gravity-theme .gfield_list_group_item + .gfield_list_group_item {
+			margin-right: 0
+	}
+		}
+
+html[dir=rtl] .gform_wrapper.gravity-theme .gfield_list_icons button.delete_list_item {
+		margin-left: 0;
+		margin-right: 5px;
+	}
+
+/* Legacy List Field Styles */
 
 .gform_wrapper.gform_legacy_markup table.gfield_list.gfield_list_container {
 
@@ -1014,7 +1068,7 @@ to no.
 				word-break: break-word;
 			}
 
-.gform_wrapper.gform_legacy_markup table.gfield_list.gfield_list_container tbody td:last-child {
+.gform_wrapper.gform_legacy_markup table.gfield_list.gfield_list_container tbody td.gfield_list_icons {
 				flex-grow: unset;
 				width: 48px;
 			}
@@ -1056,13 +1110,9 @@ to no.
 
 					.gform_wrapper.gform_legacy_markup table.gfield_list.gfield_list_container tbody tr .gfield_list_icons {
 						height: 35px;
+						width: auto;
 					}
 }
-
-html[dir=rtl] .gform_wrapper.gravity-theme .gfield_header_item + .gfield_header_item:not(:last-child), html[dir=rtl] .gform_wrapper.gravity-theme .gfield_list_group_item + .gfield_list_group_item {
-		margin-left: 0;
-		margin-right: 1rem;
-	}
 
 /*
 * Credit card field styles.

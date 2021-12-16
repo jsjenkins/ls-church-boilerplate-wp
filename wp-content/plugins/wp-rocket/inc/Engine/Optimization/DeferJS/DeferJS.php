@@ -27,6 +27,7 @@ class DeferJS {
 		'rev_slider_wrapper',
 		'FB3D_CLIENT_LOCALE',
 		'ewww_webp_supported',
+		'anr_captcha_field_div',
 	];
 
 	/**
@@ -74,6 +75,10 @@ class DeferJS {
 		}
 
 		$exclude_defer_js = implode( '|', $this->get_excluded() );
+
+		if ( ! @preg_replace( '#(' . $exclude_defer_js . ')#i', '', 'dummy-string' ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			return $html;
+		}
 
 		foreach ( $matches as $tag ) {
 			if ( preg_match( '#(' . $exclude_defer_js . ')#i', $tag['url'] ) ) {
@@ -219,6 +224,7 @@ class DeferJS {
 			'/wp-includes/js/dist/vendor/wp-polyfill(.min)?.js',
 			'/wp-includes/js/dist/url(.min)?.js',
 			'/wp-includes/js/dist/hooks(.min)?.js',
+			'www.paypal.com/sdk/js',
 		];
 
 		$exclude_defer_js = array_unique( array_merge( $exclude_defer_js, $this->options->get( 'exclude_defer_js', [] ) ) );

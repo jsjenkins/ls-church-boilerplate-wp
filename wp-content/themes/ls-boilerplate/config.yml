@@ -2,7 +2,12 @@
 PORT: 8000
 
 # Your project's server will proxy this localhost address
-LOCALHOST: localhost.boilerplate
+LOCALHOST: wordpress.localhost
+
+SSL:
+  status: true
+  key: "/opt/homebrew/etc/httpd/certs/localhost-key.pem"
+  cert: "/opt/homebrew/etc/httpd/certs/localhost.pem"
 
 # Gulp will reference these paths when it copies files
 PATHS:

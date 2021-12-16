@@ -2,6 +2,6 @@
   "name": "landslidecreative/wp-rocket",
   "type": "wordpress-plugin",
   "require": {
-    "composer/installers": "v1.5.0"
+    "composer/installers": "^1.5.0"
   }
 }

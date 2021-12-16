@@ -118,11 +118,22 @@ function images() {
     .pipe(gulp.dest(PATHS.dist + '/assets/img'));
 }
 
-// Start a server with BrowserSync to preview the site in
 function server(done) {
-  browser.init({
-    proxy: LOCALHOST, port: PORT
-  }, done);
+  if (SSL.status) {
+    browser.init({
+      proxy: LOCALHOST,
+      https: {
+        cert: SSL.cert,
+        key: SSL.key,
+      },
+      port: PORT
+    }, done);
+  } else {
+    browser.init({
+      proxy: LOCALHOST,
+      port: PORT
+    }, done);
+  }
 }
 
 // Reload the browser with BrowserSync

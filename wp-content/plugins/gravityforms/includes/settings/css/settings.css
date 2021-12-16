@@ -1779,7 +1779,7 @@ html[dir="rtl"] .gform-settings-field__text-append {
 
 }
 
-.gform-settings-field__date_time button {
+.gform-settings-field__date_time .ui-datepicker-trigger {
 
 	-webkit-appearance: none;
 	-moz-appearance: none;
@@ -2196,6 +2196,10 @@ html:not([dir="rtl"]) .gform-settings-input__container--with-merge-tag .wp-edito
 	width: 1rem;
 
 }
+
+.gform-table.gform-table--license-ui .gform-icon--cog {
+		font-size: 1.125rem;
+	}
 
 .gform-results {
 

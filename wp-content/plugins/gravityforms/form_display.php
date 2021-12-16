@@ -414,11 +414,11 @@ class GFFormDisplay {
 		$fields = array();
 		foreach ( $form['fields'] as $field ) {
 			/* @var GF_Field $field */
-			if ( GFCommon::is_product_field( $field->type ) || $field->type == 'donation' || $field->type === 'consent' ) {
+			if ( $field->is_state_validation_supported() ) {
 				$value = RGFormsModel::get_field_value( $field, $field_values, false );
 				$value = $field->get_value_default_if_empty( $value );
 
-				switch ( $field->inputType ) {
+				switch ( $field->get_input_type() ) {
 					case 'calculation' :
 					case 'singleproduct' :
 					case 'hiddenproduct' :
@@ -1282,7 +1282,17 @@ class GFFormDisplay {
 				}
 			}
 
-			return $progress_confirmation;
+			/**
+			 * Filters the form confirmation text.
+			 *
+			 * This filter allows the form confirmation text to be programmatically changed before it is rendered to the page.
+			 *
+			 * @since 2.5.15
+			 *
+			 * @param string  $progress_confirmation Confirmation text to be filtered.
+			 * @param array $form The current form object
+			 */
+			return gf_apply_filters( array( 'gform_get_form_confirmation_filter', $form_id ), $progress_confirmation, $form );
 		}
 	}
 
@@ -2051,12 +2061,7 @@ class GFFormDisplay {
 
 		global $_gf_state;
 
-		//if field can be populated dynamically, disable state validation
-		if ( $field->allowsPrepopulate ) {
-			return false;
-		} else if ( ! GFCommon::is_product_field( $field->type ) && $field->type != 'donation' && $field->type != 'consent' ) {
-			return false;
-		} else if ( ! in_array( $field->inputType, array( 'singleshipping', 'singleproduct', 'hiddenproduct', 'checkbox', 'radio', 'select', 'consent' ) ) ) {
+		if ( ! $field->is_state_validation_supported() ) {
 			return false;
 		}
 

@@ -39,8 +39,12 @@ class ServiceProvider extends AbstractServiceProvider {
 		'pdfembedder',
 		'divi',
 		'mod_pagespeed',
+		'adthrive',
+		'autoptimize',
 		'wp-meteor',
 		'revolution_slider_subscriber',
+		'wordfence_subscriber',
+		'ezoic',
 	];
 
 	/**
@@ -77,6 +81,7 @@ class ServiceProvider extends AbstractServiceProvider {
 			->share( 'divi', 'WP_Rocket\ThirdParty\Themes\Divi' )
 			->addArgument( $this->getContainer()->get( 'options_api' ) )
 			->addArgument( $options )
+			->addArgument( $this->getContainer()->get( 'delay_js_html' ) )
 			->addTag( 'common_subscriber' );
 		$this->getContainer()
 			->share( 'avada_subscriber', 'WP_Rocket\ThirdParty\Themes\Avada' )
@@ -126,12 +131,23 @@ class ServiceProvider extends AbstractServiceProvider {
 			->share( 'mod_pagespeed', 'WP_Rocket\ThirdParty\Plugins\ModPagespeed' )
 			->addTag( 'common_subscriber' );
 		$this->getContainer()
-			->share( 'wp-meteor', 'WP_Rocket\ThirdParty\Plugins\Optimization\WPMeteor' )
-			->addArgument( $this->getContainer()->get( 'options_api' ) )
+			->share( 'adthrive', 'WP_Rocket\ThirdParty\Plugins\Ads\Adthrive' )
+			->addTag( 'common_subscriber' );
+		$this->getContainer()
+			->share( 'autoptimize', 'WP_Rocket\ThirdParty\Plugins\Optimization\Autoptimize' )
 			->addArgument( $options )
 			->addTag( 'common_subscriber' );
 		$this->getContainer()
+			->share( 'wp-meteor', 'WP_Rocket\ThirdParty\Plugins\Optimization\WPMeteor' )
+			->addTag( 'common_subscriber' );
+		$this->getContainer()
 			->share( 'revolution_slider_subscriber', 'WP_Rocket\ThirdParty\Plugins\RevolutionSlider' )
+			->addTag( 'common_subscriber' );
+		$this->getContainer()
+			->share( 'wordfence_subscriber', 'WP_Rocket\ThirdParty\Plugins\Security\WordFenceCompatibility' )
+			->addTag( 'common_subscriber' );
+		$this->getContainer()
+			->share( 'ezoic', 'WP_Rocket\ThirdParty\Plugins\Optimization\Ezoic' )
 			->addTag( 'common_subscriber' );
 	}
 }
