@@ -8,33 +8,57 @@
 // Vertical padding
 @mixin vertical-padding( $value:1, $top:true, $bottom:true ) {
   @if $top {
-    padding-top: rem-calc(map-get($grid-row-gutter, 'small')*$value);
+    padding-top: rem-calc(map-get($grid-vertical-gutters, 'small')*$value);
     @include breakpoint(medium) {
-      padding-top: rem-calc(map-get($grid-row-gutter, 'medium')*$value);
+      padding-top: rem-calc(map-get($grid-vertical-gutters, 'medium')*$value);
     }
     @include breakpoint(large) {
-      padding-top: rem-calc(map-get($grid-row-gutter, 'large')*$value);
+      padding-top: rem-calc(map-get($grid-vertical-gutters, 'large')*$value);
     }
   }
 
   @if $bottom {
-    padding-bottom: rem-calc(map-get($grid-row-gutter, 'small')*$value);
+    padding-bottom: rem-calc(map-get($grid-vertical-gutters, 'small')*$value);
     @include breakpoint(medium) {
-      padding-bottom: rem-calc(map-get($grid-row-gutter, 'medium')*$value);
+      padding-bottom: rem-calc(map-get($grid-vertical-gutters, 'medium')*$value);
     }
     @include breakpoint(large) {
-      padding-bottom: rem-calc(map-get($grid-row-gutter, 'large')*$value);
+      padding-bottom: rem-calc(map-get($grid-vertical-gutters, 'large')*$value);
     }
   }
 }
 
+// Vertical margin
+@mixin vertical-margin( $value:1, $top:true, $bottom:true ) {
+  @if $top {
+    margin-top: rem-calc(map-get($grid-vertical-gutters, 'small')*$value);
+    @include breakpoint(medium) {
+      margin-top: rem-calc(map-get($grid-vertical-gutters, 'medium')*$value);
+    }
+    @include breakpoint(large) {
+      margin-top: rem-calc(map-get($grid-vertical-gutters, 'large')*$value);
+    }
+  }
+
+  @if $bottom {
+    margin-bottom: rem-calc(map-get($grid-vertical-gutters, 'small')*$value);
+    @include breakpoint(medium) {
+      margin-bottom: rem-calc(map-get($grid-vertical-gutters, 'medium')*$value);
+    }
+    @include breakpoint(large) {
+      margin-bottom: rem-calc(map-get($grid-vertical-gutters, 'large')*$value);
+    }
+  }
+}
+
+// Vertical deduct padding
 @mixin deduct-padding( $value:1 ) {
-  margin-bottom: rem-calc(map-get($grid-row-gutter, 'small')*-$value);
+  margin-bottom: rem-calc(map-get($grid-vertical-gutters, 'small')*-$value);
   @include breakpoint(medium) {
-    margin-bottom: rem-calc(map-get($grid-row-gutter, 'medium')*-$value);
+    margin-bottom: rem-calc(map-get($grid-vertical-gutters, 'medium')*-$value);
   }
   @include breakpoint(large) {
-    margin-bottom: rem-calc(map-get($grid-row-gutter, 'large')*-$value);
+    margin-bottom: rem-calc(map-get($grid-vertical-gutters, 'large')*-$value);
   }
 }
 
@@ -61,6 +85,40 @@
   }
 }
 
+// Horizontal margin
+@mixin horizontal-margin( $value:1, $left:true, $right:true ) {
+  @if $left {
+    margin-left: rem-calc(map-get($grid-column-gutter, 'small')*$value);
+    @include breakpoint(medium) {
+      margin-left: rem-calc(map-get($grid-column-gutter, 'medium')*$value);
+    }
+    @include breakpoint(large) {
+      margin-left: rem-calc(map-get($grid-column-gutter, 'large')*$value);
+    }
+  }
+
+  @if $right {
+    margin-right: rem-calc(map-get($grid-column-gutter, 'small')*$value);
+    @include breakpoint(medium) {
+      margin-right: rem-calc(map-get($grid-column-gutter, 'medium')*$value);
+    }
+    @include breakpoint(large) {
+      margin-right: rem-calc(map-get($grid-column-gutter, 'large')*$value);
+    }
+  }
+}
+
+// Card padding
+@mixin card-padding( $value:1 ) {
+  padding: rem-calc(map-get($card-padding-vertical, 'small')*$value) rem-calc(map-get($card-padding-horizontal, 'small')*$value);
+  @include breakpoint(medium) {
+    padding: rem-calc(map-get($card-padding-vertical, 'medium')*$value) rem-calc(map-get($card-padding-horizontal, 'medium')*$value);
+  }
+  @include breakpoint(large) {
+    padding: rem-calc(map-get($card-padding-vertical, 'large')*$value) rem-calc(map-get($card-padding-horizontal, 'large')*$value);
+  }
+}
+
 // Remove last child bottom margin
 @mixin clean-last-child {
   &>*:last-child {
@@ -82,4 +140,17 @@
   .h1, .h2, .h3, .h4, .h5, .h6 {
     color: $white;
   }
+}
+
+// Icon styles
+@mixin icon-styles {
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

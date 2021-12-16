@@ -118,14 +118,14 @@ $breakpoint-classes: (small medium large);
 $grid-row-width: $global-width;
 $grid-column-count: 12;
 $grid-column-gutter: (
-  small: 20px,
+  small: 25px,
   medium: 35px,
   large: 40px
 );
 $grid-row-gutter: (
-  small: 40px,
-  medium: 50px,
-  large: 60px
+  small: 45px,
+  medium: 65px,
+  large: 70px
 );
 $grid-column-align-edge: true;
 $grid-column-alias: 'columns';
@@ -143,14 +143,29 @@ $grid-margin-gutters: (
   large: 40px
 );
 $grid-vertical-gutters: (
-  small: 40px,
-  medium: 50px,
-  large: 60px
+  small: 45px,
+  medium: 65px,
+  large: 70px
 );
 $grid-padding-gutters: $grid-margin-gutters;
 $grid-container-padding: $grid-padding-gutters;
 $grid-container-max: $global-width;
 $xy-block-grid-max: 8;
+
+// 3c. Card Padding
+// ----------------
+
+$card-padding-horizontal: (
+  small: 20px,
+  medium: 25px,
+  large: 30px
+);
+$card-padding-vertical: (
+  small: 15px,
+  medium: 20px,
+  large: 25px
+);
+
 
 // 4. Base Typography
 // ------------------

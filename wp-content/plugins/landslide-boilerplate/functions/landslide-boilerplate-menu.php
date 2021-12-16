@@ -37,7 +37,8 @@ function remove_pages_from_menu() {
     remove_menu_page( 'edit-comments.php');
 
     $admins = array( 
-        'landslide'
+        'landslide',
+        'landslide_hannah'
     );
 
     $current_user = wp_get_current_user();
@@ -52,7 +53,8 @@ add_action( 'admin_menu', 'remove_pages_from_menu' );
 // Remove ACF editing rights
 function ls_acf_show_admin($show) {
     $admins = array( 
-        'landslide'
+        'landslide',
+        'landslide_hannah'
     );
 
     $current_user = wp_get_current_user();
