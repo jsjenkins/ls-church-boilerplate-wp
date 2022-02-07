@@ -1067,7 +1067,7 @@ class GF_Field extends stdClass implements ArrayAccess {
 	 * @return array
 	 */
 	public function get_selected_choice( $value ) {
-		if ( empty( $value ) || is_array( $value ) || empty( $this->choices ) ) {
+		if ( rgblank( $value ) || is_array( $value ) || empty( $this->choices ) ) {
 			return array();
 		}
 
@@ -2532,6 +2532,20 @@ class GF_Field extends stdClass implements ArrayAccess {
 			$form_id,
 			$this->id,
 		), esc_html__( 'Quantity:', 'gravityforms' ), $form_id );
+	}
+
+	/**
+	 * Returns an array of key value pairs to be saved to the entry meta after saving/updating the entry.
+	 *
+	 * @since 2.5.16
+	 *
+	 * @param array $form  The form object being saved.
+	 * @param array $entry The entry object being saved
+	 *
+	 * @return array The array that contains the key/value pairs to be stored as extra meta data.
+	 */
+	public function get_extra_entry_metadata( $form, $entry ) {
+		return array();
 	}
 
 }

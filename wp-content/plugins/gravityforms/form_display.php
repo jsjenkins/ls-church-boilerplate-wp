@@ -1601,7 +1601,6 @@ class GFFormDisplay {
          */
 		do_action( 'gform_entry_created', $lead, $form );
 		$lead = gf_apply_filters( array( 'gform_entry_post_save', $form['id'] ), $lead, $form );
-
 		gf_feed_processor()->save()->dispatch();
 
 		RGFormsModel::set_current_lead( $lead );
@@ -3584,7 +3583,7 @@ class GFFormDisplay {
 		$error_class      = $field->failed_validation ? 'gfield_error' : '';
 		$admin_only_class = $field->visibility == 'administrative' ? 'field_admin_only' : ''; // maintain for backwards compat
 		if ( $is_admin ) {
-			$visibility_class = 'gfield_visibility_visibile';
+			$visibility_class = 'gfield_visibility_visible';
 		} else {
 			$visibility_class = sprintf( 'gfield_visibility_%s', ( $field->visibility ? $field->visibility : 'visible' ) );
 		}

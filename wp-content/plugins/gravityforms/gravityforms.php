@@ -3,7 +3,7 @@
 Plugin Name: Gravity Forms
 Plugin URI: https://gravityforms.com
 Description: Easily create web forms and manage form entries within the WordPress admin.
-Version: 2.5.15
+Version: 2.5.16.1
 Requires at least: 4.0
 Requires PHP: 5.6
 Author: Gravity Forms
@@ -225,7 +225,7 @@ class GFForms {
 	 *
 	 * @var string $version The version number.
 	 */
-	public static $version = '2.5.15';
+	public static $version = '2.5.16.1';
 
 	/**
 	 * Handles background upgrade tasks.
@@ -272,16 +272,29 @@ class GFForms {
 
 	/**
 	* Register services and providers.
+	*
+	* @since 2.5.11
+	*
+	* @return void
 	*/
 	public static function register_services() {
 		$container = self::get_service_container();
 		$container->add_provider( new \Gravity_Forms\Gravity_Forms\Util\GF_Util_Service_Provider() );
 		$container->add_provider( new \Gravity_Forms\Gravity_Forms\License\GF_License_Service_Provider() );
+		$container->add_provider( new \Gravity_Forms\Gravity_Forms\Query\Batch_Processing\GF_Batch_Operations_Service_Provider() );
 	}
 
+	/**
+	* Get the Service Container for the plugin.
+	*
+	* @since 2.5.11
+	*
+	* @return \Gravity_Forms\Gravity_Forms\GF_Service_Container
+	*/
 	public static function get_service_container() {
 		require_once( plugin_dir_path( __FILE__ ) . '/includes/license/class-gf-license-service-provider.php' );
 		require_once( plugin_dir_path( __FILE__ ) . '/includes/util/class-gf-util-service-provider.php' );
+		require_once( plugin_dir_path( __FILE__ ) . '/includes/query/batch-processing/class-gf-batch-operations-service-provider.php' );
 
 		if ( ! empty( self::$container ) ) {
 			return self::$container;
@@ -736,6 +749,7 @@ class GFForms {
 	 * @access public
 	 */
 	public static function activation_hook() {
+		self::register_services();
 		self::init_background_upgrader();
 		gf_upgrade()->maybe_upgrade();
 	}
@@ -1685,7 +1699,7 @@ class GFForms {
 		$parent_menu = self::get_parent_menu( $addon_menus );
 
 		// Add a top-level left nav.
-		$update_icon = GFCommon::has_update() && current_user_can( 'install_plugins' ) ? "<span title='" . esc_attr( __( 'Update Available', 'gravityforms' ) ) . "' class='update-plugins count-1'><span class='update-count'>&#49;</span></span>" : '';
+		$update_icon = current_user_can( 'install_plugins' ) && GFCommon::has_update() ? "<span title='" . esc_attr( __( 'Update Available', 'gravityforms' ) ) . "' class='update-plugins count-1'><span class='update-count'>&#49;</span></span>" : '';
 
 		$admin_icon = self::get_admin_icon_b64( GFForms::is_gravity_page() ? '#fff' : '#a0a5aa' );
 
