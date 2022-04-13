@@ -655,7 +655,7 @@ gform.a11y = {};
 //------------------------------------------------
 
 /**
- * Options namespace to house common plugin and custom options objects for reuse across out JavaScript.
+ * Options namespace to house common plugin and custom options objects for reuse across our JavaScript.
  */
 
 gform.options = {
@@ -666,6 +666,7 @@ gform.options = {
      */
 
     jqEditorAccordions: {
+    	header: 'button.panel-block-tabs__toggle',
         heightStyle: 'content',
         collapsible: true,
         animate: false,
@@ -675,7 +676,19 @@ gform.options = {
         activate: function( event ) {
             gform.tools.setAttr( '.ui-accordion-header', 'tabindex', '0', event.target, 100 );
         },
-    }
+    },
+
+	jqAddFieldAccordions: {
+		heightStyle: 'content',
+		collapsible: true,
+		animate: false,
+		create: function( event ) {
+			gform.tools.setAttr( '.ui-accordion-header', 'tabindex', '0', event.target, 100 );
+		},
+		activate: function( event ) {
+			gform.tools.setAttr( '.ui-accordion-header', 'tabindex', '0', event.target, 100 );
+		},
+	},
 };
 
 //------------------------------------------------
@@ -1184,7 +1197,6 @@ function gformCalculateProductPrice(form_id, productFieldId){
 
 
 function gformGetProductQuantity(formId, productFieldId) {
-
     //If product is not selected
     if (!gformIsProductSelected(formId, productFieldId)) {
         return 0;
