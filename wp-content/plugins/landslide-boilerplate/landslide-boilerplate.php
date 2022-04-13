@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: Landslide Creative - Boilerplate
-Plugin URI: https://pathfinderstl.org
+Plugin URI: https://landslidecreative.com
 Description: Plugin that adds necessary content options for the Boilerplate theme
 Version: 1.0.0
 Author: Landslide Creative
