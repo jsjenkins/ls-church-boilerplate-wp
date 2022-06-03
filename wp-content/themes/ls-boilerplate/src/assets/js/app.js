@@ -11,6 +11,7 @@ import './lib/foundation-explicit-pieces';
 
 require('./lib/jquery.fitVids.js');
 require('./lib/jquery.matchHeight.js');
+// require('./lib/jquery.slick.js');
 
 $(document).ready(function() {
 
