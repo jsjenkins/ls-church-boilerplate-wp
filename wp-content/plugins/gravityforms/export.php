@@ -756,15 +756,25 @@ class GFExport {
 		while ( $go_to_next_page ) {
 
 			if ( version_compare( GFFormsModel::get_database_version(), '2.3-dev-1', '<' ) ) {
-				$sql = "SELECT d.field_number as field_id, d.value as value
+				$sql = $wpdb->prepare( "SELECT d.field_number as field_id, d.value as value
                     FROM {$wpdb->prefix}rg_lead_detail d
-                    WHERE d.form_id={$form['id']} AND cast(d.field_number as decimal) IN ({$field_ids})
-                    LIMIT {$offset}, {$page_size}";
+                    WHERE d.form_id=%d AND cast(d.field_number as decimal) IN (%d)
+                    LIMIT %d, %d",
+					$form['id'],
+					$field_ids,
+					$offset,
+					$page_size
+				);
 			} else {
-				$sql = "SELECT d.meta_key as field_id, d.meta_value as value
+				$sql = $wpdb->prepare( "SELECT d.meta_key as field_id, d.meta_value as value
                     FROM {$wpdb->prefix}gf_entry_meta d
-                    WHERE d.form_id={$form['id']} AND d.meta_key IN ({$field_ids})
-                    LIMIT {$offset}, {$page_size}";
+                    WHERE d.form_id=%d AND d.meta_key IN (%d)
+                    LIMIT %d, %d",
+					$form['id'],
+					$field_ids,
+					$offset,
+					$page_size
+				);
 			}
 
 
@@ -1075,12 +1085,16 @@ class GFExport {
 					}
 				}
 
-				if ( strpos( $value, '=' ) === 0 ) {
-					// Prevent Excel formulas
-					$value = "'" . $value;
+				if ( ! empty( $value ) ) {
+					if ( strpos( $value, '=' ) === 0 ) {
+						// Prevent Excel formulas
+						$value = "'" . $value;
+					}
+
+					$value = str_replace( '"', '""', $value );
 				}
 
-				$line .= '"' . str_replace( '"', '""', $value ) . '"' . $separator;
+				$line .= '"' . $value . '"' . $separator;
 			}
 		}
 
