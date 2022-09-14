@@ -3,7 +3,7 @@
 Plugin Name: Gravity Forms
 Plugin URI: https://gravityforms.com
 Description: Easily create web forms and manage form entries within the WordPress admin.
-Version: 2.6.3
+Version: 2.6.6.1
 Requires at least: 4.0
 Requires PHP: 5.6
 Author: Gravity Forms
@@ -121,7 +121,7 @@ define( 'GF_SUPPORTED_WP_VERSION', version_compare( get_bloginfo( 'version' ), G
  *
  * @var string GF_MIN_WP_VERSION_SUPPORT_TERMS The version number
  */
-define( 'GF_MIN_WP_VERSION_SUPPORT_TERMS', '5.8' );
+define( 'GF_MIN_WP_VERSION_SUPPORT_TERMS', '5.9' );
 
 /**
  * The filesystem path of the directory that contains the plugin, includes trailing slash.
@@ -236,7 +236,7 @@ class GFForms {
 	 *
 	 * @var string $version The version number.
 	 */
-	public static $version = '2.6.3';
+	public static $version = '2.6.6.1';
 
 	/**
 	 * Handles background upgrade tasks.
@@ -839,7 +839,7 @@ class GFForms {
 			$form_id = GFFormDisplay::is_submit_form_id_valid();
 
 			if ( $form_id ) {
-				GFFormDisplay::process_form( $form_id );
+				GFFormDisplay::process_form( $form_id, GFFormDisplay::SUBMISSION_INITIATED_BY_WEBFORM );
 			}
 		}
 	}
@@ -2469,7 +2469,11 @@ class GFForms {
 			'User-Agent'     => 'WordPress/' . get_bloginfo( 'version' ),
 		);
 
-		$raw_response = GFCommon::post_to_manager( 'changelog.php', GFCommon::get_remote_request_params(), $options );
+		$version_info = GFCommon::get_version_info();
+		$params       = GFCommon::get_remote_request_params();
+		$params       .= '&v_requested=' . urlencode( rgar( $version_info, 'version' ) );
+
+		$raw_response = GFCommon::post_to_manager( 'changelog.php', $params, $options );
 
 		if ( is_wp_error( $raw_response ) || 200 != $raw_response['response']['code'] ) {
 			$page_text = sprintf( esc_html__( 'Oops!! Something went wrong. %sPlease try again or %scontact us%s.', 'gravityforms' ), '<br/>', "<a href='https://www.gravityforms.com/support/'>", '</a>' );
