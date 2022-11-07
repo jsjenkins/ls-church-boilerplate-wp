@@ -36,30 +36,46 @@ function remove_pages_from_menu() {
 
     remove_menu_page( 'edit-comments.php');
 
-    $admins = array( 
-        'landslide',
-        'landslide_hannah'
-    );
-
     $current_user = wp_get_current_user();
     
-    if( !in_array($current_user->user_login, $admins) ) {
+    if( strpos($current_user->user_login, 'landslide')!==0 ) {
         remove_menu_page( 'edit.php?post_type=acf-field-group');
         remove_menu_page( 'plugins.php');
+        remove_submenu_page( 'options-general.php', 'wprocket' );
     }
 }
 add_action( 'admin_menu', 'remove_pages_from_menu' );
 
-// Remove ACF editing rights
-function ls_acf_show_admin($show) {
-    $admins = array( 
-        'landslide',
-        'landslide_hannah'
-    );
+// Remove WP Rocket options from Admin Bar
+function ls_remove_wp_rocket_admin_bar() {
 
     $current_user = wp_get_current_user();
+    
+    if( strpos($current_user->user_login, 'landslide')!==0 ) {
+        echo '<style>
+            #wp-admin-bar-wp-rocket #wp-admin-bar-rocket-settings,
+            #wp-admin-bar-wp-rocket #wp-admin-bar-docs,
+            #wp-admin-bar-wp-rocket #wp-admin-bar-faq,
+            #wp-admin-bar-wp-rocket #wp-admin-bar-support {
+                display: none !important;
+            }
+        </style>';
+    }
+}
+add_action('admin_head', 'ls_remove_wp_rocket_admin_bar');
 
-    return (in_array($current_user->user_login, $admins));
+// Remove ACF editing rights
+function ls_acf_show_admin($show) {
+
+    $current_user = wp_get_current_user();
+    
+    if( strpos($current_user->user_login, 'landslide')!==0 ) {
+        $show_acf = 0;
+    } else {
+        $show_acf = 1;
+    }
+
+    return $show_acf;
 }
 add_filter('acf/settings/show_admin', 'ls_acf_show_admin');
 

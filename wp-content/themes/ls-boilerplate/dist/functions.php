@@ -301,7 +301,6 @@ remove_filter('the_excerpt', 'wpautop'); // Remove <p> tags from Excerpt altoget
 \*------------------------------------*/
 
 // Remove extraneous dashboard widgets
-add_action('admin_init', 'ls_remove_dashboard_widgets');
 function ls_remove_dashboard_widgets()
 {
     remove_meta_box('dashboard_primary', 'dashboard', 'side');
@@ -309,6 +308,15 @@ function ls_remove_dashboard_widgets()
     remove_meta_box('dashboard_activity', 'dashboard', 'normal');
     remove_meta_box('dashboard_site_health', 'dashboard', 'normal');
 }
+add_action('admin_init', 'ls_remove_dashboard_widgets');
+
+// Remove Gutenberg CSS from the frontend
+function ls_remove_gutenberg_css(){
+ wp_dequeue_style( 'wp-block-library' );
+ wp_dequeue_style( 'wp-block-library-theme' );
+ wp_dequeue_style( 'wc-blocks-style' );
+} 
+add_action( 'wp_enqueue_scripts', 'ls_remove_gutenberg_css', 100 );
 
 function get_image_directory() 
 {

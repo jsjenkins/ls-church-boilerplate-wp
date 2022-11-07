@@ -1,9 +1,9 @@
 <?php
 
 /*
-Plugin Name: Landslide Creative - Boilerplate
-Plugin URI: https://landslidecreative.com
-Description: Plugin that adds necessary content options for the Boilerplate theme
+Plugin Name: CLIENT NAME Plugin
+Plugin URI: https://CLIENT.DOMAIN
+Description: Plugin that adds necessary content options for the CLIENT NAME theme
 Version: 1.0.0
 Author: Landslide Creative
 Author URI: https://landslidecreative.com
