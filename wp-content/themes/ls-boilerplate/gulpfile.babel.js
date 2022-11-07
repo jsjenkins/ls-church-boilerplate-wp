@@ -11,6 +11,9 @@ import webpackStream from 'webpack-stream';
 import webpack2      from 'webpack';
 import named         from 'vinyl-named';
 import autoprefixer  from 'autoprefixer';
+import bump          from 'gulp-bump';
+
+const gulpSass = require('gulp-sass')(require('sass'));
 
 // Load all Gulp plugins into one variable
 const $ = plugins();
@@ -28,7 +31,7 @@ function loadConfig() {
 
 // Build the "dist" folder by running all of the below tasks
 gulp.task('build',
- gulp.series(clean, gulp.parallel(pages, javascript, images, copy), sass));
+ gulp.series(clean, gulp.parallel(pages, javascript, images, copy), sass ));
 
 // Build the site, run the server, and watch for file changes
 gulp.task('default',
@@ -49,6 +52,16 @@ function copy() {
 
 // Copy page templates into finished HTML files
 function pages() {
+  var constant = "LS_BUILD_VERSION";
+  gulp.src('src/theme/functions.php')
+  .pipe($.if(PRODUCTION, $.bump({
+    key: constant, // for error reference
+    regex: new RegExp('([<|\'|"]?(' + constant + ')[>|\'|"]?[ ]*[:=,]?[ ]*[\'|"]?[a-z]?)(\\d+.\\d+.\\d+)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z\\.-]+)?([\'|"|<]?)', 'i')
+  })))
+  .pipe(gulp.dest(function(file){
+      return file.base;
+   }));
+  
   return gulp.src(PATHS.theme)
     .pipe(gulp.dest(PATHS.dist));
 }
@@ -64,10 +77,10 @@ function sass() {
 
   return gulp.src('src/assets/scss/app.scss')
     .pipe($.sourcemaps.init())
-    .pipe($.sass({
+    .pipe(gulpSass({
       includePaths: PATHS.sass
     })
-      .on('error', $.sass.logError))
+      .on('error', gulpSass.logError))
     .pipe($.postcss(postCssPlugins))
     .pipe($.if(PRODUCTION, $.cleanCss({ compatibility: 'ie9' })))
     .pipe($.if(!PRODUCTION, $.sourcemaps.write()))

@@ -10,6 +10,8 @@
     Theme Support
 \*------------------------------------*/
 
+define( 'LS_BUILD_VERSION', '1.0.0' );
+
 if (!isset($content_width))
 {
     $content_width = 1200;
@@ -53,7 +55,7 @@ function ls_boilerplate_header_scripts()
         wp_deregister_script( 'jquery' );
 
         // Add theme scripts
-        wp_register_script('jquery', get_template_directory_uri() . '/assets/js/app.js', array(), '1.0.0', false);
+        wp_register_script('jquery', get_template_directory_uri() . '/assets/js/app.js', array(), LS_BUILD_VERSION, false);
         wp_enqueue_script('jquery');
         
     }
@@ -72,7 +74,7 @@ function ls_boilerplate_conditional_scripts()
 function ls_boilerplate_styles()
 {
     // Custom CSS
-    wp_register_style('theme-styles', get_template_directory_uri() . '/assets/css/app.css', array(), '1.0.0');
+    wp_register_style('theme-styles', get_template_directory_uri() . '/assets/css/app.css', array(), LS_BUILD_VERSION);
     // Register CSS
     wp_enqueue_style('theme-styles');
 }
