@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e960a3fd94e7e74a578be0b1a8950137",
+    "content-hash": "711209d932a4ea7df791228d0731dca0",
     "packages": [
         {
             "name": "composer/installers",
@@ -159,16 +159,16 @@
         },
         {
             "name": "landslidecreative/advanced-custom-fields-pro",
-            "version": "5.12.3",
+            "version": "6.0.3",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jsjenkins/advanced-custom-fields-pro.git",
-                "reference": "815e2eb2cf207e149db22f83c39c953ef7129b98"
+                "reference": "5aed2e0858045427bedf0043c044783714535fae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsjenkins/advanced-custom-fields-pro/zipball/815e2eb2cf207e149db22f83c39c953ef7129b98",
-                "reference": "815e2eb2cf207e149db22f83c39c953ef7129b98",
+                "url": "https://api.github.com/repos/jsjenkins/advanced-custom-fields-pro/zipball/5aed2e0858045427bedf0043c044783714535fae",
+                "reference": "5aed2e0858045427bedf0043c044783714535fae",
                 "shasum": ""
             },
             "require": {
@@ -176,23 +176,23 @@
             },
             "type": "wordpress-plugin",
             "support": {
-                "source": "https://github.com/jsjenkins/advanced-custom-fields-pro/tree/5.12.3",
+                "source": "https://github.com/jsjenkins/advanced-custom-fields-pro/tree/6.0.3",
                 "issues": "https://github.com/jsjenkins/advanced-custom-fields-pro/issues"
             },
-            "time": "2022-07-21T15:47:01+00:00"
+            "time": "2022-10-24T17:14:28+00:00"
         },
         {
             "name": "landslidecreative/gravityforms",
-            "version": "2.6.6",
+            "version": "2.6.7",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jsjenkins/gravityforms.git",
-                "reference": "b1962bfa0b251726d0aa297bdeab71224bef6d35"
+                "reference": "668e72164a123699d01b620634bcef2445e2980c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsjenkins/gravityforms/zipball/b1962bfa0b251726d0aa297bdeab71224bef6d35",
-                "reference": "b1962bfa0b251726d0aa297bdeab71224bef6d35",
+                "url": "https://api.github.com/repos/jsjenkins/gravityforms/zipball/668e72164a123699d01b620634bcef2445e2980c",
+                "reference": "668e72164a123699d01b620634bcef2445e2980c",
                 "shasum": ""
             },
             "require": {
@@ -200,23 +200,23 @@
             },
             "type": "wordpress-plugin",
             "support": {
-                "source": "https://github.com/jsjenkins/gravityforms/tree/2.6.6",
+                "source": "https://github.com/jsjenkins/gravityforms/tree/2.6.7",
                 "issues": "https://github.com/jsjenkins/gravityforms/issues"
             },
-            "time": "2022-09-08T15:43:58+00:00"
+            "time": "2022-10-03T16:50:12+00:00"
         },
         {
             "name": "landslidecreative/wp-migrate-db-pro",
-            "version": "2.3.4",
+            "version": "2.4.2",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jsjenkins/wp-migrate-db-pro.git",
-                "reference": "2a21d64f11cd1066a87222204a891fb0d6323ae6"
+                "reference": "b7631d5d1a4f7c428551fc77375a6457b81dd2aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsjenkins/wp-migrate-db-pro/zipball/2a21d64f11cd1066a87222204a891fb0d6323ae6",
-                "reference": "2a21d64f11cd1066a87222204a891fb0d6323ae6",
+                "url": "https://api.github.com/repos/jsjenkins/wp-migrate-db-pro/zipball/b7631d5d1a4f7c428551fc77375a6457b81dd2aa",
+                "reference": "b7631d5d1a4f7c428551fc77375a6457b81dd2aa",
                 "shasum": ""
             },
             "require": {
@@ -224,23 +224,23 @@
             },
             "type": "wordpress-plugin",
             "support": {
-                "source": "https://github.com/jsjenkins/wp-migrate-db-pro/tree/2.3.4",
+                "source": "https://github.com/jsjenkins/wp-migrate-db-pro/tree/2.4.2",
                 "issues": "https://github.com/jsjenkins/wp-migrate-db-pro/issues"
             },
-            "time": "2022-09-08T15:46:44+00:00"
+            "time": "2022-10-24T17:19:27+00:00"
         },
         {
             "name": "landslidecreative/wp-rocket",
-            "version": "3.12.0",
+            "version": "3.12.2",
             "source": {
                 "type": "git",
                 "url": "git@github.com:jsjenkins/wp-rocket.git",
-                "reference": "1045eb57cbe05342c770c2ddfcc201a787fa7e2c"
+                "reference": "132a99ffa9a69497e19e6659f7779c9728feab85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsjenkins/wp-rocket/zipball/1045eb57cbe05342c770c2ddfcc201a787fa7e2c",
-                "reference": "1045eb57cbe05342c770c2ddfcc201a787fa7e2c",
+                "url": "https://api.github.com/repos/jsjenkins/wp-rocket/zipball/132a99ffa9a69497e19e6659f7779c9728feab85",
+                "reference": "132a99ffa9a69497e19e6659f7779c9728feab85",
                 "shasum": ""
             },
             "require": {
@@ -248,10 +248,10 @@
             },
             "type": "wordpress-plugin",
             "support": {
-                "source": "https://github.com/jsjenkins/wp-rocket/tree/3.12.0",
+                "source": "https://github.com/jsjenkins/wp-rocket/tree/3.12.2",
                 "issues": "https://github.com/jsjenkins/wp-rocket/issues"
             },
-            "time": "2022-09-08T15:49:37+00:00"
+            "time": "2022-11-02T21:55:11+00:00"
         },
         {
             "name": "wpackagist-plugin/classic-editor",
@@ -309,15 +309,15 @@
         },
         {
             "name": "wpackagist-plugin/safe-redirect-manager",
-            "version": "1.11.0",
+            "version": "1.11.1",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/safe-redirect-manager/",
-                "reference": "tags/1.11.0"
+                "reference": "tags/1.11.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/safe-redirect-manager.1.11.0.zip"
+                "url": "https://downloads.wordpress.org/plugin/safe-redirect-manager.1.11.1.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
@@ -345,15 +345,15 @@
         },
         {
             "name": "wpackagist-plugin/wordfence",
-            "version": "7.6.1",
+            "version": "7.7.1",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/wordfence/",
-                "reference": "tags/7.6.1"
+                "reference": "tags/7.7.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordfence.7.6.1.zip"
+                "url": "https://downloads.wordpress.org/plugin/wordfence.7.7.1.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
@@ -363,15 +363,15 @@
         },
         {
             "name": "wpackagist-plugin/wordpress-seo",
-            "version": "19.6.1",
+            "version": "19.9",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/wordpress-seo/",
-                "reference": "tags/19.6.1"
+                "reference": "tags/19.9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.19.6.1.zip"
+                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.19.9.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
