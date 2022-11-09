@@ -3,10 +3,6 @@ import 'what-input';
 
 window.$ = window.jQuery = $;
 
-// require('foundation-sites');
-
-// If you want to pick and choose which modules to include, comment out the above and uncomment
-// the line below
 import './lib/foundation-explicit-pieces';
 
 require('./lib/jquery.fitVids.js');
@@ -40,9 +36,5 @@ $(document).ready(function() {
 			$(this).attr('aria-expanded', "true");
 		}
 	});
-
-	$('.alert-bar .close-button').click( function(){
-        $(this).parent().slideUp('fast');
-    });
 
 });

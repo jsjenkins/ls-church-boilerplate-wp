@@ -1,4 +1,15 @@
-// Page sections
+// Page Header
+.page-header {
+	@include vertical-padding;
+	.cell {
+		@include clean-last-child;
+	}
+	&+.page-section.white-bg {
+		padding-top: 0;
+	}
+}
+
+// Page Sections
 .page-section {
 	@include vertical-padding;
 

@@ -1,3 +1,1 @@
-<div class="row columns">
-	<h2>Sorry, this page cannot be found.</h2>
-</div>
+<p class="large">Sorry, this content cannot be found.</p>

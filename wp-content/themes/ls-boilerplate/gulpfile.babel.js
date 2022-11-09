@@ -13,7 +13,7 @@ import named         from 'vinyl-named';
 import autoprefixer  from 'autoprefixer';
 import bump          from 'gulp-bump';
 
-const gulpSass = require('gulp-sass')(require('sass'));
+const gulpSass = require('gulp-sass')(require('sass-embedded'));
 
 // Load all Gulp plugins into one variable
 const $ = plugins();
@@ -82,7 +82,7 @@ function sass() {
     })
       .on('error', gulpSass.logError))
     .pipe($.postcss(postCssPlugins))
-    .pipe($.if(PRODUCTION, $.cleanCss({ compatibility: 'ie9' })))
+    .pipe($.if(PRODUCTION, $.cleanCss()))
     .pipe($.if(!PRODUCTION, $.sourcemaps.write()))
     .pipe(gulp.dest(PATHS.dist + '/assets/css'))
     .pipe(browser.reload({ stream: true }));

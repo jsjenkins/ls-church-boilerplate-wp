@@ -1,11 +1,12 @@
 <?php
-// Navigation functions
+/*------------------------------------*\
+    Navigation Menus
+\*------------------------------------*/
 
-function display_navigation($nav_slug)
-{
+// Display navigation wrapped in a <ul>
+function display_navigation($nav_slug) {
     if( has_nav_menu( $nav_slug ) ) {
-        wp_nav_menu(
-        array(
+        $menu_parameters = array(
             'theme_location'  => $nav_slug,
             'menu'            => '',
             'container'       => 'div',
@@ -22,13 +23,14 @@ function display_navigation($nav_slug)
             'items_wrap'      => '<ul>%3$s</ul>',
             'depth'           => 0,
             'walker'          => ''
-            )
         );
+
+        wp_nav_menu( $menu_parameters );
     }
 }
 
-function display_simple_navigation($nav_slug)
-{
+// Display navigation <li>s
+function display_simple_navigation($nav_slug) {
     if( has_nav_menu( $nav_slug ) ) {
         $menu_parameters = array(
             'theme_location'  => $nav_slug,
@@ -47,11 +49,11 @@ function ls_boilerplate_register_menu()
 {
     register_nav_menus(array( 
         'main-nav' => __('Main Navigation', 'html5blank'),
-        'mobile-nav' => __('Mobile Navigation', 'html5blank'),
         'footer-nav' => __('Footer Navigation', 'html5blank'),
         'policy-nav' => __('Policies Navigation', 'html5blank')
     ));
 }
+add_action('init', 'ls_boilerplate_register_menu');
 
 // Remove the <div> surrounding the dynamic navigation to cleanup markup
 function my_wp_nav_menu_args($args = '')
@@ -59,6 +61,4 @@ function my_wp_nav_menu_args($args = '')
     $args['container'] = false;
     return $args;
 }
-
-add_action('init', 'ls_boilerplate_register_menu');
-add_filter('wp_nav_menu_args', 'my_wp_nav_menu_args'); // Remove surrounding <div> from WP Navigation
+add_filter('wp_nav_menu_args', 'my_wp_nav_menu_args');

@@ -1,7 +1,10 @@
 <?php
-// Shortcode functions
+/*------------------------------------*\
+    Shortcodes
+\*------------------------------------*/
 
-function button_shortcode($atts, $content = null) {
+// Button shortcode
+/* function button_shortcode($atts, $content = null) {
     extract( shortcode_atts( array(
         'url' => '#',
         '_blank' => false,
@@ -16,4 +19,4 @@ function button_shortcode($atts, $content = null) {
     return '<a href="'.$url.'" class="button '.$alert_class.'"'.$new_window.'>'.$content.'</a>';
 }
 
-add_shortcode('button', 'button_shortcode');
+add_shortcode('button', 'button_shortcode'); */

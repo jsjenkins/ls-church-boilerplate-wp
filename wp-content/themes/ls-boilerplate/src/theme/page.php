@@ -1,12 +1,15 @@
 <?php get_header(); ?>
 
-<?php if (have_posts()): while (have_posts()) : the_post(); ?>
-	<main role="main" aria-label="Content">
+<main role="main" id="main-content">
+	<?php if (have_posts()): while (have_posts()) : the_post(); ?>
+
+		<?php get_template_part('partials/page', 'header'); ?>
+
 		<?php if($post->post_content != '') { ?>
-			<div class="page-section transparent-bg">
+			<div class="page-section white-bg">
 				<div class="grid-container">
 					<div class="grid-x grid-padding-x align-center">
-						<div class="large-9 cell">
+						<div class="large-10 cell">
 							<?php the_content(); ?>
 						</div>
 					</div>
@@ -15,13 +18,8 @@
 		<?php } ?>
 
 		<?php get_template_part('partials/page', 'builder'); ?>
-	</main>
 
-<?php endwhile; ?>
-<?php else: ?>
-
-	<?php get_template_part('partials/error', 'missing'); ?>
-
-<?php endif; ?>
+	<?php endwhile; endif; ?>
+</main>
 
 <?php get_footer(); ?>

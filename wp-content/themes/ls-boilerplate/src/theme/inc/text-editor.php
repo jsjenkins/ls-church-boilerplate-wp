@@ -1,4 +1,7 @@
-<?php // Text Editor Customizations
+<?php 
+/*------------------------------------*\
+    Text Editor Functions
+\*------------------------------------*/
 
 // Change formats hover style
 function fix_formats_hover() {
@@ -40,13 +43,7 @@ function custom_format_button( $buttons ) {
 }
 add_filter( 'mce_buttons', 'custom_format_button' );
 
-// Add font to admin
-/* function add_admin_font() {
-    wp_enqueue_style( 'admin-font', '' );
-}
-add_action( 'admin_enqueue_scripts', 'add_admin_font' ); */
-
-// Define custom formats
+// Create custom formats
 function add_custom_formats( $init_array ) {  
     $style_formats = array(
             array(
@@ -102,7 +99,15 @@ function add_custom_formats( $init_array ) {
 } 
 add_filter( 'tiny_mce_before_init', 'add_custom_formats' );
 
+// Add font to admin
+/* function add_admin_font() {
+    wp_enqueue_style( 'admin-font', 'FONT_CSS_URL' );
+}
+add_action( 'admin_enqueue_scripts', 'add_admin_font' ); */
+
+// Add styles to text editor
 function add_editor_styles() {
+    // add_editor_style( 'FONT_CSS_URL' );
     add_editor_style( 'assets/admin-css/text-editor.css' );
 }
 add_action( 'admin_init', 'add_editor_styles' );

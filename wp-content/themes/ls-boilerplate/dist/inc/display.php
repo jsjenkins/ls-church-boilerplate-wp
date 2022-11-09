@@ -1,4 +1,7 @@
-<?php // Display functions
+<?php
+/*------------------------------------*\
+    Display Functions
+\*------------------------------------*/
 
 // Get single featured image size URL
 function thumbnail_image_single( $size='medium' ) {

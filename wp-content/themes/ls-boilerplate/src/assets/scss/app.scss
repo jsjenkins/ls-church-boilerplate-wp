@@ -20,7 +20,7 @@
 // Generic components
 @include foundation-button;
 // @include foundation-button-group;
-@include foundation-close-button;
+// @include foundation-close-button;
 // @include foundation-label;
 // @include foundation-progress-bar;
 // @include foundation-slider;
@@ -37,7 +37,7 @@
 // @include foundation-tooltip;
 
 // Containers
-// @include foundation-accordion;
+@include foundation-accordion;
 // @include foundation-media-object;
 // @include foundation-orbit;
 // @include foundation-responsive-embed;

@@ -6,6 +6,7 @@
             "key": "field_5adf874534a5b",
             "label": "Alert Toggle",
             "name": "alert_toggle",
+            "aria-label": "",
             "type": "true_false",
             "instructions": "",
             "required": 0,
@@ -25,7 +26,8 @@
             "key": "field_5adf876234a5c",
             "label": "Alert Copy",
             "name": "alert_copy",
-            "type": "textarea",
+            "aria-label": "",
+            "type": "wysiwyg",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -35,10 +37,10 @@
                 "id": ""
             },
             "default_value": "",
-            "placeholder": "",
-            "maxlength": "",
-            "rows": 4,
-            "new_lines": "wpautop"
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
+            "delay": 0
         }
     ],
     "location": [
@@ -58,5 +60,6 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1599669461
+    "show_in_rest": 0,
+    "modified": 1667948904
 }

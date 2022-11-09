@@ -8,9 +8,31 @@ body {
 	}
 }
 
+p.large {
+	font-size: rem-calc(18);
+	@include breakpoint(medium) {
+		font-size: rem-calc(19);
+	}
+	@include breakpoint(large) {
+		font-size: rem-calc(20);
+	}
+}
+
 // Vertical center class
 .vertical-center {
 	align-items: center;
+}
+
+// Accessible but visually hidden
+.visually-hidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
 }
 
 // Reverse columns for mobile

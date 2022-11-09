@@ -1,10 +1,10 @@
 <?php
-// Sidebar functions
+/*------------------------------------*\
+    Sidebars
+\*------------------------------------*/
 
-// If Dynamic Sidebar Exists
-if (function_exists('register_sidebar'))
-{
-    // Define Main Sidebar
+// Create sidebar
+/* if (function_exists('register_sidebar')) {
     register_sidebar(array(
         'name' => __('Main Sidebar', 'html5blank'),
         'description' => __('Main sidebar for the site.', 'html5blank'),
@@ -14,4 +14,4 @@ if (function_exists('register_sidebar'))
         'before_title' => '<h3>',
         'after_title' => '</h3>'
     ));
-}
+} */

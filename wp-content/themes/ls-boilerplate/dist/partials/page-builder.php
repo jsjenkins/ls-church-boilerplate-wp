@@ -1,4 +1,7 @@
-<?php if( have_rows('page_builder') ):
+<?php 
+$page_section_counter = 1;
+
+if( have_rows('page_builder') ):
 	$section_header = '';
 	while( have_rows('page_builder') ) : the_row();
 		
@@ -143,6 +146,40 @@
 				</section>
 			<?php endif; ?>
 
+		<?php // Expandable Content
+		elseif( get_row_layout() == 'expandable_content' ): 
+			$background_color = get_sub_field('background_color'); ?>
+			<section class="page-section <?php echo $background_color; ?>-bg expandable-content">
+				<?php if($section_header!='') {
+					echo $section_header;
+					$section_header='';
+				} ?>
+				<?php if( have_rows('content') ): ?>
+					<div class="grid-container">
+						<div class="grid-x grid-padding-x align-center">
+							<div class="cell medium-10 large-8">
+								<ul class="accordion" data-accordion data-allow-all-closed="true" data-multi-expand="true">
+									<?php $item_counter = 1;
+									while ( have_rows('content') ) : the_row(); ?>
+										<li class="accordion-item" data-accordion-item>
+											<a href="#" class="accordion-title">
+												<h4><?php the_sub_field('label'); ?></h4>
+											</a>
+
+											<div class="accordion-content" data-tab-content>
+												<?php the_sub_field('copy'); ?>
+											</div>
+										</li>
+										<?php $item_counter++; 
+									endwhile; ?>
+								</ul>
+							</div>
+						</div>
+					</div>
+				<?php endif; ?>
+			</section>
+			<?php $page_section_counter++; ?>
+
 		<?php // Image Overlay
 		elseif( get_row_layout() == 'image_overlay' ):
 			$image = acf_image_array( 'background_image', TRUE );
@@ -192,5 +229,6 @@
 			</section>
 
 		<?php endif;
+		$page_section_counter++;
 	endwhile;
 endif;
