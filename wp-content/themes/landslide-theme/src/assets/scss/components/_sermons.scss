@@ -1,0 +1,47 @@
+// Sermons
+
+.sermon-filter-label {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+form#sermon-filter {
+	display: flex;
+	.select-container{
+		margin-right: 5px;
+		select {
+			min-width: 200px;
+			margin-bottom: 0;
+		}
+	}
+	.button {
+		margin-bottom: 0;
+	}
+}
+
+.sermon-list {
+	@include deduct-padding(.5);
+	@include clean-list;
+	.sermon-list-item {
+		@include vertical-margin(.5, false, true);
+		display: block;
+		color: $black;
+		text-decoration: none;
+		&:hover {
+			color: $black;
+			text-decoration: none;
+		}
+		img {
+			margin-bottom: 10px;
+		}
+	}
+}
+
+.single-sermon {
+	.single-sermon-image,
+	.single-sermon-video {
+		margin-bottom: rem-calc(25);
+	}
+	.single-sermon-description {
+		@include clean-last-child();
+	}
+}

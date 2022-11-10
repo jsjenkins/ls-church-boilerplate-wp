@@ -10,6 +10,9 @@ function custom_menu_order($menu_ord) {
         'separator1', // First separator
         'edit.php', // Posts
         'edit.php?post_type=page', // Pages
+        'edit.php?post_type=tribe_events', // Events
+        'edit.php?post_type=sermon', // Sermons
+        'edit.php?post_type=staff', // Staff
         'theme-settings', // Theme Settings
         
         'separator2', // Second separator

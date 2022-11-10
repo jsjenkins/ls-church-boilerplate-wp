@@ -64,6 +64,10 @@ function add_custom_formats( $init_array ) {
                 'title' => 'Headers',
                 'items' => array(
                     array(
+                        'title' => 'Heading 1',
+                        'block' => 'h1'
+                    ),
+                    array(
                         'title' => 'Heading 2',
                         'block' => 'h2'
                     ),

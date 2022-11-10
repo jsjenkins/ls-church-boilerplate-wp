@@ -195,6 +195,47 @@ if( have_rows('page_builder') ):
 				</div>
 			</section>
 
+		<?php // Event List
+		elseif( get_row_layout() == 'event_list' ): 
+			$background_color = get_sub_field('background_color'); 
+			$args = array(
+				'posts_per_page' => 3,
+				'start_date' => 'now'
+			);
+
+			if( get_sub_field('type')=='category' ) {
+				$args['tax_query'] = array(
+	                array(
+	                    'taxonomy' => 'tribe_events_cat',
+	                    'field' => 'term_id',
+	                    'terms' => get_sub_field('category')
+	                )
+	            );
+			}
+			$events = tribe_get_events($args, true);
+
+			if ( $events->have_posts() ) { ?>
+				<div class="page-section <?php echo $background_color; ?>-bg event-list">
+					<?php if($section_header!='') {
+						echo $section_header;
+						$section_header='';
+					} ?>
+					<div class="grid-container event-list-pb">
+						<div class="grid-x grid-padding-x">
+							<div class="cell">
+								<?php while ( $events->have_posts() ) {
+					        		$events->the_post(); ?>
+					        		<?php get_template_part('partials/event', 'list-item'); ?>
+					        	<?php } 
+					        	wp_reset_postdata(); ?>
+					        </div>
+						</div>
+					</div>
+				</div>
+			
+			<?php }
+			$section_header=''; ?>
+
 		<?php // CTA
 		elseif( get_row_layout() == 'cta' ): 
 			$background_color = get_sub_field('cta_background_color'); ?>

@@ -37,4 +37,10 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#event-filter').submit( function(){
+    	event.stopPropagation();
+		event.preventDefault();
+        window.location.href = $(this).find('select').val();
+    });
+
 });

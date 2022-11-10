@@ -80,6 +80,16 @@ function ls_remove_gutenberg_css() {
 } 
 add_action( 'wp_enqueue_scripts', 'ls_remove_gutenberg_css', 100 );
 
+// Remove extra tribe styles
+function deregister_tribe_styles() {
+    wp_deregister_style( 'tribe-events-pro-views-v2-full' );
+    wp_deregister_style( 'tribe-events-views-v2-full' );
+    wp_deregister_style( 'tribe-common-full-style' );
+    wp_deregister_style( 'tribe-events-pro-mini-calendar-block-styles' );
+    wp_deregister_style( 'tribe-events-calendar-pro-style' );
+}
+add_action( 'wp_enqueue_scripts', 'deregister_tribe_styles', 1 );
+
 // Remove 'text/css' from stylesheet
 function ls_style_type_remove($tag) {
     return preg_replace('~\s+type=["\'][^"\']++["\']~', '', $tag);

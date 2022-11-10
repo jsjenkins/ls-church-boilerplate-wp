@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e4f6cf5b100008702d3a0d35c6a39c09",
+    "content-hash": "594c781f06402f63397d1fa7004411d8",
     "packages": [
         {
             "name": "composer/installers",
@@ -180,6 +180,30 @@
                 "issues": "https://github.com/jsjenkins/advanced-custom-fields-pro/issues"
             },
             "time": "2022-10-24T17:14:28+00:00"
+        },
+        {
+            "name": "landslidecreative/events-calendar-pro",
+            "version": "6.0.2",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:jsjenkins/events-calendar-pro.git",
+                "reference": "0019fcd60d8698b77d453e2e3854e2c00ac5decc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jsjenkins/events-calendar-pro/zipball/0019fcd60d8698b77d453e2e3854e2c00ac5decc",
+                "reference": "0019fcd60d8698b77d453e2e3854e2c00ac5decc",
+                "shasum": ""
+            },
+            "require": {
+                "composer/installers": "^1.5.0"
+            },
+            "type": "wordpress-plugin",
+            "support": {
+                "source": "https://github.com/jsjenkins/events-calendar-pro/tree/6.0.2",
+                "issues": "https://github.com/jsjenkins/events-calendar-pro/issues"
+            },
+            "time": "2022-10-24T17:23:27+00:00"
         },
         {
             "name": "landslidecreative/gravityforms",
@@ -378,6 +402,24 @@
             },
             "type": "wordpress-plugin",
             "homepage": "https://wordpress.org/plugins/svg-support/"
+        },
+        {
+            "name": "wpackagist-plugin/the-events-calendar",
+            "version": "6.0.3.1",
+            "source": {
+                "type": "svn",
+                "url": "https://plugins.svn.wordpress.org/the-events-calendar/",
+                "reference": "tags/6.0.3.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://downloads.wordpress.org/plugin/the-events-calendar.6.0.3.1.zip"
+            },
+            "require": {
+                "composer/installers": "^1.0 || ^2.0"
+            },
+            "type": "wordpress-plugin",
+            "homepage": "https://wordpress.org/plugins/the-events-calendar/"
         },
         {
             "name": "wpackagist-plugin/user-switching",

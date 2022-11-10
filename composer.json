@@ -26,6 +26,10 @@
           {
                "type" : "vcs",
                "url" : "git@github.com:jsjenkins/wp-migrate-db-pro.git"
+          },
+          {
+               "type" : "vcs",
+               "url" : "git@github.com:jsjenkins/events-calendar-pro.git"
           }
      ],
      "extra" : {
@@ -46,6 +50,8 @@
           "wpackagist-plugin/query-monitor" : "3.10.1",
           "wpackagist-plugin/safe-redirect-manager" : "1.11.1",
           "wpackagist-plugin/svg-support" : "2.5.1",
+          "wpackagist-plugin/the-events-calendar" : "6.0.3.1",
+          "landslidecreative/events-calendar-pro" : "6.0.2",
           "wpackagist-plugin/user-switching" : "1.7.0",
           "wpackagist-plugin/wordfence" : "7.7.1",
           "wpackagist-plugin/wp-crontrol" : "1.14.0",

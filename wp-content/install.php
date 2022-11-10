@@ -79,9 +79,9 @@ function wp_install_defaults( $user_id ) {
 
 		$first_page .= "<p>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec convallis risus eget interdum rutrum. Praesent volutpat nisl lorem, non gravida elit commodo in. Sed varius ornare dictum. Etiam lacinia elit ac eros consectetur malesuada. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus sodales consequat risus, vel maximus metus venenatis non.</p>";
 
-		$first_page .= "<a class=\"button\" href=\"/\">Test Button</a>";
+		$first_page .= "<p><a class=\"button\" href=\"/\">Test Button</a></p>";
 
-		$first_page .= "<a class=\"button hollow\" href=\"/\">Test Button</a>";
+		$first_page .= "<p><a class=\"button hollow\" href=\"/\">Test Button</a></p>";
 	}
 
 	$first_post_guid = get_option( 'home' ) . '/?page_id=1';
