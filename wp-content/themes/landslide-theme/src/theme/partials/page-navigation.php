@@ -1,4 +1,4 @@
-<div class="navigation-container" id="main-navigation">
+<div class="navigation-container" id="main-navigation" <?php ls_sticky_nav(); ?>>
 	<div class="grid-container">
 		<div class="grid-x grid-padding-x vertical-center">
 			<div class="cell auto">

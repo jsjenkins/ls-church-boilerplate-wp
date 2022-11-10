@@ -25,7 +25,7 @@
 	        </ul>
 		</div>
 		<div class="off-canvas-content" data-off-canvas-content>
-			<header class="header" role="banner">
+			<header class="header" role="banner" <?php ls_sticky_nav( 'container' ); ?>>
 
 				<div class="accessibility-nav">
 					<a href="#main-content" class="skip-to-main">Skip to Main Content</a>

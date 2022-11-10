@@ -22,16 +22,16 @@ $(document).ready(function() {
 	$('nav.main-nav .menu-item-has-children>a, .off-canvas-navigation .menu-item-has-children>a').click(function(event) {
 		event.stopPropagation();
 		event.preventDefault();
-		if ($(this).parent().hasClass('open')) {
-			$('.open .sub-menu').slideUp('fast',
+		if ($(this).parent().hasClass('nav-open')) {
+			$('.nav-open .sub-menu').slideUp('fast',
 				function() {
-				$('.open>a').attr('aria-expanded', "false");
-			    $('.open').removeClass('open');
+				$('.nav-open>a').attr('aria-expanded', "false");
+			    $('.nav-open').removeClass('nav-open');
 			});
 		} else {
-			$('.open .sub-menu').hide();
-			$('.open').removeClass('open');
-			$(this).parent().addClass('open');
+			$('.nav-open .sub-menu').hide();
+			$('.nav-open').removeClass('nav-open');
+			$(this).parent().addClass('nav-open');
 			$(this).parent().find('.sub-menu').slideDown('fast');
 			$(this).attr('aria-expanded', "true");
 		}

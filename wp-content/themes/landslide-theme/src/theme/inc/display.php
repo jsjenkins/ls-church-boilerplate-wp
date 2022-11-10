@@ -205,3 +205,26 @@ function ls_get_times( $start, $end=NULL ) {
 
 	return $date_string;
 }
+
+/* Sticky navigation
+* 
+* To turn on sticky navigation, change $sticky to true and enable it in these Foundation files:
+*
+* - /assets/app.scss (line 57)
+* - /assets/js/lib/foundation-explicit-pieces.js (lines 30 & 77)
+*
+*/
+function ls_sticky_nav( $position='' ) {
+	// To turn on sticky navigation, change this variable to true and uncomment the sticky script and css in Foundation
+	$sticky = false;
+
+	if( $sticky ) {
+		if( $position=='container' ) {
+			echo 'data-sticky-container';
+		} else {
+			echo 'data-sticky data-margin-top="0"';
+		}
+	}
+
+	return TRUE;
+}

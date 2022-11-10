@@ -101,7 +101,7 @@ nav.main-nav {
 				  	margin-top: 10px;
 				}
 			}
-			&.menu-item-has-children.open>a {
+			&.menu-item-has-children.nav-open>a {
 				&::after {
 					border-left: 5px solid transparent;
 				  	border-right: 5px solid transparent;
@@ -175,7 +175,7 @@ ul.off-canvas-navigation {
 			  	margin-top: 8px;
 			}
 		}
-		&.menu-item-has-children.open>a {
+		&.menu-item-has-children.nav-open>a {
 			&::after {
 				border-left: 5px solid transparent;
 			  	border-right: 5px solid transparent;
