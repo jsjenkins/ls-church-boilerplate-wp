@@ -178,7 +178,6 @@ if( have_rows('page_builder') ):
 					</div>
 				<?php endif; ?>
 			</section>
-			<?php $page_section_counter++; ?>
 
 		<?php // Image Overlay
 		elseif( get_row_layout() == 'image_overlay' ):
@@ -216,6 +215,11 @@ if( have_rows('page_builder') ):
 				</div>
 			</section>
 		
+		<?php /* // Page Specific Content (Needs to be added to custom fields)
+		elseif( get_row_layout() == 'page_specific_content' ):
+			if( is_page_template( 'templates/template-sample.php' ) ) {
+				get_template_part('partials/page', 'sample');
+			} */ ?>
 
 		<?php else: ?>
 			<section class="page-section">

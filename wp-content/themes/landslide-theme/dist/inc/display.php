@@ -215,7 +215,6 @@ function ls_get_times( $start, $end=NULL ) {
 *
 */
 function ls_sticky_nav( $position='' ) {
-	// To turn on sticky navigation, change this variable to true and uncomment the sticky script and css in Foundation
 	$sticky = false;
 
 	if( $sticky ) {
