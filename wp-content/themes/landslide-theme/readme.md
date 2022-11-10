@@ -1,6 +1,6 @@
 # Landslide Creative Wordpress Theme Boilerplate
 
-This theme boilerplate is maintained by [Landslide Creative](https://landslidecreative.com) using [Foundation by Zurb](https://foundation.zurb.com/sites/docs/) (version 6.5.3) with some functionality pulled from a legacy version of [HTML5 Blank](http://html5blank.com/).
+This theme boilerplate is maintained by [Landslide Creative](https://landslidecreative.com) using [Foundation by Zurb](https://foundation.zurb.com/sites/docs/) (version 6.7.5) with some functionality pulled from a legacy version of [HTML5 Blank](http://html5blank.com/).
 
 It has a Gulp-powered build system with these features:
 
@@ -18,7 +18,7 @@ It has a Gulp-powered build system with these features:
 
 To develop this theme, your computer needs:
 
-- [NodeJS](https://nodejs.org/en/) (Version 6 or greater recommended, tested with 6.11.4 and 8.12.0)
+- [NodeJS](https://nodejs.org/en/) (Version 18 recommended)
 - [Git](https://git-scm.com/)
 
 To install the needed dependencies, open the theme folder via CLI and run:
@@ -27,14 +27,14 @@ To install the needed dependencies, open the theme folder via CLI and run:
 npm install
 ```
 
-The BrowserSync server uses a proxy to open a virtual host URL, like localhost.boilerplate, on your local development environment. To change that URL for your project, open the _config.yml_ file and update the LOCALHOST variable. This should be set to the address you use to access the homepage of your wordpress install.
+The BrowserSync server uses a proxy to open a virtual host URL, like https://landslide.localhost, on your local development environment. To change that URL for your project, open the _config.yml_ file and update the LOCALHOST variable. This should be set to the address you use to access the homepage of your wordpress install.
 
 ### Development
 
 Next, to start Gulp, run: 
 
 ```bash
-npm run build
+npm start
 ```
 
 Your finished theme will be created in a folder called `dist`, and your BrowserSync site will be viewable at this URL:
