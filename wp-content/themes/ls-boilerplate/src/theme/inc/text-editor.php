@@ -53,6 +53,11 @@ function add_custom_formats( $init_array ) {
                         'title' => 'Paragraph',
                         'block' => 'p'
                     ),
+                    array(
+                        'title' => 'Large Paragraph',
+                        'block' => 'p',
+                        'classes' => 'large'
+                    ),
                 )
             ),
             array(
@@ -87,6 +92,11 @@ function add_custom_formats( $init_array ) {
                         'title' => 'Button',
                         'inline' => 'a',
                         'classes' => 'button'
+                    ),
+                    array(
+                        'title' => 'Button - Outline',
+                        'inline' => 'a',
+                        'classes' => 'button hollow'
                     )
                 )
             ),

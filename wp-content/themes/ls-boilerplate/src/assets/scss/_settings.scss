@@ -335,7 +335,7 @@ $breadcrumbs-item-separator-color: $medium-gray;
 
 $button-font-family: inherit;
 $button-font-weight: null;
-$button-padding: 0.85em 1em;
+$button-padding: rem-calc(12) rem-calc(25);
 $button-margin: 0 0 $global-margin 0;
 $button-fill: solid;
 $button-background: $primary-color;
