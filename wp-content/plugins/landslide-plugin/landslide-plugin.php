@@ -14,9 +14,9 @@ if( ! defined( 'ABSPATH' ) ) exit;
 
 
 // check if class already exists
-if( !class_exists('landslide_boilerplate') ) :
+if( !class_exists('landslide_plugin') ) :
 
-class landslide_boilerplate {
+class landslide_plugin {
 	
 	// vars
 	var $settings;
@@ -46,15 +46,15 @@ class landslide_boilerplate {
 		);
 		
 		
-		include_once('functions/landslide-boilerplate-cpt.php');
-		include_once('functions/landslide-boilerplate-menu.php');
-		include_once('functions/landslide-boilerplate-queries.php');
+		include_once('functions/landslide-plugin-cpt.php');
+		include_once('functions/landslide-plugin-menu.php');
+		include_once('functions/landslide-plugin-queries.php');
 	}
 	
 }
 
 // initialize
-new landslide_boilerplate();
+new landslide_plugin();
 
 // class_exists check
 endif;
