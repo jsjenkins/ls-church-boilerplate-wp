@@ -40,17 +40,38 @@
 
 // Main Header
 header.header {
-	.logo {
-		max-width: 200px;
-		@include breakpoint(medium) {
-			max-width: 225px;
-		}
-		@include breakpoint(large) {
-			max-width: 275px;
-		}
-	}
 	.navigation-container {
-		@include vertical-padding(.25, true, false);
+		width: 100%;
+		padding: 15px 0;
+		background-color: rgba($white, 0);
+		transition: 200ms height;
+		@include breakpoint(medium) {
+			padding: 20px 0;
+		}
+		.logo {
+			transition: 200ms all;
+			max-width: 100%;
+			width: 200px;
+			@include breakpoint(medium) {
+				width: 225px;
+			}
+			@include breakpoint(large) {
+				width: 275px;
+			}
+		}
+		&.is-stuck {
+			background-color: rgba($white, 1);
+			box-shadow: 0 0 10px 0 rgba($black, .25);
+			.logo {
+				width: 150px;
+				@include breakpoint(medium) {
+					width: 150px;
+				}
+				@include breakpoint(large) {
+					width: 175px;
+				}
+			}
+		}
 	}
 }
 

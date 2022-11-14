@@ -2,8 +2,8 @@
 	<div class="grid-container">
 		<div class="grid-x grid-padding-x align-center vertical-center">
 			<div class="cell auto">
-				<?php if($post->post_content != '') {
-					the_content();
+				<?php if( get_field('events_header') ) {
+					the_field('events_header');
 				} else { ?>
 					<h1><?php the_title(); ?></h1>
 				<?php } ?>

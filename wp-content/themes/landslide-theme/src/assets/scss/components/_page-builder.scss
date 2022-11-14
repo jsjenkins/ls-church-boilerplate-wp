@@ -153,34 +153,22 @@
 
 // CTA
 .page-section.cta {
-	.cta-container {
-		@include horizontal-padding(1);
-		@include vertical-padding(.5);
-		background-color: $primary-color;
+	@include vertical-padding(.5);
+	@include white-text;
+	.cta-copy {
+		@include white-text;
+		@include clean-last-child;
+		margin-bottom: 15px;
 		@include breakpoint(medium) {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-		}
-		.cta-copy {
-			@include clean-last-child;
-			@include white-text;
-			margin-bottom: 15px;
-			@include breakpoint(medium) {
-				margin-bottom: 0;
-				@include horizontal-padding(1, false, true);
-			}
-		}
-		.cta-button {
-			.button.hollow {
-				border-color: $white;
-				color: $white;
-				margin-bottom: 0;
-			}
+			margin-bottom: 0;
+			@include horizontal-padding(1, false, true);
 		}
 	}
-	.white-bg+&,
-	.transparent-bg+& {
-		padding-top: 0;
+	.cta-button {
+		.button.hollow {
+			border-color: $white;
+			color: $white;
+			margin-bottom: 0;
+		}
 	}
 }

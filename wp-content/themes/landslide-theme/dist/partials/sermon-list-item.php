@@ -9,7 +9,7 @@ $speakers = get_the_terms( $post->ID, 'speaker' ); ?>
 			<div class="sermon-list-image">
 				<?php the_post_thumbnail('medium'); ?>
 			</div>
-		<?php } else if( get_field('series_art', $series[0]) ) { ?>
+		<?php } else if( $series && get_field('series_art', $series[0]) ) { ?>
 			<div class="sermon-list-image">
 				<?php acf_image_tag( 'series_art', '100vw', 'medium', FALSE, $series[0] ); ?>
 			</div>

@@ -215,13 +215,13 @@ function ls_get_times( $start, $end=NULL ) {
 *
 */
 function ls_sticky_nav( $position='' ) {
-	$sticky = false;
+	$sticky = true;
 
 	if( $sticky ) {
 		if( $position=='container' ) {
 			echo 'data-sticky-container';
 		} else {
-			echo 'data-sticky data-margin-top="0"';
+			echo 'data-sticky data-margin-top="0" data-sticky-on="small"';
 		}
 	}
 

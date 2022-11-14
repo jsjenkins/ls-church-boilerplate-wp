@@ -239,15 +239,15 @@ if( have_rows('page_builder') ):
 		<?php // CTA
 		elseif( get_row_layout() == 'cta' ): 
 			$background_color = get_sub_field('cta_background_color'); ?>
-			<section class="page-section cta">
+			<section class="page-section cta <?php echo $background_color; ?>-bg">
 				<div class="grid-container">
 					<div class="grid-x grid-padding-x align-center">
 						<div class="large-10 cell">
-							<div class="cta-container <?php echo $background_color; ?>-bg">
-								<div class="cta-copy">
+							<div class="grid-x grid-padding-x vertical-center">
+								<div class="medium-auto cell cta-copy">
 									<?php the_sub_field('copy'); ?>
 								</div>
-								<div class="cta-button">
+								<div class="medium-shrink cell cta-button">
 									<?php button_from_link( 'button', TRUE, '', ' hollow'); ?>
 								</div>
 							</div>

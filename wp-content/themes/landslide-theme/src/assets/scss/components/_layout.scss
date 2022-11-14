@@ -29,9 +29,25 @@
 		}
 	}
 
+	// Blue background
+	&.blue-bg {
+		background-color: $primary-color;
+		&+& {
+			padding-top: 0;
+		}
+	}
+
 	// Light grey background
 	&.light-grey-bg {
 		background-color: $light-gray;
+		&+& {
+			padding-top: 0;
+		}
+	}
+
+	// Dark grey background
+	&.dark-grey-bg {
+		background-color: $dark-gray;
 		&+& {
 			padding-top: 0;
 		}

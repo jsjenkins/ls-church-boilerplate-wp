@@ -11,7 +11,7 @@ if( is_archive() ) {
 			$post = $current_page;
 			setup_postdata($post); 
 			if( $post ) {
-				get_template_part('partials/page', 'header');
+				get_template_part('partials/page', 'header-event');
 			}
 			wp_reset_postdata(); ?>
 

@@ -35,7 +35,7 @@ get_header(); ?>
 							<div class="single-sermon-image">
 								<?php the_post_thumbnail('medium'); ?>
 							</div>
-						<?php } else if( get_field('series_art', $series[0]) ) { ?>
+						<?php } else if( $series && get_field('series_art', $series[0]) ) { ?>
 							<div class="single-sermon-image">
 								<?php acf_image_tag( 'series_art', '100vw', 'medium', FALSE, $series[0] ); ?>
 							</div>
