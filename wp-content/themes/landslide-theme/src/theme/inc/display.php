@@ -215,7 +215,7 @@ function ls_get_times( $start, $end=NULL ) {
 *
 */
 function ls_sticky_nav( $position='' ) {
-	$sticky = true;
+	$sticky = false;
 
 	if( $sticky ) {
 		if( $position=='container' ) {
