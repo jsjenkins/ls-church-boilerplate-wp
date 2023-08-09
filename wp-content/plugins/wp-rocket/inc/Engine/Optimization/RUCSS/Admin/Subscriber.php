@@ -68,8 +68,11 @@ class Subscriber implements Subscriber_Interface {
 			'update_option_' . $slug                  => [
 				[ 'clean_used_css_and_cache', 9, 2 ],
 				[ 'maybe_set_processing_transient', 50, 2 ],
+				[ 'maybe_unlock_preload', 9, 2 ],
+				[ 'maybe_delete_transient', 10, 2 ],
 			],
 			'switch_theme'                            => 'truncate_used_css',
+			'permalink_structure_changed'             => 'truncate_used_css',
 			'wp_trash_post'                           => 'delete_used_css_on_update_or_delete',
 			'delete_post'                             => 'delete_used_css_on_update_or_delete',
 			'clean_post_cache'                        => 'delete_used_css_on_update_or_delete',
@@ -83,6 +86,7 @@ class Subscriber implements Subscriber_Interface {
 				[ 'display_processing_notice' ],
 				[ 'display_success_notice' ],
 				[ 'display_wrong_license_notice' ],
+				[ 'display_saas_error_notice' ],
 				[ 'display_no_table_notice' ],
 				[ 'notice_write_permissions' ],
 			],
@@ -139,6 +143,30 @@ class Subscriber implements Subscriber_Interface {
 	}
 
 	/**
+	 * Maybe unlock all locked preload urls.
+	 *
+	 * @param array $old_value An array of submitted values for the settings.
+	 * @param array $value     An array of previous values for the settings.
+	 *
+	 * @return void
+	 */
+	public function maybe_unlock_preload( $old_value, $value ) {
+		if ( ! isset( $value['remove_unused_css'], $old_value['remove_unused_css'] ) ) {
+			return;
+		}
+
+		if ( $value['remove_unused_css'] === $old_value['remove_unused_css'] ) {
+			return;
+		}
+
+		if ( $value['remove_unused_css'] ) {
+			return;
+		}
+
+		do_action( 'rocket_preload_unlock_all_urls' );
+	}
+
+	/**
 	 * Deletes the used CSS when updating a term
 	 *
 	 * @since 3.10.2
@@ -183,6 +211,16 @@ class Subscriber implements Subscriber_Interface {
 
 		$this->delete_used_css_rows();
 		$this->set_notice_transient();
+
+		wp_safe_remote_get(
+			home_url(),
+			[
+				'timeout'    => 0.01,
+				'blocking'   => false,
+				'user-agent' => 'WP Rocket/Homepage Preload',
+				'sslverify'  => apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			]
+		);
 	}
 
 	/**
@@ -312,6 +350,16 @@ class Subscriber implements Subscriber_Interface {
 
 		$this->set_notice_transient();
 
+		wp_remote_get(
+			home_url(),
+			[
+				'timeout'    => 0.01,
+				'blocking'   => false,
+				'user-agent' => 'WP Rocket/Homepage Preload',
+				'sslverify'  => apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+			]
+		);
+
 		wp_safe_redirect( esc_url_raw( wp_get_referer() ) );
 		rocket_get_constant( 'WP_ROCKET_IS_TESTING', false ) ? wp_die() : exit;
 	}
@@ -409,13 +457,44 @@ class Subscriber implements Subscriber_Interface {
 	 * @return void
 	 */
 	public function display_wrong_license_notice() {
-		$transient = get_transient( 'wp_rocket_no_licence' );
+		$transient = get_option( 'wp_rocket_no_licence' );
 
 		if ( ! $transient ) {
 			return;
 		}
 
 		$this->settings->display_wrong_license_notice();
+	}
+
+	/**
+	 * Display error notice when connection to SAAS fails
+	 *
+	 * @return void
+	 */
+	public function display_saas_error_notice() {
+		$this->settings->display_saas_error_notice();
+	}
+
+
+	/**
+	 * Display admin notice when detecting any missed Action scheduler tables.
+	 *
+	 * @since 3.11.0.3
+	 *
+	 * @return void
+	 */
+	public function display_as_missed_tables_notice() {
+		$screen = get_current_screen();
+
+		if ( isset( $screen->id ) && 'tools_page_action-scheduler' === $screen->id ) {
+			return;
+		}
+
+		if ( $this->is_valid_as_tables() ) {
+			return;
+		}
+
+		$this->settings->display_as_missed_tables_notice();
 	}
 
 	/**
@@ -436,6 +515,12 @@ class Subscriber implements Subscriber_Interface {
 	 * @return void
 	 */
 	public function clear_url_usedcss() {
+		check_admin_referer( 'rocket_clear_usedcss_url' );
+
+		if ( ! current_user_can( 'rocket_remove_unused_css' ) ) {
+			wp_nonce_ays( '' );
+		}
+
 		$url = wp_get_referer();
 
 		if ( 0 !== strpos( $url, 'http' ) ) {
@@ -660,7 +745,7 @@ class Subscriber implements Subscriber_Interface {
 	 * @return bool
 	 */
 	public function disable_russ_on_wrong_license() {
-		if ( false !== get_transient( 'wp_rocket_no_licence' ) ) {
+		if ( false !== (bool) get_option( 'wp_rocket_no_licence' ) ) {
 			return false;
 		}
 		return null;
@@ -702,6 +787,30 @@ class Subscriber implements Subscriber_Interface {
 	 */
 	public function display_no_table_notice() {
 		$this->settings->display_no_table_notice();
+	}
+
+	/**
+	 * Maybe delete transient.
+	 *
+	 * @param mixed $old_value Option old value.
+	 * @param mixed $value     Option new value.
+	 *
+	 * @return void
+	 */
+	public function maybe_delete_transient( $old_value, $value ) {
+		if ( ! isset( $old_value['remove_unused_css'], $value['remove_unused_css'] ) ) {
+			return;
+		}
+
+		if ( 1 === (int) $value['remove_unused_css'] ) {
+			return;
+		}
+
+		if ( $old_value['remove_unused_css'] === $value['remove_unused_css'] ) {
+			return;
+		}
+
+		delete_transient( 'wp_rocket_no_licence' );
 	}
 
 	/**

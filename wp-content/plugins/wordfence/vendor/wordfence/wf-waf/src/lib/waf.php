@@ -363,17 +363,38 @@ auEa+7b+FGTKs7dUo2BNGR7OVifK4GZ8w/ajS0TelhrSRi3BBQCGXLzUO/UURUAh
 		}
 	}
 
+	private function handleRuleFailure($rule, $cause) {
+		global $wf_waf_failure;
+		error_log("An unexpected error occurred while processing WAF rule " . $rule->getRuleID() . ": {$cause}");
+		$wf_waf_failure = [
+			'rule_id' => $rule->getRuleID(),
+			'throwable' => $cause
+		];
+	}
+
 	/**
 	 * @throws wfWAFAllowException|wfWAFBlockException|wfWAFBlockXSSException
 	 */
 	public function runRules() {
+		global $wf_waf_failure;
 		/**
 		 * @var int $ruleID
 		 * @var wfWAFRule $rule
 		 */
 		foreach ($this->getRules() as $ruleID => $rule) {
 			if (!$this->isRuleDisabled($ruleID)) {
-				$rule->evaluate();
+				try {
+					$rule->evaluate();
+				}
+				catch (wfWAFRunException $e) {
+					throw $e;
+				}
+				catch (Exception $e) { // In PHP 5, Throwable does not exist
+					$this->handleRuleFailure($rule, $e);
+				}
+				catch (Throwable $t) {
+					$this->handleRuleFailure($rule, $t);
+				}
 			}
 		}
 
@@ -1782,6 +1803,10 @@ HTML
 		return null;
 	}
 
+	public function getVersion() {
+		return WFWAF_VERSION;
+	}
+
 }
 
 require_once __DIR__ . '/api.php';
@@ -1881,12 +1906,13 @@ class wfWAFCronFetchRulesEvent extends wfWAFCronEvent {
 		$guessSiteURL = sprintf('%s://%s/', $waf->getRequest()->getProtocol(), $waf->getRequest()->getHost());
 		try {
 			$payload = array(
-				'action'   => 'get_waf_rules',
-				'k'        => $waf->getStorageEngine()->getConfig('apiKey', null, 'synced'),
-				's'        => $waf->getStorageEngine()->getConfig('siteURL', null, 'synced') ? $waf->getStorageEngine()->getConfig('siteURL', null, 'synced') : $guessSiteURL,
-				'h'        => $waf->getStorageEngine()->getConfig('homeURL', null, 'synced') ? $waf->getStorageEngine()->getConfig('homeURL', null, 'synced') : $guessSiteURL,
-				'openssl'  => $waf->hasOpenSSL() ? 1 : 0,
-				'lang'     => $waf->getStorageEngine()->getConfig('WPLANG', null, 'synced'),
+				'action' => 'get_waf_rules',
+				'k' => $waf->getStorageEngine()->getConfig('apiKey', null, 'synced'),
+				's' => $waf->getStorageEngine()->getConfig('siteURL', null, 'synced') ? $waf->getStorageEngine()->getConfig('siteURL', null, 'synced') : $guessSiteURL,
+				'h' => $waf->getStorageEngine()->getConfig('homeURL', null, 'synced') ? $waf->getStorageEngine()->getConfig('homeURL', null, 'synced') : $guessSiteURL,
+				'openssl' => $waf->hasOpenSSL() ? 1 : 0,
+				'lang' => $waf->getStorageEngine()->getConfig('WPLANG', null, 'synced'),
+				'waf_version' => $waf->getVersion()
 			);
 			$lastRuleHash=$this->forceUpdate ? null : $waf->getStorageEngine()->getConfig('lastRuleHash', null, 'transient');
 			if($lastRuleHash!==null)
@@ -2140,8 +2166,8 @@ class wfWAFCronFetchCookieRedactionPatternsEvent extends wfWAFCronEvent {
 		$lastFailure = $storageEngine->getConfig('cookieRedactionLastUpdateFailure', null, 'transient');
 		if ($lastFailure !== null && time() - (int) $lastFailure < self::RETRY_DELAY)
 			return;
-		$api = new wfWafApi($waf);
 		try {
+			$api = new wfWafApi($waf);
 			$response = $api->actionGet('get_cookie_redaction_patterns');
 			if ($response->getStatusCode() === 200) {
 				$body = $response->getBody();
@@ -2159,7 +2185,10 @@ class wfWAFCronFetchCookieRedactionPatternsEvent extends wfWAFCronEvent {
 				error_log('Failed to retrieve cookie redaction patterns, response code: ' . $response->getStatusCode());
 			}
 		}
-		catch(wfWafApiException $e) {
+		catch (wfWafMissingApiKeyException $e) {
+			// This is intentionally ignored as the API key may be missing during initial setup of the plugin
+		}
+		catch (wfWafApiException $e) {
 			error_log('Failed to retrieve cookie redaction patterns: ' . $e->getMessage());
 		}
 		$storageEngine->setConfig('cookieRedactionLastUpdateFailure', time(), 'transient');

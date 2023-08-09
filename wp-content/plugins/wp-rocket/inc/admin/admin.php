@@ -149,6 +149,10 @@ function rocket_dismiss_boxes( $args = [] ) {
 		return;
 	}
 
+	if ( ! current_user_can( 'rocket_manage_options' ) ) {
+		wp_nonce_ays( '' );
+	}
+
 	rocket_dismiss_box( $args['box'] );
 
 	if ( 'admin-post.php' === $pagenow ) {
@@ -191,6 +195,10 @@ function rocket_deactivate_plugin() {
 		wp_nonce_ays( '' );
 	}
 
+	if ( ! current_user_can( 'rocket_manage_options' ) ) {
+		wp_nonce_ays( '' );
+	}
+
 	deactivate_plugins( sanitize_text_field( wp_unslash( $_GET['plugin'] ) ) );
 
 	wp_safe_redirect( wp_get_referer() );
@@ -208,11 +216,11 @@ function rocket_do_options_export() {
 		wp_nonce_ays( '' );
 	}
 
-	$site_name = get_rocket_parse_url( get_home_url() );
-	$site_name = $site_name['host'] . $site_name['path'];
-	$filename  = sprintf( 'wp-rocket-settings-%s-%s-%s.json', $site_name, date( 'Y-m-d' ), uniqid() ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
-	$gz        = 'gz' . strrev( 'etalfed' );
-	$options   = wp_json_encode( get_option( WP_ROCKET_SLUG ), JSON_PRETTY_PRINT ); // do not use get_rocket_option() here.
+	if ( ! current_user_can( 'rocket_manage_options' ) ) {
+		wp_nonce_ays( '' );
+	}
+
+	list( $filename, $options ) = rocket_export_options();
 	nocache_headers();
 	@header( 'Content-Type: application/json' );
 	@header( 'Content-Disposition: attachment; filename="' . $filename . '"' );

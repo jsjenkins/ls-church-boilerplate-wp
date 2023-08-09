@@ -119,11 +119,11 @@ function get_rocket_config_file() { // phpcs:ignore WordPress.NamingConventions.
 		}
 
 		if ( 'secret_cache_key' === $option ) {
-			$buffer .= '$rocket_' . $option . ' = \'' . $value . "';\n";
+			$buffer .= '$rocket_' . $option . ' = \'' . sanitize_key( $value ) . "';\n";
 		}
 
 		if ( 'cache_reject_uri' === $option ) {
-			$buffer .= '$rocket_' . $option . ' = \'' . get_rocket_cache_reject_uri() . "';\n";
+			$buffer .= '$rocket_' . $option . ' = \'' . get_rocket_cache_reject_uri( true ) . "';\n";
 		}
 
 		if ( 'cache_query_strings' === $option ) {
@@ -154,6 +154,8 @@ function get_rocket_config_file() { // phpcs:ignore WordPress.NamingConventions.
 	$buffer .= '$rocket_cache_mandatory_cookies = ' . call_user_func( 'var_export', get_rocket_cache_mandatory_cookies(), true ) . ";\n";
 
 	$buffer .= '$rocket_cache_dynamic_cookies = ' . call_user_func( 'var_export', get_rocket_cache_dynamic_cookies(), true ) . ";\n";
+
+	$buffer .= '$rocket_permalink_structure = \'' . wp_slash( get_option( 'permalink_structure' ) ) . "';\n";
 
 	/** This filter is documented in inc/front/htaccess.php */
 	if ( apply_filters( 'rocket_url_no_dots', false ) ) {
@@ -231,6 +233,34 @@ function rocket_delete_config_file() {
 	list( $config_files_path ) = get_rocket_config_file();
 	foreach ( $config_files_path as $config_file ) {
 		rocket_direct_filesystem()->delete( $config_file );
+	}
+
+	// Bail out if WP Rocket is multisite.
+	if ( is_multisite() ) {
+		return;
+	}
+
+	try {
+		$config_dir = new FilesystemIterator( (string) rocket_get_constant( 'WP_ROCKET_CONFIG_PATH' ) );
+	} catch ( Exception $e ) {
+		return;
+	}
+
+	// Remove all files with php extension in the config folder.
+	foreach ( $config_dir as $file ) {
+		if ( ! $file->isFile() || 'php' !== strtolower( $file->getExtension() ) ) {
+			continue;
+		}
+
+		if ( 1 === substr_count( $file->getFilename(), '.' ) ) {
+			continue;
+		}
+
+		if ( false === strpos( rocket_direct_filesystem()->get_contents( $file->getPathname() ), '$rocket_cookie_hash' ) ) {
+			continue;
+		}
+
+		rocket_direct_filesystem()->delete( $file->getPathname() );
 	}
 }
 
@@ -473,6 +503,34 @@ function rocket_clean_cache_busting( $extensions = [ 'js', 'css' ] ) {
 }
 
 /**
+ * Returns the right path when the post is trashed.
+ *
+ * @param array $parsed_url current parsed url.
+ * @param int   $post_id      ID from the post.
+ *
+ * @return array
+ */
+function rocket_maybe_find_right_trash_url( array $parsed_url, int $post_id ) {
+
+	$post = get_post( $post_id );
+
+	if ( ! $post || 'trash' !== $post->post_status ) {
+		return $parsed_url;
+	}
+
+	$post->post_status = 'publish';
+
+	$permalink = get_permalink( $post );
+
+	if ( ! $permalink ) {
+		return $parsed_url;
+	}
+
+	$new_permalink = str_replace( '__trashed', '', $permalink );
+	return get_rocket_parse_url( $new_permalink );
+}
+
+/**
  * Delete one or several cache files.
  *
  * @since 3.5.5 Optimizes by grabbing root cache dirs once, bailing out when file/dir doesn't exist, & directly
@@ -514,7 +572,6 @@ function rocket_clean_files( $urls, $filesystem = null ) {
 	do_action( 'before_rocket_clean_files', $urls ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals
 
 	foreach ( $urls as $url ) {
-
 		/**
 		 * Fires before the cache file is deleted.
 		 *
@@ -532,7 +589,25 @@ function rocket_clean_files( $urls, $filesystem = null ) {
 
 		if ( ! empty( $parsed_url['host'] ) ) {
 			foreach ( _rocket_get_cache_dirs( $parsed_url['host'], $cache_path ) as $dir ) {
+				// Decode url path.
+				$url_chunks = explode( '/', $parsed_url['path'] );
+				$matches    = preg_grep( '/%/', $url_chunks );
+
+				if ( ! empty( $matches ) ) {
+					$parsed_url['path'] = rawurldecode( $parsed_url['path'] );
+				}
+
+				// Encode Non-latin characters if found in url path.
+				if ( false !== preg_match_all( '/(?<non_latin>[^\x00-\x7F]+)/', $parsed_url['path'], $matches ) ) {
+					$cb_encode_non_latin = function( $non_latin ) {
+						return strtolower( rawurlencode( $non_latin ) );
+					};
+
+					$parsed_url['path'] = str_replace( $matches['non_latin'], array_map( $cb_encode_non_latin, $matches['non_latin'] ), $parsed_url['path'] );
+				}
+
 				$entry = $dir . $parsed_url['path'];
+
 				// Skip if the dir/file does not exist.
 				if ( ! $filesystem->exists( $entry ) ) {
 					continue;
@@ -661,6 +736,10 @@ function rocket_clean_home( $lang = '' ) {
  * @return void
  */
 function rocket_clean_home_feeds() {
+
+	if ( ! has_filter( 'rocket_cache_reject_uri', 'wp_rocket_cache_feed' ) ) {
+		return;
+	}
 
 	$urls   = [];
 	$urls[] = get_feed_link();
@@ -878,7 +957,7 @@ function rocket_clean_user( $user_id, $lang = '' ) {
 		return;
 	}
 
-	$user_key = $user->user_login . '-' . get_rocket_option( 'secret_cache_key' );
+	$user_key = rawurlencode( $user->user_login ) . '-' . get_rocket_option( 'secret_cache_key' );
 
 	foreach ( $urls as $url ) {
 		$parse_url = get_rocket_parse_url( $url );
@@ -888,7 +967,9 @@ function rocket_clean_user( $user_id, $lang = '' ) {
 			$parse_url['host'] = str_replace( '.', '_', $parse_url['host'] );
 		}
 
-		$root = rocket_get_constant( 'WP_ROCKET_CACHE_PATH' ) . $parse_url['host'] . '-' . $user_key . '*' . $parse_url['path'];
+		$cache_dir = $parse_url['host'] . '-' . strtolower( $user_key );
+		$cache_dir = $cache_dir . $parse_url['path'];
+		$root      = rocket_get_constant( 'WP_ROCKET_CACHE_PATH' ) . $cache_dir;
 
 		/**
 		 * Fires before all caching files are deleted for a specific user

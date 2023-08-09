@@ -10,6 +10,7 @@ class wfLog {
 	private $wp_version = '';
 	private $db = false;
 	private $googlePattern = '/\.(?:googlebot\.com|google\.[a-z]{2,3}|google\.[a-z]{2}\.[a-z]{2}|1e100\.net)$/i';
+	private $loginsTable, $statusTable;
 	private static $gbSafeCache = array();
 
 	/**
@@ -89,11 +90,7 @@ class wfLog {
 		$this->wp_version = $wp_version;
 		$this->hitsTable = wfDB::networkTable('wfHits');
 		$this->loginsTable = wfDB::networkTable('wfLogins');
-		$this->blocksTable = wfBlock::blocksTable();
-		$this->lockOutTable = wfDB::networkTable('wfLockedOut');
-		$this->throttleTable = wfDB::networkTable('wfThrottleLog');
 		$this->statusTable = wfDB::networkTable('wfStatus');
-		$this->ipRangesTable = wfDB::networkTable('wfBlocksAdv');
 		
 		add_filter('determine_current_user', array($this, '_userIDDetermined'), 99, 1);
 	}
@@ -917,6 +914,12 @@ class wfUserIPRange {
 		return false;
 	}
 
+	private static function repeatString($string, $count) {
+		if ($count <= 0)
+			return '';
+		return str_repeat($string, $count);
+	}
+
 	/**
 	 * Expand a compressed printable range representation of an IPv6 address.
 	 *
@@ -933,7 +936,7 @@ class wfUserIPRange {
 		}
 		$dbl_colon_pos = strpos($ip_range, '::');
 		if ($dbl_colon_pos !== false) {
-			$ip_range = str_replace('::', str_repeat(':0000',
+			$ip_range = str_replace('::', self::repeatString(':0000',
 					(($dbl_colon_pos === 0 || $dbl_colon_pos === strlen($ip_range) - 2) ? 9 : 8) - $colon_count) . ':', $ip_range);
 			$ip_range = trim($ip_range, ':');
 		}
@@ -1272,7 +1275,7 @@ class wfRequestModel extends wfModel {
 	 * @param $actionData
 	 * @return mixed|string|void
 	 */
-	public static function serializeActionData($actionData) {
+	public static function serializeActionData($actionData, $optionalKeys = array(), $maxLength = 65535) {
 		if (is_array($actionData)) {
 			foreach (self::$actionDataEncodedParams as $key) {
 				if (array_key_exists($key, $actionData)) {
@@ -1280,7 +1283,31 @@ class wfRequestModel extends wfModel {
 				}
 			}
 		}
-		return json_encode($actionData);
+		do {
+			$serialized = json_encode($actionData, JSON_UNESCAPED_SLASHES);
+			$length = strlen($serialized);
+			if ($length <= $maxLength)
+				return $serialized;
+			$excess = $length - $maxLength;
+			$truncated = false;
+			foreach ($optionalKeys as $key) {
+				if (array_key_exists($key, $actionData)) {
+					$fieldValue = $actionData[$key];
+					$fieldLength = strlen($fieldValue);
+					$truncatedLength = min($fieldLength, $excess);
+					$truncated = true;
+					if ($truncatedLength > 0) {
+						$actionData[$key] = substr($fieldValue, 0, -$truncatedLength);
+						$excess -= $truncatedLength;
+					}
+					else {
+						unset($actionData[$key]);
+						break;
+					}
+				}
+			}
+		} while ($truncated);
+		return null;
 	}
 
 	/**

@@ -101,6 +101,8 @@ class wfSupportController {
 	const ITEM_FIREWALL_BLOCKING_BYPASS_COOKIE = 'firewall-blocking-bypass-cookie';
 	const ITEM_FIREWALL_BLOCKING_BYPASS_REDIRECT = 'firewall-blocking-bypass-redirect';
 	const ITEM_FIREWALL_BLOCKING_FULL_SITE = 'firewall-blocking-full-site';
+
+	const ITEM_FIREWALL_REMOVE_OPTIMIZATION = 'firewall-remove-optimization';
 	
 	const ITEM_SCAN = 'scan';
 	const ITEM_SCAN_STATUS_OVERALL = 'scan-status-overall';
@@ -138,6 +140,7 @@ class wfSupportController {
 	const ITEM_SCAN_OPTION_EXCLUDE_PATTERNS = 'scan-option-exclude-patterns';
 	const ITEM_SCAN_OPTION_CUSTOM_MALWARE_SIGNATURES = 'scan-option-custom-malware-signatures';
 	const ITEM_SCAN_OPTION_MAX_RESUME_ATTEMPTS = 'scan-option-max-resume-attempts';
+	const ITEM_SCAN_OPTION_USE_ONLY_IPV4 = 'scan-option-use-only-ipv4';
 	const ITEM_SCAN_TIME_LIMIT = 'scan-time-limit';
 	const ITEM_SCAN_FAILS = 'scan-fails';
 	const ITEM_SCAN_FAILED_START = 'scan-failed-start';
@@ -290,6 +293,8 @@ class wfSupportController {
 			case self::ITEM_FIREWALL_BLOCKING_BYPASS_COOKIE:
 			case self::ITEM_FIREWALL_BLOCKING_BYPASS_REDIRECT:
 			case self::ITEM_FIREWALL_BLOCKING_FULL_SITE:
+
+			case self::ITEM_FIREWALL_REMOVE_OPTIMIZATION:
 				
 			case self::ITEM_SCAN:
 			case self::ITEM_SCAN_STATUS_OVERALL:
@@ -332,6 +337,7 @@ class wfSupportController {
 			case self::ITEM_SCAN_OPTION_EXCLUDE_PATTERNS:
 			case self::ITEM_SCAN_OPTION_CUSTOM_MALWARE_SIGNATURES:
 			case self::ITEM_SCAN_OPTION_MAX_RESUME_ATTEMPTS:
+			case self::ITEM_SCAN_OPTION_USE_ONLY_IPV4:
 			case self::ITEM_SCAN_RESULT_PUBLIC_CONFIG:
 			case self::ITEM_SCAN_RESULT_PLUGIN_ABANDONED:
 			case self::ITEM_SCAN_RESULT_PLUGIN_REMOVED:

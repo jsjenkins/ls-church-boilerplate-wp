@@ -344,19 +344,6 @@ class Settings {
 		// Option : fonts to preload.
 		$input['preload_fonts'] = ! empty( $input['preload_fonts'] ) ? $this->sanitize_fonts( $input['preload_fonts'] ) : [];
 
-		// Options : CloudFlare.
-		$input['do_cloudflare']               = ! empty( $input['do_cloudflare'] ) ? 1 : 0;
-		$input['cloudflare_email']            = isset( $input['cloudflare_email'] ) ? sanitize_email( $input['cloudflare_email'] ) : '';
-		$input['cloudflare_api_key']          = isset( $input['cloudflare_api_key'] ) ? sanitize_text_field( $input['cloudflare_api_key'] ) : '';
-		$input['cloudflare_zone_id']          = isset( $input['cloudflare_zone_id'] ) ? sanitize_text_field( $input['cloudflare_zone_id'] ) : '';
-		$input['cloudflare_devmode']          = isset( $input['cloudflare_devmode'] ) && is_numeric( $input['cloudflare_devmode'] ) ? (int) $input['cloudflare_devmode'] : 0;
-		$input['cloudflare_auto_settings']    = ( isset( $input['cloudflare_auto_settings'] ) && is_numeric( $input['cloudflare_auto_settings'] ) ) ? (int) $input['cloudflare_auto_settings'] : 0;
-		$input['cloudflare_protocol_rewrite'] = ! empty( $input['cloudflare_protocol_rewrite'] ) ? 1 : 0;
-
-		if ( defined( 'WP_ROCKET_CF_API_KEY' ) ) {
-			$input['cloudflare_api_key'] = WP_ROCKET_CF_API_KEY;
-		}
-
 		// Options: Sucuri cache. And yeah, there's a typo, but now it's too late to fix ^^'.
 		$input['sucury_waf_cache_sync'] = ! empty( $input['sucury_waf_cache_sync'] ) ? 1 : 0;
 
@@ -393,8 +380,7 @@ class Settings {
 
 		// Option : CDN Cnames.
 		if ( isset( $input['cdn_cnames'] ) ) {
-			$input['cdn_cnames'] = array_map( 'sanitize_text_field', $input['cdn_cnames'] );
-			$input['cdn_cnames'] = array_filter( $input['cdn_cnames'] );
+			$input['cdn_cnames'] = $this->sanitize_cdn_cnames( $input['cdn_cnames'] );
 		} else {
 			$input['cdn_cnames'] = [];
 		}
@@ -682,5 +668,35 @@ class Settings {
 		add_settings_error( 'general', 'reject_uri_global_exclusion', __( 'Sorry! Adding /(.*) in Advanced Rules > Never Cache URL(s) was not saved because it disables caching and optimizations for every page on your site.', 'rocket' ) );
 
 		return array_diff_key( $field, array_flip( array_keys( $field, '/(.*)', true ) ) );
+	}
+
+	/**
+	 * Sanitizes the CDN cnames values
+	 *
+	 * @param array $cnames Array of user submitted values for the cnames.
+	 *
+	 * @return array
+	 */
+	private function sanitize_cdn_cnames( array $cnames ) {
+		$cnames = array_map(
+			function( $cname ) {
+				$cname = trim( $cname );
+
+				if ( empty( $cname ) ) {
+					return false;
+				}
+
+				$cname_parts = get_rocket_parse_url( rocket_add_url_protocol( $cname ) );
+
+				if ( false === filter_var( $cname_parts['host'], FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME ) ) {
+					return false;
+				}
+
+				return $cname_parts['scheme'] . '://' . $cname_parts['host'] . $cname_parts['path'];
+			},
+			$cnames
+		);
+
+		return array_unique( array_filter( $cnames ) );
 	}
 }

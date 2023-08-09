@@ -58,9 +58,9 @@ function pages() {
     key: constant, // for error reference
     regex: new RegExp('([<|\'|"]?(' + constant + ')[>|\'|"]?[ ]*[:=,]?[ ]*[\'|"]?[a-z]?)(\\d+.\\d+.\\d+)(-[0-9A-Za-z.-]+)?(\\+[0-9A-Za-z\\.-]+)?([\'|"|<]?)', 'i')
   })))
-  .pipe(gulp.dest(function(file){
+    .pipe($.if(PRODUCTION, gulp.dest(function (file) {
       return file.base;
-   }));
+   })));
   
   return gulp.src(PATHS.theme)
     .pipe(gulp.dest(PATHS.dist));

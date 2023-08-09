@@ -204,6 +204,7 @@ class wfConfig {
 			'onboardingAttempt2' => array('value' => '', 'autoload' => self::DONT_AUTOLOAD, 'validation' => array('type' => self::TYPE_STRING)),
 			'onboardingAttempt3' => array('value' => '', 'autoload' => self::DONT_AUTOLOAD, 'validation' => array('type' => self::TYPE_STRING)),
 			'onboardingAttempt3Initial' => array('value' => false, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_BOOL)),
+			'onboardingDelayedAt' => array('value' => false, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_INT)),
 			'needsNewTour_dashboard' => array('value' => true, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_BOOL)),
 			'needsNewTour_firewall' => array('value' => true, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_BOOL)),
 			'needsNewTour_scan' => array('value' => true, 'autoload' => self::AUTOLOAD, 'validation' => array('type' => self::TYPE_BOOL)),
@@ -969,8 +970,12 @@ class wfConfig {
 		self::remove($name . '.lock');
 	}
 	public static function autoUpdate(){
-		// Prevent auto-update for PHP 5.2. Consider tying this into `wfVersionCheckController::PHP_DEPRECATING`.
-		if (version_compare(PHP_VERSION, '5.3', '<')) {
+		require(dirname(__FILE__) . '/wfVersionSupport.php');
+		/**
+		 * @var string $wfPHPDeprecatingVersion
+		 * @var string $wfPHPMinimumVersion
+		 */
+		if (version_compare(PHP_VERSION, $wfPHPMinimumVersion, '<')) {
 			return;
 		}
 
