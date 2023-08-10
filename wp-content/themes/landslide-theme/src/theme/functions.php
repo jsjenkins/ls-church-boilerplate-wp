@@ -341,6 +341,13 @@ require get_template_directory() . '/inc/acf.php';
 
 require get_template_directory() . '/inc/text-editor.php';
 
+
+/*------------------------------------*\
+    Global Sections
+\*------------------------------------*/
+
+require get_template_directory() . '/inc/global-sections.php';
+
 /*------------------------------------*\
     ShortCode Functions
 \*------------------------------------*/
